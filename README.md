@@ -1,10 +1,12 @@
 # OpenPointMesh
 University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Team, 2016
 
+-----
+
 ## Developer Environment Setup
 ### Linux
 #### Prerequisites
-##### Point Cloud Library 1.7 for Ubuntu
+##### Point Cloud Library 1.7 for Linux
 1. Navigate to http://www.pointclouds.org/downloads/linux.html
 2. Follow the instructions to install the PCL prebuilt binaries for your OS
 
@@ -24,6 +26,8 @@ University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Te
 5. `cd build`
 6. `cmake ..`
 7. `make`
+
+-----
 
 ### OSX 10.11 El Capitan
 #### Prerequisites
