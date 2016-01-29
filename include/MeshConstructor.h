@@ -57,6 +57,12 @@ namespace vba
 			int setOutputFilename( std::string filename , MESH_FILETYPE type );
 
 			int constructMesh();
+			
+			inline
+			std::string getInputFilename() { return input_filename; }
+			
+			inline
+			std::string getOutputFilename() { return output_filename; }
 
             void setOutputBuffer(boost::lockfree::spsc_queue<std::string>* q);
 

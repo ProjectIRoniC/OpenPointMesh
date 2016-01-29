@@ -94,9 +94,9 @@ namespace vba
 			 */
 			int setPCDDirectory( std::string directory_path );
 
-			/*Public facing function that allows the user to select which directory contains target pcd files.
-			 * The function then checks the existence of the directory and extracts all files with .pcd file
-			 * extension.
+			/*Public facing function that allows the user to select which directory contains the final stitched
+			 * cloud. The function then checks the existence of the directory and that a real file name was
+			 * given.
 			 *
 			 * @param: The string containing the absolute path where the user wants the final stitched cloud
 			 *			to be sent to.
@@ -104,7 +104,12 @@ namespace vba
 			 */
 			int setOutputPath( const std::string output_path );
 			
-
+			/*Public facing function that returns the set output path
+			 *
+			 * @return: output path string
+			 */
+			inline
+			std::string getOutputPath() { return output_path; }
 
 			/*Public facing function that accepts a function pointer. This function pointer will be passed all
 			 * the output from this function. If no function pointer is ever given, we will just default to sending

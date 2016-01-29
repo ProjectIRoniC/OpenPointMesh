@@ -5,7 +5,7 @@
  *      Author: matt
  */
 
-#include "CloudStitcher.h"
+#include "../include/CloudStitcher.h"
 
 namespace vba
 {

@@ -5,73 +5,133 @@ File:			oni-to-pcd.h
 Description:	Reads an oni file recorded using the Openni2 library and outputs point clouds (pcd files)
 */
 
-#include <pcl/io/openni2_grabber.h>
+#include <fstream>
+#include <pcl/io/openni2/openni.h>
 #include <pcl/point_cloud.h>
-#include <vector>
 #include <boost/lockfree/spsc_queue.hpp>
 
 #ifndef _ONI_TO_PCD
 #define _ONI_TO_PCD
 
-
-typedef pcl::PointCloud<pcl::PointXYZRGBA> Cloud;
-typedef Cloud::ConstPtr CloudConstPtr;
-
-namespace vba {
-	namespace oni2pcd {
-		const int DEFAULT_FRAME_SKIP = 25;
-
+namespace vba
+{
+	typedef union
+		{
+			struct
+			{
+				unsigned char Blue;
+				unsigned char Green;
+				unsigned char Red;
+				unsigned char Alpha;
+			};
+			float float_value;
+			uint32_t long_value;
+		} RGBValue;
 		
+	const int DEFAULT_FRAME_SKIP = 10;
+	
+	class OniToPcd
+	{
+		public:
+			/*Default constructor for this class, which initializes the members to default values.
+			 *
+			 */
+			OniToPcd();
 
-		/*
-		read single oni and write pcds
-		*/
-		void readOni (const char* oniFile, 
-			char* writeToDirPath = NULL, 
-			const int framesToSkip = DEFAULT_FRAME_SKIP);
+			/*Overloaded constructor
+			 *
+			 * @param: outputDirectoryPath - path to where output files will be written
+			 * @param: frameSkipModulus - how many frames to skip between reading a frame
+			 */
+			OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer );
 
-		/*
-		return directory path to write pcd files to
-		*/
-		char* getWriteDirPath (char* writeToDir = NULL);
+			/*Default destructor that deallocates the dynamically allocated members of the class.
+			 *
+			 */
+			virtual ~OniToPcd();
+		
+			/*Public facing function that accepts a function pointer. This function pointer will be passed all
+			 * the output from this function. If no function pointer is ever given, it will default to sending
+			 * all the output to standard out and standard error.
+			 *
+			 * @param: Function pointer following the signature   void functionName( std::string )
+			 */	
+			void setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _outputBuffer );
 
-		/*
-		set number of frames to skip in writing pcd files
-		*/
-		void setFrameSkip (const int framesToSkip);
+			/*Public facing function that sets the number of frames to skip between reading a frame, a
+			 * minimum value of 10 is required
+			 *
+			 * @param: number of frames to skip, if less than 10, 10 will be set by default
+			 */
+			void setFrameSkip( const int framesToSkip );
+			
+			/*Public facing function that reads an oni file and exports data as excel docs and point clouds
+			 *
+			 * @param: The string containing the absolute path pointing towards the directory containing
+			 * 			the target input oni file.
+			 * @return: 0 if the operation was successful, -1 if not.
+			 */
+			int outputOniData( std::string inputFile );
+			
+		private:
+			/*Performs class setup actions
+			 * 
+			 */
+			void init();
+			
+			/*Sends output messages to the output buffer
+			 *
+			 * @param: output - contains information to be displayed to the user
+			 * @param: error - true if the message is an error message, false otherwise
+			 */
+			void sendOutput( const std::string& output, bool error );
+			
+			/*Exports a depth frame to comma separated value (.csv) file
+			 *
+			 * @param: outFileStream - file data stream for csv output
+			 * @param: frameReference - a depth frame to output
+			 */
+			void outputFrameToCsv( std::ofstream& outFileStream, const openni::VideoFrameRef frameReference );
 
-		/*
-		assigns totalFrames, framestoRead, and currentFrame based on framesInOni
-		*/
-		void setFrameInfo (const int framesInOni);
-
-		/*
-		sets timeout based on processing
-		*/
-		void setTimeout (const int to);
-
-		/*
-		callback for our readOniFile, actually writes the pointcloud
-		*/
-        void writeCloudCb (const CloudConstPtr& cloud);
-
-        /*
-         * driver that controls the oni to pcd conversion
-         */
-        int driver(int argc, char* argv[]);
-
-        /*
-         * Pre:  _outputBuffer points to a buffer that will be maintained by external user.
-         *       _outputBuffer is not nullptr
-         * Post: global outputBuffer points to _outputBuffer
-         */
-        void setOutputBuffer(boost::lockfree::spsc_queue<std::string>* _outputBuffer);
-
-        /*
-         * Pre:  outPut contains information to be displayed to the user
-         * Post: if outputBuffer has not been initialized then output will be sent to std::cout or std::cerr
-         */
-        void sendOutput(const std::string& output, bool error);
+			/*Template Function Exports a depth and RGB frame to point cloud data (.pcd) files
+			 *
+			 * @param: outputFrameDirectory - directory to output the .pcd files
+			 * @param: device - pointer to the device with the loaded oni file
+			 * @param: depthFrameReference - depth frame to output
+			 * @param: colorFrameReference - color frame to output
+			 */
+			template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
+			outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference );
+			
+			/*Fills a RGB24 image buffer with downsampling
+			 *
+			 * @param: newWidth - width of the new buffer image
+			 * @param: newHeight - height of the new buffer image
+			 * @param: rgb_buffer - buffer to fill with the new image
+			 * @param: oldWidth - width of the input image
+			 * @param: oldHeight - height of the input image
+			 * @param: colorFrameReference - input image to copy
+			 * @param: rgb_line_step - the number of lines to step when downsampling
+			 */
+			void fillBufferRGB( unsigned newWidth, unsigned newHeight, unsigned char* rgb_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step = 0 );
+			
+			/*Fills a depth image buffer with downsampling
+			 *
+			 * @param: newWidth - width of the new buffer image
+			 * @param: newHeight - height of the new buffer image
+			 * @param: depth_buffer - buffer to fill with the new image
+			 * @param: oldWidth - width of the input image
+			 * @param: oldHeight - height of the input image
+			 * @param: depthFrameReference - input image to copy
+			 * @param: line_step - the number of lines to step when downsampling
+			 */
+			void fillBufferDepth( unsigned newWidth, unsigned newHeight, unsigned short* depth_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef depthFrameReference, unsigned line_step = 0 );
+			
+			// Private Data Members
+			unsigned frameSkip;
+			std::string outputDirPath;
+			boost::lockfree::spsc_queue<std::string>* outputBuffer;
+			bool redirectOutputFlag;
 	};
 };
 

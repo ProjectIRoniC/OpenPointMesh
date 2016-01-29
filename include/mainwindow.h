@@ -4,13 +4,9 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <string>
 #include <QPlainTextEdit>
 #include <boost/lockfree/spsc_queue.hpp>
-#include <boost/atomic.hpp>
-#include <boost/lockfree/policies.hpp>
 #include <boost/thread.hpp>
-#include <../include/MeshConstructor.h>
 
 namespace Ui {
 class MainWindow;
@@ -28,7 +24,7 @@ public:
      */
 
     /* Post: Initialize GUI object */
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow( QWidget *parent = 0 );
 
     /*
      * Destructor
@@ -41,7 +37,7 @@ private:
      * Post: Msg has been added to GUI display.
      * Note: Currently does not support is_error effect
      */
-    void appendMessage(std::string msg, const bool is_error = false);
+    void appendMessage( std::string msg, const bool is_error = false );
 
     /*
      * Pre:  outputBuffer has been initialized to a non-null object.
@@ -71,14 +67,14 @@ private slots:
     /*
      * Post: display console visibility is toggled
      */
-    void on_radioButton_toggled(bool checked);
+    void on_radioButton_toggled( bool checked );
     /*
      * Pre:  constrollerConstant must from the controller constants set
      * Post: nextstep for given constant is executed.
      * Note: This is where software flow is defined. Connect signal to a slot and call nextStep at the end of
      *       every subtask passing the controller constant for the next action to be performed
      */
-    void nextStep(const int& controllerConstant);
+    void nextStep( const int& controllerConstant );
     /*
      * Post: Opens files explorer so that the user can select an output folder. outputFolderName stores absolute path
      */
@@ -87,14 +83,14 @@ private slots:
      * Post: Display concole is moved to the cursor position
      * Note: Not sure if this is needed.
      */
-    void ensureCursorVisible(QString);
+    void ensureCursorVisible( QString );
 
 signals:
     /*
      * Pre:  msg is non-nul / non-empty.
      * Post: AppendMessage has been called with msg. EnsureCursorvisibile has also been called.
      */
-    void appendToConsole(QString msg);
+    void appendToConsole( QString msg );
 
 
     /*
@@ -104,17 +100,17 @@ signals:
      * Start is not really needed. Start is for readability. Start signal is attached to nextstep.
      * Post: nextStep has been called
      */
-    void start(int);
+    void start( int );
     /*
      * Signal that marks the end of onitToPcd conversion.
      * Post: nextStep is called
      */
-    void oniToPCDFinished(int);
+    void oniToPCDFinished( int );
     /*
      * Signal that marks the end of cloudstiching.
      * Post: nextstep is called
      */
-    void cloudStitcherFinished(int);
+    void cloudStitcherFinished( int );
 
 
 private:
@@ -133,9 +129,9 @@ private:
      */
     Ui::MainWindow *ui;
     /*
-     * Contains onifilename absolute path
+     * Contains onifilenames with absolute paths
      */
-    QString oniFileName;
+    QStringList oniFileNames;
     /*
      * Contains user desired output folder absolute path
      */
