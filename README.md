@@ -31,7 +31,7 @@ University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Te
 
 ### OSX 10.11 El Capitan
 #### Prerequisites
-##### Point Cloud Library 1.8 for Mac
+##### Point Cloud Library 1.7 for Mac
 1. Install a Java JDK (required for Homebrew only) from the Java website http://www.oracle.com/technetwork/java/javase/downloads/index.html
 2. Open a Terminal window
 3. Install Homebrew with the command `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
@@ -39,7 +39,7 @@ University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Te
 5. Enter your admin password when prompted
 6. Enter the command `brew update`
 7. Enter the command `brew tap homebrew/science`
-8. Enter the command `brew install pcl --HEAD --with-openni2` (this can take a long time to complete)
+8. Enter the command `brew install pcl --with-openni2` (this can take a long time to complete)
 
 #### Getting and Compiling the source code (Enter all commands in terminal)
 1. `sudo apt-get install git` (follow the prompts to install git)
