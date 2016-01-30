@@ -39,8 +39,6 @@ private:
      */
     void appendMessageToOutputBuffer( std::string msg, const bool is_error = false );
 
-    void addMessageToOutputQueue(std::string msg, const bool is_error = false );
-
     /*
      * Pre:  outputBuffer has been initialized to a non-null object.
      * Post: If outputBuffer is non-empty then element is send to appenedMessage
