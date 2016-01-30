@@ -67,9 +67,9 @@ void MainWindow::nextStep( const int& step )
     default :
         QString errmsg = "MESSAGE: Well this is embarassing, there seems to be an ";
         errmsg += "error with my instruction set and I not quiet sure how to fix it. ";
-        errmsg += "I affraid I cannot continue processing. Please try again later.";
+        errmsg += "I affraid I cannot continue processing. Please try again later.\n";
         appendToConsole( errmsg );
-        appendToConsole( QString("ERROR: Program execution stopped.") );
+        appendToConsole( QString("ERROR: Program execution stopped.\n") );
         break;
     }
 
@@ -87,39 +87,39 @@ void MainWindow::clearTaskThread()
 
 void MainWindow::meshConstructorController()
 {
-	appendMessage( "Start mesh constructor..." );
+    appendMessageToOutputBuffer( "Start mesh constructor...\n" );
     vba::MeshConstructor* mMeshConstructor = new vba::MeshConstructor();
 
     // pass outputbuffer
     mMeshConstructor->setOutputBuffer( this->outputBuffer );
     //just pass in a string with the path to the stitched pcd file
     mMeshConstructor->setInputFilename( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[0].toStdString(), "_finalPointCloud.pcd") );
-	appendMessage( "File used for construction " + mMeshConstructor->getInputFilename() );
+    appendMessageToOutputBuffer( "File used for construction " + mMeshConstructor->getInputFilename()  + '\n');
     //pass in a string of the output path where the final mesh should be sent. The file does not have to exist already.
     //The second parameter lets you choose the output filetype. I would just stick with PLY for now.
     mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.ply" , vba::PLY );
-    appendMessage( "Output final mesh to " + mMeshConstructor->getOutputFilename() );
+    appendMessageToOutputBuffer( "Output final mesh to " + mMeshConstructor->getOutputFilename() + '\n');
 
     //this does the rest
     mMeshConstructor->constructMesh();
 
-	appendMessage( "Mesh constructor complete." );
+    appendMessageToOutputBuffer( "Mesh constructor complete.\n" );
     delete mMeshConstructor;
     // emit meshConstructorFinished();
 }
 
 void MainWindow::cloudStitcherController()
 {
-	appendMessage( "Start point cloud stitching..." );
+    appendMessageToOutputBuffer( "Start point cloud stitching...\n" );
     vba::CloudStitcher* mCloudStitcher = new vba::CloudStitcher;
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
     
 	// Loop through each input file
 	for( unsigned h = 0; h < oniFileNames.size(); ++h )
 	{
-		appendMessage( "Working on stitching " + oniFileNames[h].toStdString() + "...\n" );
+        appendMessageToOutputBuffer( "Working on stitching " + oniFileNames[h].toStdString() + "...\n" );
 		mCloudStitcher->setOutputPath( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "_finalPointCloud.pcd") );
-		appendMessage( "Output final point cloud to " + mCloudStitcher->getOutputPath() );
+        appendMessageToOutputBuffer( "Output final point cloud to " + mCloudStitcher->getOutputPath() + '\n');
 		mCloudStitcher->stitchPCDFiles( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "") );
 	}
     
@@ -139,11 +139,11 @@ void MainWindow::on_Browse_clicked()
         oniFileNames = files;
 		
 		for( unsigned j = 0; j < oniFileNames.size(); ++j )
-			appendMessage( oniFileNames[j].toStdString() + " selected" );
+            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
     }
     else
     {
-        appendMessage( "No .ONI file selected" );
+        appendMessageToOutputBuffer( "No .ONI file selected\n" );
     }
 }
 
@@ -179,25 +179,25 @@ void MainWindow::oniToPCDController()
 {
     if( outputFolderName == "" )
 	{
-		appendMessage( "No output directory selected. Please select an output folder where you would like the final oni to go." );
+        appendMessageToOutputBuffer( "No output directory selected. Please select an output folder where you would like the final oni to go.\n" );
         return;
     }
 
     if( oniFileNames.isEmpty() )
 	{
-		appendMessage( "ERROR: Please browse for an .ONI file before clicking start." );
+        appendMessageToOutputBuffer( "ERROR: Please browse for an .ONI file before clicking start.\n" );
         return;
     }
 	
-	appendMessage( "Start oni data output..." );
-	appendMessage( "Output to " + outputFolderName.toStdString() );
+    appendMessageToOutputBuffer( "Start oni data output...\n" );
+    appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
 	unsigned frameSkipMod = 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
 	
 	// Loop through each input file
 	for( unsigned i = 0; i < oniFileNames.size(); ++i )
 	{
-		appendMessage( "Working on file " + oniFileNames[i].toStdString() );
+        appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
 	}
 	
@@ -219,10 +219,13 @@ void MainWindow::on_radioButton_toggled( bool checked )
 
 
 // ** Helper Functions ** //
-void MainWindow::appendMessage( std::string msg,const bool is_error )
+void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_error )
 {
     QString output = QString::fromStdString( msg );
-    ui->plainTextEdit->appendPlainText( output );
+    this->outputBuffer->push(msg);
+    // ui->plainTextEdit->appendPlainText( output );
+
+
 }
 void MainWindow::on_Browse_output_clicked()
 {
@@ -234,10 +237,10 @@ void MainWindow::on_Browse_output_clicked()
     if( dir.size() > 0 )
     {
         outputFolderName = QString::fromStdString( boost::filesystem::absolute(dir.toStdString()).string() );
-        appendMessage( outputFolderName.toStdString() + " selected for output", false );
+        appendMessageToOutputBuffer( outputFolderName.toStdString() + " selected for output\n", false );
     }
     else
     {
-        appendMessage( "No outputFolder Selected file selected", false );
+        appendMessageToOutputBuffer( "No outputFolder Selected file selected\n", false );
     }
 }
