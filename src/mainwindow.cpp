@@ -223,8 +223,6 @@ void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_erro
 {
     QString output = QString::fromStdString( msg );
     this->outputBuffer->push(msg);
-    // ui->plainTextEdit->appendPlainText( output );
-
 
 }
 void MainWindow::on_Browse_output_clicked()
