@@ -27,7 +27,7 @@ namespace vba
 	{
 		delete pcd_filenames;
 
-		for( int i = 0 ; i < worker_threads->size() ; ++i )
+		for( unsigned i = 0 ; i < worker_threads->size() ; ++i )
 		{
 			CloudStitcher::CloudStitchingThread* temp = this->worker_threads->at(i);
 			delete temp;
@@ -406,7 +406,7 @@ namespace vba
         //otherwise we are going to divide up the filename array as evenly as possible among all the threads
 		else
 		{
-			for( int i = 0 ; i < thread_count - 1 ; ++i )
+			for( unsigned i = 0 ; i < thread_count - 1 ; ++i )
 			{
 				std::vector< std::string >::iterator last = ( current_offset + offset );
 				std::vector< std::string > param_vec( current_offset , last );
