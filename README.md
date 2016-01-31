@@ -4,9 +4,9 @@ University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Te
 -----
 
 ## Developer Environment Setup
-### Linux
+### Ubuntu 64-bit
 #### Prerequisites
-##### Point Cloud Library 1.7 for Linux
+##### Point Cloud Library 1.7 for Ubuntu
 1. Navigate to http://www.pointclouds.org/downloads/linux.html
 2. Follow the instructions to install the PCL prebuilt binaries for your OS
 
