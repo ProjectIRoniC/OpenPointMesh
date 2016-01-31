@@ -1,30 +1,44 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(VBA)
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 FATAL_ERROR )
+PROJECT( OpenPointMesh )
 
-find_package(Qt4 REQUIRED)
-find_package(VTK REQUIRED)
-find_package(PCL 1.7 REQUIRED)
+#### Package Dependencies
+FIND_PACKAGE( Qt4 REQUIRED )
+FIND_PACKAGE( VTK REQUIRED )
+FIND_PACKAGE( PCL 1.7 REQUIRED )
 
-include_directories(${PCL_INCLUDE_DIRS} ../include)
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+#### Variables
+FILE( GLOB OPENPOINTMESH_HEADERS "include/*.h" )
+FILE( GLOB OPENPOINTMESH_SOURCES "src/*.cpp" )
+FILE( GLOB OPENPOINTMESH_FORMS "src/*.ui" )
+SET( OPENPOINTMESH_INCLUDE_DIRS "include" )
+SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/build_output" )
+SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
 
-set(PROJECT_SOURCES main.cpp oni-to-pcd.cpp mainwindow.cpp errorMsgHandler.cpp CloudStitcher.cpp PCDRegistration.cpp MeshConstructor.cpp filesystemHelper.cpp)
-set(project_HEADERS include/errorMsgHandler.h include/oni-to-pcd.h include/mainwindow.h include/CloudStitcher.h include/PCDRegistration.h include/MeshConstructor.h include/filesystemHelper.h include/OniProperties.h)
-set(project_FORMS   src/mainwindow.ui)
-set(VTK_LIBRARIES   vtkRendering vtkGraphics vtkHybrid QVTK)
-set(PROJECT_EXECS src/main.cpp src/oni-to-pcd.cpp src/errorMsgHandler.cpp src/mainwindow.cpp src/CloudStitcher.cpp src/PCDRegistration.cpp src/MeshConstructor.cpp src/filesystemHelper.cpp)
+#### Qt4 Settings
+INCLUDE( ${QT_USE_FILE} )
+QT4_WRAP_CPP( OPENPOINTMESH_HEADERS_MOC ${OPENPOINTMESH_HEADERS} )
+QT4_WRAP_UI( OPENPOINTMESH_FORMS_HEADERS ${OPENPOINTMESH_FORMS} )
 
-QT4_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
-QT4_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
+#### Build Settings
+SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
+SET( CMAKE_LIBRARIES_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
 
-INCLUDE         (${QT_USE_FILE})
-ADD_DEFINITIONS (${QT_DEFINITIONS})
+INCLUDE_DIRECTORIES(	${PCL_INCLUDE_DIRS}
+						${OPENPOINTMESH_INCLUDE_DIRS} )
 
+LINK_DIRECTORIES( ${PCL_LIBRARY_DIRS} )
 
-ADD_EXECUTABLE  (vba ${project_SOURCES}
-                                ${project_FORMS_HEADERS}
-                                ${project_HEADERS_MOC} 
-				${PROJECT_EXECS} )
-target_link_libraries(vba ${PCL_LIBRARIES} ${QT_LIBRARIES} ${VTK_LIBRARIES})
+ADD_DEFINITIONS(	${PCL_DEFINITIONS}
+					${QT_DEFINITIONS} )
+
+ADD_EXECUTABLE(	${PROJECT_NAME}
+				${OPENPOINTMESH_SOURCES}
+				${OPENPOINTMESH_FORMS_HEADERS}
+				${OPENPOINTMESH_HEADERS_MOC} )
+
+target_link_libraries(	${PROJECT_NAME}
+						${PCL_LIBRARIES}
+						${QT_LIBRARIES}
+						${VTK_LIBRARIES} )
+
 
