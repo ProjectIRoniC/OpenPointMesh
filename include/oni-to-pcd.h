@@ -71,7 +71,7 @@ namespace vba
 			 * 			the target input oni file.
 			 * @return: 0 if the operation was successful, -1 if not.
 			 */
-			int outputOniData( std::string inputFile );
+			int outputOniData( const std::string inputFile );
 			
 		private:
 			/*Performs class setup actions
@@ -84,7 +84,7 @@ namespace vba
 			 * @param: output - contains information to be displayed to the user
 			 * @param: error - true if the message is an error message, false otherwise
 			 */
-			void sendOutput( const std::string& output, bool error );
+			void sendOutput( const std::string& output, const bool error );
 			
 			/*Exports a depth frame to comma separated value (.csv) file
 			 *
@@ -101,7 +101,7 @@ namespace vba
 			 * @param: colorFrameReference - color frame to output
 			 */
 			template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
-			outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference );
+			outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference, const float fieldOfView_X, const float fieldOfView_Y );
 			
 			/*Fills a RGB24 image buffer with downsampling
 			 *
@@ -113,7 +113,7 @@ namespace vba
 			 * @param: colorFrameReference - input image to copy
 			 * @param: rgb_line_step - the number of lines to step when downsampling
 			 */
-			void fillBufferRGB( unsigned newWidth, unsigned newHeight, unsigned char* rgb_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step = 0 );
+			void fillBufferRGB( const unsigned newWidth, const unsigned newHeight, unsigned char* rgb_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step = 0 );
 			
 			/*Fills a depth image buffer with downsampling
 			 *
@@ -125,7 +125,7 @@ namespace vba
 			 * @param: depthFrameReference - input image to copy
 			 * @param: line_step - the number of lines to step when downsampling
 			 */
-			void fillBufferDepth( unsigned newWidth, unsigned newHeight, unsigned short* depth_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef depthFrameReference, unsigned line_step = 0 );
+			void fillBufferDepth( const unsigned newWidth, const unsigned newHeight, unsigned short* depth_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef depthFrameReference, unsigned line_step = 0 );
 			
 			// Private Data Members
 			unsigned frameSkip;

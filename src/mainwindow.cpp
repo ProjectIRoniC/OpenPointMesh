@@ -115,7 +115,7 @@ void MainWindow::cloudStitcherController()
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
     
 	// Loop through each input file
-	for( unsigned h = 0; h < oniFileNames.size(); ++h )
+	for( int h = 0; h < oniFileNames.size(); ++h )
 	{
         appendMessageToOutputBuffer( "Working on stitching " + oniFileNames[h].toStdString() + "...\n" );
 		mCloudStitcher->setOutputPath( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "_finalPointCloud.pcd") );
@@ -138,7 +138,7 @@ void MainWindow::on_Browse_clicked()
     {
         oniFileNames = files;
 		
-		for( unsigned j = 0; j < oniFileNames.size(); ++j )
+		for( int j = 0; j < oniFileNames.size(); ++j )
             appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
     }
     else
@@ -195,7 +195,7 @@ void MainWindow::oniToPCDController()
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
 	
 	// Loop through each input file
-	for( unsigned i = 0; i < oniFileNames.size(); ++i )
+	for( int i = 0; i < oniFileNames.size(); ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
