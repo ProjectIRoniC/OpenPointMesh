@@ -113,6 +113,7 @@ printHelp (int, char **argv)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TODO: move class definitions to .h file
 template <typename PointType>
 class OpenNI2Viewer
 {
@@ -162,8 +163,15 @@ public:
   void
   keyboard_callback (const pcl::visualization::KeyboardEvent& event, void*)
   {
-    if (event.getKeyCode ())
+    if (event.getKeyCode ()) {
+
+      /**
+       * capture keypress
+       * @author - nicole cranon
+       */
+      this->keypressed = event.getKeyCode ();
       cout << "the key \'" << event.getKeyCode () << "\' (" << event.getKeyCode () << ") was";
+    }
     else
       cout << "the special key \'" << event.getKeySym () << "\' was";
     if (event.keyDown ())
@@ -267,6 +275,14 @@ public:
         image_viewer_->spinOnce ();
 
       }
+
+      /**
+       * check for pause
+       * @author - nicole cranon
+       */
+      if (this->keypressed == PAUSE) {
+        this->pause();
+      }
     }
 
     grabber_.stop ();
@@ -289,12 +305,39 @@ public:
   unsigned char* rgb_data_;
   unsigned rgb_data_size_;
 
+  /**
+   * Playback control keys
+   * @author - nicole cranon
+   */ 
+  static const char PLAY = ' ';
+  static const char PAUSE = 'p';
+  static const char STOP = 's';
+  static const char REWIND = 'r';
+  static const char FORWARD = 'f';
+  static const char BEG_BLURRY = 'b';  // beginning blurry frame(s)
+  static const char END_BLURRY = 'e';  // end of blurry frame(s)
+
 private:
   /**
    * @description - used for frame tracking during viewing
    * @author - nicole cranon
    */
   int currentFrame;
+  /**
+   * @description - used for keypress tracking during viewing
+   * @author - nicole cranon
+   */
+  char keypressed;
+
+  /**
+   * @function pause
+   * @description - uses busy waiting to pause playback
+   * @author - nicole cranon
+   */
+   void pause () {
+    // while (this->keypressed != PLAY) {
+    // }
+   }
 };
 
 // Create the PCLVisualizer object
@@ -302,83 +345,83 @@ boost::shared_ptr<pcl::visualization::PCLVisualizer> cld;
 boost::shared_ptr<pcl::visualization::ImageViewer> img;
 
 /* ---[ */
-int
-main (int argc, char** argv)
-{
-  std::string device_id ("");
-  pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
-  pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
-  bool xyz = false;
+// int
+// main (int argc, char** argv)
+// {
+//   std::string device_id ("");
+//   pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+//   pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+//   bool xyz = false;
 
-  if (argc >= 2)
-  {
-    device_id = argv[1];
-    if (device_id == "--help" || device_id == "-h")
-    {
-      printHelp (argc, argv);
-      return 0;
-    }
-    else if (device_id == "-l")
-    {
-      if (argc >= 3)
-      {
-        pcl::io::OpenNI2Grabber grabber (argv[2]);
-        boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = grabber.getDevice ();
-        cout << *device;		// Prints out all sensor data, including supported video modes
-      }
-      else
-      {
-        boost::shared_ptr<pcl::io::openni2::OpenNI2DeviceManager> deviceManager = pcl::io::openni2::OpenNI2DeviceManager::getInstance ();
-        if (deviceManager->getNumOfConnectedDevices () > 0)
-        {
-          for (unsigned deviceIdx = 0; deviceIdx < deviceManager->getNumOfConnectedDevices (); ++deviceIdx)
-          {
-            boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = deviceManager->getDeviceByIndex (deviceIdx);
-            cout << "Device " << device->getStringID () << "connected." << endl;
-          }
+//   if (argc >= 2)
+//   {
+//     device_id = argv[1];
+//     if (device_id == "--help" || device_id == "-h")
+//     {
+//       printHelp (argc, argv);
+//       return 0;
+//     }
+//     else if (device_id == "-l")
+//     {
+//       if (argc >= 3)
+//       {
+//         pcl::io::OpenNI2Grabber grabber (argv[2]);
+//         boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = grabber.getDevice ();
+//         cout << *device;		// Prints out all sensor data, including supported video modes
+//       }
+//       else
+//       {
+//         boost::shared_ptr<pcl::io::openni2::OpenNI2DeviceManager> deviceManager = pcl::io::openni2::OpenNI2DeviceManager::getInstance ();
+//         if (deviceManager->getNumOfConnectedDevices () > 0)
+//         {
+//           for (unsigned deviceIdx = 0; deviceIdx < deviceManager->getNumOfConnectedDevices (); ++deviceIdx)
+//           {
+//             boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = deviceManager->getDeviceByIndex (deviceIdx);
+//             cout << "Device " << device->getStringID () << "connected." << endl;
+//           }
 
-        }
-        else
-          cout << "No devices connected." << endl;
+//         }
+//         else
+//           cout << "No devices connected." << endl;
 
-        cout <<"Virtual Devices available: ONI player" << endl;
-      }
-      return 0;
-    }
-  }
-  else
-  {
-    boost::shared_ptr<pcl::io::openni2::OpenNI2DeviceManager> deviceManager = pcl::io::openni2::OpenNI2DeviceManager::getInstance ();
-    if (deviceManager->getNumOfConnectedDevices () > 0)
-    {
-      boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = deviceManager->getAnyDevice ();
-      cout << "Device ID not set, using default device: " << device->getStringID () << endl;
-    }
-  }
+//         cout <<"Virtual Devices available: ONI player" << endl;
+//       }
+//       return 0;
+//     }
+//   }
+//   else
+//   {
+//     boost::shared_ptr<pcl::io::openni2::OpenNI2DeviceManager> deviceManager = pcl::io::openni2::OpenNI2DeviceManager::getInstance ();
+//     if (deviceManager->getNumOfConnectedDevices () > 0)
+//     {
+//       boost::shared_ptr<pcl::io::openni2::OpenNI2Device> device = deviceManager->getAnyDevice ();
+//       cout << "Device ID not set, using default device: " << device->getStringID () << endl;
+//     }
+//   }
 
-  unsigned mode;
-  if (pcl::console::parse (argc, argv, "-depthmode", mode) != -1)
-    depth_mode = pcl::io::OpenNI2Grabber::Mode (mode);
+//   unsigned mode;
+//   if (pcl::console::parse (argc, argv, "-depthmode", mode) != -1)
+//     depth_mode = pcl::io::OpenNI2Grabber::Mode (mode);
 
-  if (pcl::console::parse (argc, argv, "-imagemode", mode) != -1)
-    image_mode = pcl::io::OpenNI2Grabber::Mode (mode);
+//   if (pcl::console::parse (argc, argv, "-imagemode", mode) != -1)
+//     image_mode = pcl::io::OpenNI2Grabber::Mode (mode);
 
-  if (pcl::console::find_argument (argc, argv, "-xyz") != -1)
-    xyz = true;
+//   if (pcl::console::find_argument (argc, argv, "-xyz") != -1)
+//     xyz = true;
 
-  pcl::io::OpenNI2Grabber grabber (device_id, depth_mode, image_mode);
+//   pcl::io::OpenNI2Grabber grabber (device_id, depth_mode, image_mode);
 
-  if (xyz || !grabber.providesCallback<pcl::io::OpenNI2Grabber::sig_cb_openni_point_cloud_rgb> ())
-  {
-    OpenNI2Viewer<pcl::PointXYZ> openni_viewer (grabber);
-    openni_viewer.run ();
-  }
-  else
-  {
-    OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber);
-    openni_viewer.run ();
-  }
+//   if (xyz || !grabber.providesCallback<pcl::io::OpenNI2Grabber::sig_cb_openni_point_cloud_rgb> ())
+//   {
+//     OpenNI2Viewer<pcl::PointXYZ> openni_viewer (grabber);
+//     openni_viewer.run ();
+//   }
+//   else
+//   {
+//     OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber);
+//     openni_viewer.run ();
+//   }
 
-  return (0);
-}
+//   return (0);
+// }
 /* ]--- */
