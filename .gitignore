@@ -1,7 +1,5 @@
 # Custom
-*~
 *.swp
-*.o
 *.oni
 *.pcd
 res/*
@@ -17,15 +15,7 @@ install_manifest.txt
 
 # QT
 # C++ objects and libs
-*.slo
-*.lo
-*.o
-*.a
-*.la
-*.lai
-*.so
 *.dll
-*.dylib
 
 # Qt-es
 /.qmake.cache
@@ -50,3 +40,26 @@ Makefile*
 
 #QtCtreator CMake
 CMakeLists.txt.user
+
+# ignore the entire tree for ExternalSources
+*ExternalSources*
+
+# Ignore git merge temporaries.
+*.orig
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# emacs backup files
+*~
