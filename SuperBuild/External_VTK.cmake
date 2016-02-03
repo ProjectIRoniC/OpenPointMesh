@@ -14,7 +14,7 @@ endif()
 # Set dependency list
 set(${proj}_DEPENDENCIES
 	# Qt4
-	zlib
+	ZLIB
 	)
 
 # Include dependent projects if any
@@ -143,6 +143,8 @@ if((NOT DEFINED VTK_DIR OR NOT DEFINED VTK_SOURCE_DIR) AND NOT ${CMAKE_PROJECT_N
       -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
       -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
       INSTALL_COMMAND ""
+	  DEPENDS
+		${${proj}_DEPENDENCIES}
     )
   ### --- End Project specific additions
   set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
