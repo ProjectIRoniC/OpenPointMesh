@@ -30,13 +30,12 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       -DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
       -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
       -DEIGEN_TEST_NOQT:BOOL=ON
-      -DBUILD_TESTING:BOOL=OFF
+      -DBUILD_TESTING:BOOL=ON
     )
   ### --- End Project specific additions
   
-  set(${proj}_REPOSITORY "${git_protocol}://bitbucket.org/eigen/eigen.git")
-  set(${proj}_GIT_TAG "b30b87236a1b1552af32ac34075ee5696a9b5a33") # 3.2.7
-    #URL http://bitbucket.org/eigen/eigen/get/3.2.7.tar.gz
+  set(${proj}_REPOSITORY "${git_protocol}://github.com/RLovelett/eigen.git")
+  set(${proj}_GIT_TAG "2efca7e71fff7f17fcba0658f640b6ce8a53d469") # 3.2.7ish
   ExternalProject_Add(${proj}
     ${${proj}_EP_ARGS}
     GIT_REPOSITORY ${${proj}_REPOSITORY}

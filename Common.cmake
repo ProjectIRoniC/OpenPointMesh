@@ -4,7 +4,7 @@
 LIST( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake )
 
 #-----------------------------------------------------------------------------
-# ENABLE_LANGUAGE(C)	# not sure if this is needed
+ENABLE_LANGUAGE( C )	# not sure if this is needed
 ENABLE_LANGUAGE( CXX )
 
 INCLUDE( CMakeDependentOption )
@@ -23,6 +23,13 @@ IF( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
 	SET( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE )
 	# Set the possible values of build type for cmake-gui
 	SET_PROPERTY( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
+ENDIF()
+
+# Set make command for external projects not using cmake
+IF( WIN32 )
+	SET( ${PRIMARY_PROJECT_NAME}_NONCMAKE_BUILD_COMMAND "mingw32-make")
+ELSE()
+	SET( ${PRIMARY_PROJECT_NAME}_NONCMAKE_BUILD_COMMAND "make")
 ENDIF()
 
 #-----------------------------------------------------------------------------

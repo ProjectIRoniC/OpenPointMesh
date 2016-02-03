@@ -45,7 +45,7 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
   set(${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl.git")
   set(${proj}_GIT_TAG 0ddf11a6ad1175b6f1c253da003de20c1295cde0)  # 1.7.2
   ExternalProject_Add(${proj}
-    ${${proj}_EP_ARGS}
+	${${proj}_EP_ARGS}
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_GIT_TAG}
     SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}

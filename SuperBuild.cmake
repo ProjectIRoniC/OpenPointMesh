@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# enable_language(C)	# not sure if this is needed
+ENABLE_LANGUAGE( C )	# not sure if this is needed
 ENABLE_LANGUAGE( CXX )
 
 #-----------------------------------------------------------------------------

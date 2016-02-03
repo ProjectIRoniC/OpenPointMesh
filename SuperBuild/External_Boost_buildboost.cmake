@@ -4,35 +4,34 @@
 
 if(WIN32)
 set(XXX "
-# Needed for UKF
+# Needed for PCL
+		--with-atomic
+		--with-BLAH		
+        --with-chrono 
+        --with-context 
+        --with-date_time 
+        --with-exception 
+        --with-filesystem
+		--with-format
+        --with-graph 
+        --with-graph_parallel 
+        --with-iostreams 
+		--with-locale
+        --with-log 
+        --with-math 
+        --with-mpi 
+		--with-program_options
+        --with-python 
+        --with-random 
+        --with-regex 
+        --with-serialization 
+        --with-signals
         --with-system
         --with-thread
-# Needed for DTIProcess
-        --with-program_options 
-        --with-locale 
-        --with-format
-        --with-BLAH
+		--with-timer 
+        --with-wave
 # Not Needed
-        --without-atomic 
-        --without-chrono 
-        --without-context 
-        --without-date_time 
-        --without-exception 
-        --without-filesystem 
-        --without-graph 
-        --without-graph_parallel 
-        --without-iostreams 
-        --without-log 
-        --without-math 
-        --without-mpi 
-        --without-python 
-        --without-random 
-        --without-regex 
-        --without-serialization 
-        --without-signals
         --without-test 
-        --without-timer 
-        --without-wave
 "
 )
   execute_process(COMMAND ./b2 install --prefix=${BOOST_INSTALL_DIR}

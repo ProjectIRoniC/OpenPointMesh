@@ -48,6 +48,8 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
     LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
     ${cmakeversion_external_update} "${cmakeversion_external_update_value}"
 	INSTALL_DIR ${${proj}_INSTALL_DIR}
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ${PRIMARY_PROJECT_NAME}_NONCMAKE_BUILD_COMMAND 
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS -Wno-dev --no-warn-unused-cli
     CMAKE_CACHE_ARGS
