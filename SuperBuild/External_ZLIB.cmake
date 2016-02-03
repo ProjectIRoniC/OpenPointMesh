@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-set(extProjName zlib) #The find_package known name
-set(proj        zlib) #This local name
+set(extProjName ZLIB) #The find_package known name
+set(proj        ZLIB) #This local name
 set(${extProjName}_REQUIRED_VERSION "")  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
