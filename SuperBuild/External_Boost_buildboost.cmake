@@ -5,8 +5,7 @@
 if(WIN32)
 set(XXX "
 # Needed for PCL
-		--with-atomic
-		--with-BLAH		
+		--with-atomic	
         --with-chrono 
         --with-context 
         --with-date_time 
