@@ -23,21 +23,19 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
   set(${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
   set(${proj}_CMAKE_OPTIONS
       -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	  -DCMAKE_CXX_COMPILER_ID:STRING=GNU
-	  -DCMAKE_C_COMPILER_ID:STRING=GNU
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
       -DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+      -DBUILD_MATLAB_BINDINGS:BOOL=OFF
       -DBUILD_EXAMPLES:BOOL=OFF
-      -DBUILD_TESTING:BOOL=OFF
       -DBUILD_TESTS:BOOL=OFF
   )
   ### --- End Project specific additions
 
   set(${proj}_REPOSITORY "${git_protocol}://github.com/mariusmuja/flann.git") # USE THIS FOR UPDATED VERSION
-  set(${proj}_GIT_TAG 48883132fed3002ed46694c04e46a7943beeba9a)  # 1.8.4
+  set(${proj}_GIT_TAG master)  # master
   ExternalProject_Add(${proj}
     ${${proj}_EP_ARGS}
     GIT_REPOSITORY ${${proj}_REPOSITORY}
