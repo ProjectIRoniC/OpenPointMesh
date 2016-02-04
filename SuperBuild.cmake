@@ -129,7 +129,7 @@ IF( ${PRIMARY_PROJECT_NAME}_USE_QT )
 			QT_MOC_EXECUTABLE:PATH
 			QT_UIC_EXECUTABLE:PATH
 		ALL_PROJECTS
-		)
+	)
 ENDIF()
 MARK_AS_SUPERBUILD( ${PRIMARY_PROJECT_NAME}_USE_QT )
 
@@ -194,7 +194,7 @@ SET( ${PRIMARY_PROJECT_NAME}_DEPENDENCIES
 	# VTK
 #	JPEG
 	${QT_DEPENDENT_PACKAGES}
-	)
+)
 
 # IF( BUILD_STYLE_UTILS )
 #	LIST( APPEND ${PRIMARY_PROJECT_NAME}_DEPENDENCIES Cppcheck KWStyle ) #Uncrustify)
@@ -232,7 +232,7 @@ EXTERNALPROJECT_ADD( ${proj}
 			-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
 		-D${PRIMARY_PROJECT_NAME}_SUPERBUILD:BOOL=OFF    #NOTE: VERY IMPORTANT reprocess top level CMakeList.txt
 	INSTALL_COMMAND ""
-	)
+)
 
 # This custom external project step forces the build and later
 # steps to run whenever a top level build is done...
@@ -242,4 +242,4 @@ EXTERNALPROJECT_ADD_STEP( ${proj} forcebuild
 	COMMENT "Forcing build step for '${proj}'"
 	DEPENDEES build
 	ALWAYS 1
-	)
+)
