@@ -13,12 +13,12 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 here for execution of code in standalone, will be removed once 
 integrated in project
 ***************************************************************/
-int main( int argc, char* argv[] )
-{
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+// int main( int argc, char* argv[] )
+// {
+//     QApplication a(argc, argv);
+//     MainWindow w;
+//     w.show();
 
-    return a.exec();
-}
+//     return a.exec();
+// }
 
