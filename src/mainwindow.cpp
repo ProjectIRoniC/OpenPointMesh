@@ -30,9 +30,13 @@ MainWindow::MainWindow( QWidget *parent ) :
     connect( this, SIGNAL(appendToConsole(QString)), this, SLOT(ensureCursorVisible(QString)) );
     connect( this, SIGNAL(cloudStitcherFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(meshConstructorFinished(int)), this, SLOT(nextStep(int)) );
+
+    // set initial values for varibles
     outputFolderName = QString( "" );
     oniFileNames = QStringList();
     taskThread = NULL;
+
+    this->ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     // Set initial button state
     setInitialButtonState();
