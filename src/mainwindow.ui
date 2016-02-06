@@ -78,25 +78,6 @@
    <string>PointCloud and Mesh Generator</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QRadioButton" name="radioButton">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>60</y>
-      <width>128</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Details</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
@@ -115,20 +96,20 @@
     <widget class="QPushButton" name="Cancel">
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>20</y>
+       <x>190</x>
+       <y>60</y>
        <width>172</width>
        <height>27</height>
       </rect>
      </property>
      <property name="text">
-      <string>Close</string>
+      <string>Cancel</string>
      </property>
     </widget>
     <widget class="QPushButton" name="Start">
      <property name="geometry">
       <rect>
-       <x>13</x>
+       <x>370</x>
        <y>20</y>
        <width>172</width>
        <height>27</height>
@@ -138,10 +119,10 @@
       <string>Start</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="Browse">
+    <widget class="QPushButton" name="Browse_oni">
      <property name="geometry">
       <rect>
-       <x>191</x>
+       <x>10</x>
        <y>20</y>
        <width>173</width>
        <height>27</height>
@@ -155,7 +136,7 @@
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>50</y>
+       <y>20</y>
        <width>173</width>
        <height>27</height>
       </rect>
@@ -174,14 +155,32 @@
       </rect>
      </property>
     </widget>
+    <widget class="QRadioButton" name="radioButton">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>60</y>
+       <width>91</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Details</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="autoRepeat">
+      <bool>true</bool>
+     </property>
+    </widget>
     <zorder>Browse_output</zorder>
-    <zorder>Browse</zorder>
+    <zorder>Browse_oni</zorder>
     <zorder>Start</zorder>
     <zorder>Cancel</zorder>
     <zorder>plainTextEdit</zorder>
+    <zorder>radioButton</zorder>
    </widget>
-   <zorder>frame</zorder>
-   <zorder>radioButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -194,9 +193,8 @@
    </property>
    <widget class="QMenu" name="menuVolcano_Bot">
     <property name="title">
-     <string>Volcano Bot</string>
+     <string/>
     </property>
-    <addaction name="separator"/>
    </widget>
    <addaction name="menuVolcano_Bot"/>
   </widget>
@@ -205,7 +203,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

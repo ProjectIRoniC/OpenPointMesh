@@ -45,6 +45,21 @@ private:
      */
     void processOutputQueue();
 
+    /* Pre:  All buttons are either enabled(true) or enabled(false).
+     * Post: Browse_oni    = enabled
+     *       Browse_output = disabled
+     *       Start         = disabled
+     *       Close         = enabled
+     */
+    void setInitialButtonState() ;
+
+    /*
+     * Post: Browse_oni    = disabled
+     *       Browse_output = disabled
+     *       Start         = disabled
+     */
+    void setButtonsAllDisabledState();
+
     /*
      * Slots
      */
@@ -54,7 +69,7 @@ private slots:
      * Post: Opens file explorer to choose .oni file. 
      *       Path is stored in onifileName
      */
-    void on_Browse_clicked();
+    void on_Browse_oni_clicked();
     /*
      * Post: Closes application. Destroys GUI
      */
@@ -85,6 +100,8 @@ private slots:
      */
     void ensureCursorVisible( QString );
 
+
+
 signals:
     /*
      * Pre:  msg is non-nul / non-empty.
@@ -112,6 +129,12 @@ signals:
      */
     void cloudStitcherFinished( int );
 
+    /*
+     * Sginal that marks the end of the mesh construction
+     * Post: nextstep is called with passed int
+     */
+    void meshConstructorFinished( int );
+
 
 private:
 
@@ -123,6 +146,7 @@ private:
     static const int ONITOPCD = 0;
     static const int CLOUDSTITCHER = 1;
     static const int MESHCONSTRUCTOR = 2;
+    static const int FINISHED = 3;
 
     /*
      * Main ui

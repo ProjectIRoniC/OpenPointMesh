@@ -29,9 +29,27 @@ MainWindow::MainWindow( QWidget *parent ) :
     connect( this, SIGNAL(oniToPCDFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(appendToConsole(QString)), this, SLOT(ensureCursorVisible(QString)) );
     connect( this, SIGNAL(cloudStitcherFinished(int)), this, SLOT(nextStep(int)) );
+    connect( this, SIGNAL(meshConstructorFinished(int)), this, SLOT(nextStep(int)) );
     outputFolderName = QString( "" );
     oniFileNames = QStringList();
     taskThread = NULL;
+
+    // Set initial button state
+    setInitialButtonState();
+}
+
+void MainWindow::setInitialButtonState()
+{
+    this->ui->Browse_oni->setEnabled(true);
+    this->ui->Browse_output->setEnabled(false);
+    this->ui->Start->setEnabled(false);
+}
+
+void MainWindow::setButtonsAllDisabledState()
+{
+    this->ui->Browse_oni->setEnabled(false);
+    this->ui->Browse_output->setEnabled(false);
+    this->ui->Start->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +71,7 @@ void MainWindow::nextStep( const int& step )
     switch( step ) {
 
     case ONITOPCD:
+        setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::oniToPCDController, this );
         break;
@@ -64,7 +83,12 @@ void MainWindow::nextStep( const int& step )
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::meshConstructorController, this );
         break;
+    case FINISHED:
+        clearTaskThread();
+        setInitialButtonState();
+        break;
     default :
+        setInitialButtonState();
         QString errmsg = "MESSAGE: Well this is embarassing, there seems to be an ";
         errmsg += "error with my instruction set and I not quiet sure how to fix it. ";
         errmsg += "I affraid I cannot continue processing. Please try again later.\n";
@@ -105,7 +129,7 @@ void MainWindow::meshConstructorController()
 
     appendMessageToOutputBuffer( "Mesh constructor complete.\n" );
     delete mMeshConstructor;
-    // emit meshConstructorFinished();
+    emit meshConstructorFinished(FINISHED);
 }
 
 void MainWindow::cloudStitcherController()
@@ -125,31 +149,6 @@ void MainWindow::cloudStitcherController()
     
     delete mCloudStitcher;
     emit cloudStitcherFinished( MESHCONSTRUCTOR );
-}
-
-void MainWindow::on_Browse_clicked()
-{
-    QStringList files = QFileDialog::getOpenFileNames(
-                this,
-                "Select one or more files to open",
-                "/home",
-                "Text files (*.oni)");
-    if( files.size() > 0 )
-    {
-        oniFileNames = files;
-		
-		for( int j = 0; j < oniFileNames.size(); ++j )
-            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
-    }
-    else
-    {
-        appendMessageToOutputBuffer( "No .ONI file selected\n" );
-    }
-}
-
-void MainWindow::on_Cancel_clicked()
-{
-    this->close();
 }
 
 void MainWindow::processOutputQueue()
@@ -205,6 +204,58 @@ void MainWindow::oniToPCDController()
 
 }
 
+
+// Button functions
+
+void MainWindow::on_Browse_oni_clicked()
+{
+    QStringList files = QFileDialog::getOpenFileNames(
+                this,
+                "Select one or more files to open",
+                "/home",
+                "Text files (*.oni)");
+    if( files.size() > 0 )
+    {
+        oniFileNames = files;
+
+        for( int j = 0; j < oniFileNames.size(); ++j )
+            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
+        // update buttons
+        this->ui->Browse_oni->setEnabled(false);
+        this->ui->Browse_output->setEnabled(true);
+
+    }
+    else
+    {
+        appendMessageToOutputBuffer( "No .ONI file selected\n" );
+    }
+}
+
+void MainWindow::on_Browse_output_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
+    if( dir.size() > 0 )
+    {
+        outputFolderName = QString::fromStdString( boost::filesystem::absolute(dir.toStdString()).string() );
+        appendMessageToOutputBuffer( outputFolderName.toStdString() + " selected for output\n", false );
+        this->ui->Browse_output->setEnabled(false);
+        this->ui->Start->setEnabled(true);
+    }
+    else
+    {
+        appendMessageToOutputBuffer( "No outputFolder Selected file selected\n", false );
+    }
+}
+
+void MainWindow::on_Cancel_clicked()
+{
+    this->close();
+}
+
 void MainWindow::on_Start_clicked()
 {
     emit start( ONITOPCD );
@@ -225,20 +276,4 @@ void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_erro
     this->outputBuffer->push(msg);
 
 }
-void MainWindow::on_Browse_output_clicked()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
 
-    if( dir.size() > 0 )
-    {
-        outputFolderName = QString::fromStdString( boost::filesystem::absolute(dir.toStdString()).string() );
-        appendMessageToOutputBuffer( outputFolderName.toStdString() + " selected for output\n", false );
-    }
-    else
-    {
-        appendMessageToOutputBuffer( "No outputFolder Selected file selected\n", false );
-    }
-}
