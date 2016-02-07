@@ -38,6 +38,9 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     this->ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
+    // Set color of Main Window
+    //this->ui->
+
     // Set initial button state
     setInitialButtonState();
 }
