@@ -40,7 +40,8 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     // Set color of Main Window
     //this->ui->
-
+    //this->ui->radioButton->setStyleSheet("background-color: blue ");
+    //emit appendToConsole( output );
     // Set initial button state
     setInitialButtonState();
 }

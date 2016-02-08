@@ -47,3 +47,6 @@ unix:!macx: LIBS += -L$$PWD/../../../usr/lib/ -lpcl_io
 
 INCLUDEPATH += $$PWD/../../../usr/include/pcl-1.7
 DEPENDPATH += $$PWD/../../../usr/include/pcl-1.7
+
+RESOURCES += \
+    res/resources.qrc
