@@ -25,22 +25,26 @@ IF( NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}"
 
 	# SVN is too slow SVN_REPOSITORY http://svn.boost.org/svn/boost/trunk
 	# SVN is too slow SVN_REVISION -r "82586"
-	SET( ${proj}_URL http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz )
-	SET( ${proj}_MD5 28f58b9a33469388302110562bdf6188 )
+	
 
 	IF( CMAKE_COMPILER_IS_CLANGXX )
 		SET( CLANG_ARG -DCMAKE_COMPILER_IS_CLANGXX:BOOL=ON )
 	ENDIF()
 	
-	SET( BOOST_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )	
-	SET( ${proj}_REPOSITORY "${git_protocol}://github.com/boostorg/boost.git" )
-	SET( ${proj}_GIT_TAG "boost-1.60.0" ) # Dec 23, 2015
+	# Boost Git has too many repos and is too slow, so we download instead
+	SET( BOOST_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
+	SET( ${proj}_URL http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz )
+	SET( ${proj}_MD5 28f58b9a33469388302110562bdf6188 )
+	# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/boostorg/boost.git" )
+	# SET( ${proj}_GIT_TAG "boost-1.60.0" ) # Dec 23, 2015
 	### --- End Project specific additions
 	
 	ExternalProject_Add( ${proj}
 		${${proj}_EP_ARGS}
-		GIT_REPOSITORY ${${proj}_REPOSITORY}
-		GIT_TAG ${${proj}_GIT_TAG}
+		# GIT_REPOSITORY ${${proj}_REPOSITORY}
+		# GIT_TAG ${${proj}_GIT_TAG}
+		URL ${${proj}_URL}
+		URL_MD5 ${${proj}_MD5}
 		SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
 		BUILD_IN_SOURCE 1
 
