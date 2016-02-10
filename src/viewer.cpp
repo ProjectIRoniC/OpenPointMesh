@@ -170,8 +170,8 @@ OpenNI2Viewer<PointType>::mouse_callback (const pcl::visualization::MouseEvent& 
 }
 
 /**
-* @brief starts the main loop
-*/
+ * @brief starts the main loop
+ */
 template<typename PointType>
 void
 OpenNI2Viewer<PointType>::run ()
@@ -288,13 +288,65 @@ OpenNI2Viewer<PointType>::run ()
 
 /**
  * @function pause
- * @description - uses busy waiting to pause playback
+ * @description - uses --- to pause playback
  * @author - nicole cranon
  */
 template<typename PointType>
 void 
 OpenNI2Viewer<PointType>::pause () {
-  // need an interruptable pause
+  this->paused = true;
+  this->playing = false;
+  this->rewinding = false;
+  this->fastforwarding = false;
+  this->stopped = false;
+}
+
+/**
+ * @function play
+ * @description - breaks the state of a 1) pause, 2) rewind, 3) fastforward, 4) stop?
+ * @author - nicole cranon
+ */
+template<typename PointType>
+void 
+OpenNI2Viewer<PointType>::play () {
+  this->paused = false;
+  this->playing = true;
+  this->rewinding = false;
+  this->fastforwarding = false;
+  this->stopped = false;
+}
+
+
+/**
+ * @function rewind
+ * @description - rewinds the player until 1) the beginning, 2) play is pressed,
+ * 3) the stop is pressed, 4) fastforward is pressed
+ * @author - nicole cranon,  
+ */
+template<typename PointType>
+void 
+OpenNI2Viewer<PointType>::rewind () {
+  this->paused = false;
+  this->playing = false;
+  this->rewinding = true;
+  this->fastforwarding = false;
+  this->stopped = false;
+}
+
+/**
+ * @function fastforward
+ * @description - fastforwards the player until 1) the end, 2) play is pressed,
+ * 3) the stop is pressed, 4) rewind is pressed
+ * @author - nicole cranon, 
+ */
+template<typename PointType>
+void 
+OpenNI2Viewer<PointType>::fastforward () {
+  this->paused = false;
+  this->playing = false;
+  this->rewinding = false;
+  this->fastforwarding = true;
+  this->stopped = false;
 }
 
 // Create the PCLVisualizer object

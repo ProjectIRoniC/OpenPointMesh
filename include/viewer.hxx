@@ -28,6 +28,37 @@ public:
   mouse_callback (const pcl::visualization::MouseEvent& mouse_event, void*);
 
   /**
+   * @description - is used for external classes and functions to check if the player is paused
+   * @author - nicole cranon
+   */
+  bool is_paused ();
+
+  /**
+   * @description - is used for external classes and functions to check if the player is playing
+   * @author - nicole cranon
+   */
+  bool is_playing ();
+
+  /**
+   * @description - is used for external classes and functions to check if the player is stopped
+   * @author - nicole cranon
+   */
+  bool is_stopped ();
+  
+  /**
+   * @description - is used for external classes and functions to check if the player is rewinding
+   * @author - nicole cranon
+   */
+  bool is_rewinding ();
+
+  /**
+   * @description - is used for external classes and functions to check if the player is fastforwarding
+   * @author - nicole cranon
+   */
+  bool is_fastforwarding ();
+
+
+  /**
   * @brief starts the main loop
   */
   void
@@ -45,18 +76,6 @@ public:
   unsigned char* rgb_data_;
   unsigned rgb_data_size_;
 
-  /**
-   * Playback control keys
-   * @author - nicole cranon
-   */ 
-  static const char PLAY = ' ';
-  static const char PAUSE = 'p';
-  static const char STOP = 's';
-  static const char REWIND = 'r';
-  static const char FORWARD = 'f';
-  static const char BEG_BLURRY = 'b';  // beginning blurry frame(s)
-  static const char END_BLURRY = 'e';  // end of blurry frame(s)
-
 private:
   /**
    * @description - used for frame tracking during viewing
@@ -71,10 +90,66 @@ private:
   char keypressed;
 
   /**
-   * @function pause
-   * @description - uses busy waiting to pause playback
+   * Playback control keys
+   * @author - nicole cranon
+   */ 
+  static const char PLAY = ' ';
+  static const char PAUSE = 'p';
+  static const char STOP = 's';
+  static const char REWIND = 'r';
+  static const char FORWARD = 'f';
+  static const char BEG_BLURRY = 'b';  // beginning blurry frame(s)
+  static const char END_BLURRY = 'e';  // end of blurry frame(s)
+
+  /**
+   * @description - state holding vars
    * @author - nicole cranon
    */
-   void 
-   pause ();
+  bool paused;
+  bool stopped;
+  bool playing;
+  bool rewinding;
+  bool fastforwarding;
+
+  /**
+   * @function pause
+   * @description - uses --- to pause playback
+   * @author - nicole cranon
+   */
+  void 
+  pause ();
+
+  /**
+   * @function play
+   * @description - breaks the state of a 1) pause, 2) rewind, 3) fastforward, 4) stop?
+   * @author - nicole cranon
+   */
+  void 
+  play ();
+
+  /**
+   * @function rewind
+   * @description - rewinds the player until 1) the beginning, 2) play is pressed,
+   * 3) the stop is pressed, 4) fastforward is pressed
+   * @author - nicole cranon, 
+   */
+  void 
+  rewind ();
+
+  /**
+   * @function fastforward
+   * @description - fastforwards the player until 1) the end, 2) play is pressed,
+   * 3) the stop is pressed, 4) rewind is pressed
+   * @author - nicole cranon, 
+   */
+  void 
+  fastforward ();
+
+   /**
+   * @function stop
+   * @description - stops the player until 1) play is pressed
+   * @author - nicole cranon, 
+   */
+  void 
+  stop ();
 };
