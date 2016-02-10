@@ -72,6 +72,7 @@ typedef boost::chrono::high_resolution_clock HRClock;
 { \
 }while (false)
 #endif
+int capturedFrameArray[500] = { };
 
 void
 printHelp (int, char **argv)
@@ -259,6 +260,18 @@ OpenNI2Viewer<PointType>::run ()
 
     }
 
+    /**
+     * check for frame capture
+     * @author - david andrews
+     */
+    int capturedFrameCount = 0;
+    if (this->keypressed == "z") {
+      //using global array for now.
+        capturedFrameArray[capturedFrameCount] = i;
+        std::cout<< "Captured Frame Number is: " << capturedFrameArray[capturedFrameCount] << '\n';
+        capturedFrameCount++;
+    }
+      
     /**
      * check for pause
      * @author - nicole cranon
