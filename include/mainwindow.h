@@ -8,6 +8,12 @@
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
 
+
+class QAction;
+class QActionGroup;
+class QLabel;
+class QMenu;
+
 namespace Ui {
 class MainWindow;
 }
@@ -100,6 +106,17 @@ private slots:
      */
     void ensureCursorVisible( QString );
 
+    /*
+     * Menu functions
+     */
+    void openSlot();
+//    void exitSlot();
+//    void omitFramesSlot();
+//    void filterAccuracySlot();
+//    void meshAccuracySlot();
+//    void aboutSlot();
+//    void viewWikiSlot();
+
 
 
 signals:
@@ -134,6 +151,7 @@ signals:
      * Post: nextstep is called with passed int
      */
     void meshConstructorFinished( int );
+
 
 
 private:
@@ -172,6 +190,24 @@ private:
      * worker thread that will do all the tasks that user enters
      */
     boost::thread* taskThread;
+
+    /*
+     * Actions for menue
+     */
+    QAction *openAct;
+    QAction *exitAct;
+    QAction *omitFramesAct;
+    QAction *filterAccuracyAct;
+    QAction *meshAccuracyAct;
+    QAction *aboutAct;
+    QAction *viewWikiAct;
+
+    /*
+     * Menu
+     */
+    QMenu *fileMenu;
+    QMenu *settingMenu;
+    QMenu *helpMenu;
 
     /*
      * Marks the completion of the last step of controller constants

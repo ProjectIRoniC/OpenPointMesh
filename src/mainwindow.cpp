@@ -36,7 +36,22 @@ MainWindow::MainWindow( QWidget *parent ) :
     oniFileNames = QStringList();
     taskThread = NULL;
 
+    /* Add a horizontal Scroll Bar*/
     this->ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    /* create actions for menu */
+    openAct = new QAction(tr("&Open"), this);
+    openAct->setShortcuts(QKeySequence::New);
+    //openAct->setStatusTip(tr("Create a new file"));
+    connect(openAct, SIGNAL(triggered()), this, SLOT(openSlot()));
+
+    /* create menu */
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    settingMenu = menuBar()->addMenu(tr("&Settings"));
+    helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    /* add action to menu */
+    fileMenu->addAction(openAct);
 
     // Set color of Main Window
     //this->ui->
@@ -46,6 +61,18 @@ MainWindow::MainWindow( QWidget *parent ) :
     setInitialButtonState();
 }
 
+/*
+ * ***************************Action button Controls***************************
+ */
+
+void MainWindow::openSlot()
+{
+    std::cout << "openslot\n";
+}
+
+/*
+ * ***************************Action button Controls***************************
+ */
 void MainWindow::setInitialButtonState()
 {
     this->ui->Browse_oni->setEnabled(true);
