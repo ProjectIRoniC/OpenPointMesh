@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>779</width>
-    <height>514</height>
+    <width>776</width>
+    <height>419</height>
    </rect>
   </property>
   <property name="palette">
@@ -34,9 +34,18 @@
      <colorrole role="Highlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>219</red>
-        <green>47</green>
-        <blue>119</blue>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="LinkVisited">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
        </color>
       </brush>
      </colorrole>
@@ -63,9 +72,18 @@
      <colorrole role="Highlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>219</red>
-        <green>47</green>
-        <blue>119</blue>
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="LinkVisited">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
        </color>
       </brush>
      </colorrole>
@@ -98,6 +116,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="LinkVisited">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
@@ -114,8 +141,14 @@
       <x>10</x>
       <y>30</y>
       <width>751</width>
-      <height>421</height>
+      <height>321</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="baseSize">
      <size>
@@ -593,16 +626,19 @@
      </palette>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="lineWidth">
+     <number>0</number>
     </property>
     <widget class="QPushButton" name="Start">
      <property name="geometry">
       <rect>
-       <x>390</x>
-       <y>120</y>
+       <x>560</x>
+       <y>30</y>
        <width>172</width>
        <height>27</height>
       </rect>
@@ -614,8 +650,8 @@
     <widget class="QPushButton" name="Browse_output">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>120</y>
+       <x>10</x>
+       <y>30</y>
        <width>173</width>
        <height>27</height>
       </rect>
@@ -1177,9 +1213,9 @@
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="geometry">
       <rect>
-       <x>110</x>
-       <y>180</y>
-       <width>531</width>
+       <x>10</x>
+       <y>80</y>
+       <width>731</width>
        <height>221</height>
       </rect>
      </property>
@@ -1383,33 +1419,17 @@
       </palette>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>40</y>
-       <width>531</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <zorder>Browse_output</zorder>
     <zorder>Start</zorder>
     <zorder>plainTextEdit</zorder>
-    <zorder>lineEdit</zorder>
    </widget>
-   <zorder>frame</zorder>
-   <zorder>Browse_oni</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>779</width>
+     <width>776</width>
      <height>25</height>
     </rect>
    </property>

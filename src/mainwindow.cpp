@@ -43,43 +43,44 @@ MainWindow::MainWindow( QWidget *parent ) :
     /* create actions for menu */
     /* Open */
     openAct = new QAction(tr("&Open"), this);
-    openAct->setShortcuts(QKeySequence::New);
-    openAct->setStatusTip(tr("Create a new file"));
+    openAct->setShortcuts(QKeySequence::Open);
+    openAct->setStatusTip(tr("Open a .ONI file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(openSlot()));
 
     /* Exit */
     exitAct = new QAction(tr("&Exit"), this);
-    exitAct->setShortcuts(QKeySequence::New);
+    exitAct->setShortcuts(QKeySequence::Close);
+    openAct->setStatusTip(tr("Exit the program"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(exitSlot()));
 
     /* Omit Frames */
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
-    omitFramesAct->setShortcuts(QKeySequence::New);
-    omitFramesAct->setStatusTip(tr("Select frames to omit with gui"));
+    omitFramesAct->setShortcuts(QKeySequence::Find);
+    omitFramesAct->setStatusTip(tr("Select frames to omit"));
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
 
     /* Filter Accuracy */
     filterAccuracyAct = new QAction(tr("&Filter Accuracy"), this);
     filterAccuracyAct->setShortcuts(QKeySequence::New);
-    filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program effects run time"));
+    filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program may effects run time"));
     connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
 
     /* Mesh Accuracy */
     meshAccuracyAct = new QAction(tr("&Mesh Accuracy"), this);
-    meshAccuracyAct->setShortcuts(QKeySequence::New);
-    meshAccuracyAct->setStatusTip(tr("Select Mesh Creation Accuracy"));
+    meshAccuracyAct->setShortcuts(QKeySequence::Italic);
+    meshAccuracyAct->setStatusTip(tr("Select mesh creation accuracy"));
     connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
 
     /* About */
     aboutAct = new QAction(tr("&About"), this);
-    aboutAct->setShortcuts(QKeySequence::New);
+    aboutAct->setShortcuts(QKeySequence::SelectAll);
     aboutAct->setStatusTip(tr("About"));
     // connect(aboutAct, SIGNAL(triggered()), qApp, SLOT(aboutSlot()));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutSlot()));
 
     /* View Wiki Page */
     viewWikiAct = new QAction(tr("&Wiki"), this);
-    viewWikiAct->setShortcuts(QKeySequence::New);
+    viewWikiAct->setShortcuts(QKeySequence::Underline);
     viewWikiAct->setStatusTip(tr("Wiki Page"));
     connect(viewWikiAct, SIGNAL(triggered()), this, SLOT(viewWikiSlot()));
 
@@ -337,30 +338,6 @@ void MainWindow::oniToPCDController()
 }
 
 
-// Button functions
-
-void MainWindow::on_Browse_oni_clicked()
-{
-    QStringList files = QFileDialog::getOpenFileNames(
-                this,
-                "Select one or more files to open",
-                "/home",
-                "Text files (*.oni)");
-    if( files.size() > 0 )
-    {
-        oniFileNames = files;
-
-        for( int j = 0; j < oniFileNames.size(); ++j )
-            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
-        // update buttons
-        this->ui->Browse_output->setEnabled(true);
-
-    }
-    else
-    {
-        appendMessageToOutputBuffer( "No .ONI file selected\n" );
-    }
-}
 
 void MainWindow::on_Browse_output_clicked()
 {
@@ -373,7 +350,6 @@ void MainWindow::on_Browse_output_clicked()
     {
         outputFolderName = QString::fromStdString( boost::filesystem::absolute(dir.toStdString()).string() );
         appendMessageToOutputBuffer( outputFolderName.toStdString() + " selected for output\n", false );
-        this->ui->Browse_output->setEnabled(false);
         this->ui->Start->setEnabled(true);
     }
     else
@@ -382,23 +358,11 @@ void MainWindow::on_Browse_output_clicked()
     }
 }
 
-void MainWindow::on_Cancel_clicked()
-{
-    this->close();
-}
 
 void MainWindow::on_Start_clicked()
 {
     emit start( ONITOPCD );
 }
-
-
-void MainWindow::on_radioButton_toggled( bool checked )
-{
-    ui->plainTextEdit->setVisible( checked );
-    ui->plainTextEdit->ensureCursorVisible();
-}
-
 
 // ** Helper Functions ** //
 void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_error )

@@ -73,23 +73,10 @@ private:
 private slots:
 
     /*
-     * Post: Opens file explorer to choose .oni file. 
-     *       Path is stored in onifileName
-     */
-    void on_Browse_oni_clicked();
-    /*
-     * Post: Closes application. Destroys GUI
-     */
-    void on_Cancel_clicked();
-    /*
      * Pre:  oniFileName points to an oni file. outpuFolderName points to dir where output will be placed
      * Post: Begins oni to mesh transformation
      */
     void on_Start_clicked();
-    /*
-     * Post: display console visibility is toggled
-     */
-    void on_radioButton_toggled( bool checked );
     /*
      * Pre:  constrollerConstant must from the controller constants set
      * Post: nextstep for given constant is executed.
@@ -110,8 +97,19 @@ private slots:
     /*
      * Menu functions
      */
+    /*
+     * Post: Opens file explorer to choose .oni file.
+     *       Path is stored in onifileName
+     */
     void openSlot();
+    /*
+     * Post: Closes application. Destroys GUI
+     */
     void exitSlot();
+
+    /*
+     * Not Implemented
+     */
     void omitFramesSlot();
     void filterAccuracySlot();
     void meshAccuracySlot();

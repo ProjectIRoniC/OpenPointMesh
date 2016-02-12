@@ -32,6 +32,7 @@ int main( int argc, char* argv[] )
         std::cout << "Could not open \' " << File.fileName().toStdString() << "\' \n";
     }
 
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
     return a.exec();
 }
 
