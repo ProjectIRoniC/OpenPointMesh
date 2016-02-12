@@ -50,7 +50,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     /* Exit */
     exitAct = new QAction(tr("&Exit"), this);
     exitAct->setShortcuts(QKeySequence::Close);
-    openAct->setStatusTip(tr("Exit the program"));
+    exitAct->setStatusTip(tr("Exit the program"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(exitSlot()));
 
     /* Omit Frames */

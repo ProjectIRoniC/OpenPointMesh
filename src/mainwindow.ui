@@ -1249,42 +1249,6 @@
           </color>
          </brush>
         </colorrole>
-        <colorrole role="Window">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>64</green>
-           <blue>151</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Shadow">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>83</green>
-           <blue>168</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="HighlightedText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>210</red>
-           <green>40</green>
-           <blue>147</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ToolTipText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>246</red>
-           <green>53</green>
-           <blue>183</blue>
-          </color>
-         </brush>
-        </colorrole>
        </active>
        <inactive>
         <colorrole role="Midlight">
@@ -1314,42 +1278,6 @@
           </color>
          </brush>
         </colorrole>
-        <colorrole role="Window">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>64</green>
-           <blue>151</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Shadow">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>83</green>
-           <blue>168</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="HighlightedText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>210</red>
-           <green>40</green>
-           <blue>147</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ToolTipText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>246</red>
-           <green>53</green>
-           <blue>183</blue>
-          </color>
-         </brush>
-        </colorrole>
        </inactive>
        <disabled>
         <colorrole role="Midlight">
@@ -1376,42 +1304,6 @@
            <red>245</red>
            <green>64</green>
            <blue>151</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Window">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>64</green>
-           <blue>151</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="Shadow">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>245</red>
-           <green>83</green>
-           <blue>168</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="HighlightedText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>210</red>
-           <green>40</green>
-           <blue>147</blue>
-          </color>
-         </brush>
-        </colorrole>
-        <colorrole role="ToolTipText">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>246</red>
-           <green>53</green>
-           <blue>183</blue>
           </color>
          </brush>
         </colorrole>
