@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>408</height>
+    <width>779</width>
+    <height>514</height>
    </rect>
   </property>
   <property name="palette">
@@ -101,8 +101,11 @@
     </disabled>
    </palette>
   </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
   <property name="windowTitle">
-   <string>PointCloud and Mesh Generator</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QFrame" name="frame">
@@ -110,8 +113,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>551</width>
-      <height>351</height>
+      <width>751</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="baseSize">
@@ -1490,8 +1493,8 @@
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>110</y>
+       <x>90</x>
+       <y>190</y>
        <width>531</width>
        <height>221</height>
       </rect>
@@ -1722,13 +1725,15 @@
     <zorder>plainTextEdit</zorder>
     <zorder>radioButton</zorder>
    </widget>
+   <zorder>frame</zorder>
+   <zorder>Browse_oni</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>574</width>
+     <width>779</width>
      <height>25</height>
     </rect>
    </property>
@@ -2262,6 +2267,7 @@
    </widget>
    <addaction name="menuVolcano_Bot"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

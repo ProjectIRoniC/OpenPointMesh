@@ -110,12 +110,12 @@ private slots:
      * Menu functions
      */
     void openSlot();
-//    void exitSlot();
-//    void omitFramesSlot();
-//    void filterAccuracySlot();
-//    void meshAccuracySlot();
-//    void aboutSlot();
-//    void viewWikiSlot();
+    void exitSlot();
+    void omitFramesSlot();
+    void filterAccuracySlot();
+    void meshAccuracySlot();
+    void aboutSlot();
+    void viewWikiSlot();
 
 
 

@@ -40,10 +40,46 @@ MainWindow::MainWindow( QWidget *parent ) :
     this->ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     /* create actions for menu */
+    /* Open */
     openAct = new QAction(tr("&Open"), this);
     openAct->setShortcuts(QKeySequence::New);
-    //openAct->setStatusTip(tr("Create a new file"));
+    openAct->setStatusTip(tr("Create a new file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(openSlot()));
+
+    /* Exit */
+    exitAct = new QAction(tr("&Exit"), this);
+    exitAct->setShortcuts(QKeySequence::New);
+    connect(exitAct, SIGNAL(triggered()), this, SLOT(exitSlot()));
+
+    /* Omit Frames */
+    omitFramesAct = new QAction(tr("&Omit Frames"), this);
+    omitFramesAct->setShortcuts(QKeySequence::New);
+    omitFramesAct->setStatusTip(tr("Select frames to omit with gui"));
+    connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
+
+    /* Filter Accuracy */
+    filterAccuracyAct = new QAction(tr("&Filter Accuracy"), this);
+    filterAccuracyAct->setShortcuts(QKeySequence::New);
+    filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program effects run time"));
+    connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
+
+    /* Mesh Accuracy */
+    meshAccuracyAct = new QAction(tr("&Mesh Accuracy"), this);
+    meshAccuracyAct->setShortcuts(QKeySequence::New);
+    meshAccuracyAct->setStatusTip(tr("Select Mesh Creation Accuracy"));
+    connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
+
+    /* About */
+    aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setShortcuts(QKeySequence::New);
+    aboutAct->setStatusTip(tr("About"));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutSlot()));
+
+    /* View Wiki Page */
+    viewWikiAct = new QAction(tr("&Wiki"), this);
+    viewWikiAct->setShortcuts(QKeySequence::New);
+    viewWikiAct->setStatusTip(tr("Wiki Page"));
+    connect(viewWikiAct, SIGNAL(triggered()), this, SLOT(viewWikiSlot()));
 
     /* create menu */
     fileMenu = menuBar()->addMenu(tr("&File"));
@@ -52,6 +88,17 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     /* add action to menu */
     fileMenu->addAction(openAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAct);
+
+    settingMenu->addAction(omitFramesAct);
+    settingMenu->addAction(filterAccuracyAct);
+    settingMenu->addAction(meshAccuracyAct);
+    settingMenu->addSeparator();
+
+    helpMenu->addAction(aboutAct);
+    helpMenu->addAction(viewWikiAct);
+    helpMenu->addSeparator();
 
     // Set color of Main Window
     //this->ui->
@@ -67,7 +114,56 @@ MainWindow::MainWindow( QWidget *parent ) :
 
 void MainWindow::openSlot()
 {
-    std::cout << "openslot\n";
+    QStringList files = QFileDialog::getOpenFileNames(
+                this,
+                "Select one or more files to open",
+                "/home",
+                "Text files (*.oni)");
+    if( files.size() > 0 )
+    {
+        oniFileNames = files;
+
+        for( int j = 0; j < oniFileNames.size(); ++j )
+            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
+        // update buttons
+        this->ui->Browse_oni->setEnabled(false);
+        this->ui->Browse_output->setEnabled(true);
+
+    }
+    else
+    {
+        appendMessageToOutputBuffer( "No .ONI file selected\n" );
+    }
+}
+
+void MainWindow::exitSlot()
+{
+    this->close();
+}
+
+void MainWindow::omitFramesSlot()
+{
+    std::cout << "inside omitframesslot\n";
+}
+
+void MainWindow::filterAccuracySlot()
+{
+    std::cout << "inside filteraccuracyslot\n";
+}
+
+void MainWindow::meshAccuracySlot()
+{
+    std::cout << "inside mesh accuracy slot\n";
+}
+
+void MainWindow::aboutSlot()
+{
+    std::cout << "inside about slot\n";
+}
+
+void MainWindow::viewWikiSlot()
+{
+    std::cout << "inside view wiki slot\n";
 }
 
 /*
