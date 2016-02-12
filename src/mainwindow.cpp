@@ -9,6 +9,7 @@
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
 
+
 MainWindow::MainWindow( QWidget *parent ) :
     QMainWindow( parent ),
     ui( new Ui::MainWindow )
@@ -73,6 +74,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setShortcuts(QKeySequence::New);
     aboutAct->setStatusTip(tr("About"));
+    // connect(aboutAct, SIGNAL(triggered()), qApp, SLOT(aboutSlot()));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutSlot()));
 
     /* View Wiki Page */
@@ -126,7 +128,6 @@ void MainWindow::openSlot()
         for( int j = 0; j < oniFileNames.size(); ++j )
             appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
         // update buttons
-        this->ui->Browse_oni->setEnabled(false);
         this->ui->Browse_output->setEnabled(true);
 
     }
@@ -158,7 +159,9 @@ void MainWindow::meshAccuracySlot()
 
 void MainWindow::aboutSlot()
 {
-    std::cout << "inside about slot\n";
+    QMessageBox::about(this, tr("About Menu"),
+            tr("This <b>messagebox</b> example shows how we can create "
+               "an about page or instructions."));
 }
 
 void MainWindow::viewWikiSlot()
@@ -171,14 +174,12 @@ void MainWindow::viewWikiSlot()
  */
 void MainWindow::setInitialButtonState()
 {
-    this->ui->Browse_oni->setEnabled(true);
     this->ui->Browse_output->setEnabled(false);
     this->ui->Start->setEnabled(false);
 }
 
 void MainWindow::setButtonsAllDisabledState()
 {
-    this->ui->Browse_oni->setEnabled(false);
     this->ui->Browse_output->setEnabled(false);
     this->ui->Start->setEnabled(false);
 }
@@ -352,7 +353,6 @@ void MainWindow::on_Browse_oni_clicked()
         for( int j = 0; j < oniFileNames.size(); ++j )
             appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
         // update buttons
-        this->ui->Browse_oni->setEnabled(false);
         this->ui->Browse_output->setEnabled(true);
 
     }
