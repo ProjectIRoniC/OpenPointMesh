@@ -112,12 +112,9 @@ MainWindow::MainWindow( QWidget *parent ) :
     helpMenu->addAction(viewWikiAct);
     helpMenu->addSeparator();
 
-    // Set color of Main Window
-    //this->ui->
-    //this->ui->radioButton->setStyleSheet("background-color: blue ");
-    //emit appendToConsole( output );
     // Set initial button state
     setInitialButtonState();
+
 }
 
 /*
@@ -126,29 +123,7 @@ MainWindow::MainWindow( QWidget *parent ) :
 
 void MainWindow::openSlot()
 {
-    QStringList files = QFileDialog::getOpenFileNames(
-                this,
-                "Select one or more files to open",
-                "/home",
-                "Text files (*.oni)");
-    if( files.size() > 0 )
-    {
-        oniFileNames = files;
-        this->ui->textBrowser->setText("");
-        for( int j = 0; j < oniFileNames.size(); ++j ) {
-            // appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
-            this->ui->textBrowser->insertPlainText(oniFileNames[j] + ' ');
-            this->ui->textBrowser->insertHtml("<b>;</b> ");
-            this->ui->textBrowser->insertPlainText(" ");
-        }
-        // update buttons
-        this->ui->Browse_output->setEnabled(true);
-
-    }
-    else
-    {
-        appendMessageToOutputBuffer( "No .ONI file selected\n" );
-    }
+    on_oni_browse_button_clicked();
 }
 
 void MainWindow::exitSlot()
@@ -190,6 +165,7 @@ void MainWindow::setInitialButtonState()
 {
     this->ui->Browse_output->setEnabled(false);
     this->ui->Start->setEnabled(false);
+    this->ui->oni_browse_button->setEnabled(true);
 }
 
 void MainWindow::setButtonsAllDisabledState()
@@ -382,6 +358,32 @@ void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_erro
 {
     QString output = QString::fromStdString( msg );
     this->outputBuffer->push(msg);
-
 }
 
+
+void MainWindow::on_oni_browse_button_clicked()
+{
+    QStringList files = QFileDialog::getOpenFileNames(
+                this,
+                "Select one or more files to open",
+                "/home",
+                "Text files (*.oni)");
+    if( files.size() > 0 )
+    {
+        oniFileNames = files;
+        this->ui->textBrowser->setText("");
+        for( int j = 0; j < oniFileNames.size(); ++j ) {
+            // appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
+            this->ui->textBrowser->insertPlainText(oniFileNames[j] + ' ');
+            this->ui->textBrowser->insertHtml("<b>;</b> ");
+            this->ui->textBrowser->insertPlainText(" ");
+        }
+        // update buttons
+        this->ui->Browse_output->setEnabled(true);
+
+    }
+    else
+    {
+        appendMessageToOutputBuffer( "No .ONI file selected\n" );
+    }
+}

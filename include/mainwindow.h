@@ -118,6 +118,8 @@ private slots:
 
 
 
+    void on_oni_browse_button_clicked();
+
 signals:
     /*
      * Pre:  msg is non-nul / non-empty.
