@@ -8,6 +8,7 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 #include <QApplication>
 #include <iostream>
 #include "../include/mainwindow.h"
+#include <QTextStream>
 
 /***************************************************************
 here for execution of code in standalone, will be removed once 
@@ -19,6 +20,19 @@ int main( int argc, char* argv[] )
     MainWindow w;
     w.show();
 
+    QFile File("../res/ss.qss");
+
+    if(File.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        //a.setStyleSheet(File.readAll());
+        File.close();
+    }
+    else
+    {
+        std::cout << "Could not open \' " << File.fileName().toStdString() << "\' \n";
+    }
+
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
     return a.exec();
 }
 

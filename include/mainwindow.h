@@ -1,12 +1,19 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtGui>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPlainTextEdit>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
+
+
+class QAction;
+class QActionGroup;
+class QLabel;
+class QMenu;
 
 namespace Ui {
 class MainWindow;
@@ -45,29 +52,31 @@ private:
      */
     void processOutputQueue();
 
+    /* Pre:  All buttons are either enabled(true) or enabled(false).
+     * Post: Browse_oni    = enabled
+     *       Browse_output = disabled
+     *       Start         = disabled
+     *       Close         = enabled
+     */
+    void setInitialButtonState() ;
+
+    /*
+     * Post: Browse_oni    = disabled
+     *       Browse_output = disabled
+     *       Start         = disabled
+     */
+    void setButtonsAllDisabledState();
+
     /*
      * Slots
      */
 private slots:
 
     /*
-     * Post: Opens file explorer to choose .oni file. 
-     *       Path is stored in onifileName
-     */
-    void on_Browse_clicked();
-    /*
-     * Post: Closes application. Destroys GUI
-     */
-    void on_Cancel_clicked();
-    /*
      * Pre:  oniFileName points to an oni file. outpuFolderName points to dir where output will be placed
      * Post: Begins oni to mesh transformation
      */
     void on_Start_clicked();
-    /*
-     * Post: display console visibility is toggled
-     */
-    void on_radioButton_toggled( bool checked );
     /*
      * Pre:  constrollerConstant must from the controller constants set
      * Post: nextstep for given constant is executed.
@@ -84,6 +93,32 @@ private slots:
      * Note: Not sure if this is needed.
      */
     void ensureCursorVisible( QString );
+
+    /*
+     * Menu functions
+     */
+    /*
+     * Post: Opens file explorer to choose .oni file.
+     *       Path is stored in onifileName
+     */
+    void openSlot();
+    /*
+     * Post: Closes application. Destroys GUI
+     */
+    void exitSlot();
+
+    /*
+     * Not Implemented
+     */
+    void omitFramesSlot();
+    void filterAccuracySlot();
+    void meshAccuracySlot();
+    void aboutSlot();
+    void viewWikiSlot();
+
+
+
+    void on_oni_browse_button_clicked();
 
 signals:
     /*
@@ -112,6 +147,13 @@ signals:
      */
     void cloudStitcherFinished( int );
 
+    /*
+     * Sginal that marks the end of the mesh construction
+     * Post: nextstep is called with passed int
+     */
+    void meshConstructorFinished( int );
+
+
 
 private:
 
@@ -123,6 +165,7 @@ private:
     static const int ONITOPCD = 0;
     static const int CLOUDSTITCHER = 1;
     static const int MESHCONSTRUCTOR = 2;
+    static const int FINISHED = 3;
 
     /*
      * Main ui
@@ -148,6 +191,24 @@ private:
      * worker thread that will do all the tasks that user enters
      */
     boost::thread* taskThread;
+
+    /*
+     * Actions for menue
+     */
+    QAction *openAct;
+    QAction *exitAct;
+    QAction *omitFramesAct;
+    QAction *filterAccuracyAct;
+    QAction *meshAccuracyAct;
+    QAction *aboutAct;
+    QAction *viewWikiAct;
+
+    /*
+     * Menu
+     */
+    QMenu *fileMenu;
+    QMenu *settingMenu;
+    QMenu *helpMenu;
 
     /*
      * Marks the completion of the last step of controller constants
