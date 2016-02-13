@@ -1,3 +1,5 @@
+#include <cctype>
+
 template <typename PointType>
 class OpenNI2Viewer
 {
@@ -13,6 +15,7 @@ public:
     , currentFrame (0)
     , totalFrames (totalFrames)
   {
+    this->pause();  // start the viewer in paused state
   }
 
   void
@@ -95,11 +98,17 @@ private:
    */ 
   static const char PLAY = ' ';
   static const char PAUSE = 'p';
+  static const char UPPER_PAUSE = 'P';
   static const char STOP = 's';
+  static const char UPPER_STOP = 'S';
   static const char REWIND = 'r';
+  static const char UPPER_REWIND = 'R';
   static const char FORWARD = 'f';
-  static const char BEG_BLURRY = 'b';  // beginning blurry frame(s)
-  static const char END_BLURRY = 'e';  // end of blurry frame(s)
+  static const char UPPER_FORWARD = 'F';
+  // static const char BEG_BLURRY = 'b';  // beginning blurry frame(s)
+  // static const char UPPER_BEG_BLURRY = 'B';  // beginning blurry frame(s)
+  // static const char END_BLURRY = '';  // end of blurry frame(s)
+  // static const char UPPER_END_BLURRY = 'E';  // end of blurry frame(s)
 
   /**
    * @description - state holding vars

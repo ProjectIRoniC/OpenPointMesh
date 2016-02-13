@@ -213,7 +213,7 @@ OpenNI2Viewer<PointType>::run ()
       cloud_mutex_.unlock ();
     }
 
-    if (cloud)
+    if (cloud && !is_paused())
     {
       FPS_CALC("drawing cloud");
 
@@ -243,7 +243,7 @@ OpenNI2Viewer<PointType>::run ()
     }
 
 
-    if (image)
+    if (image && !is_paused())
     {
       if (!image_init && cloud && cloud->width != 0)
       {
@@ -265,7 +265,7 @@ OpenNI2Viewer<PointType>::run ()
      * @author - david andrews
      */
     int capturedFrameCount = 0;
-    if (this->keypressed == "z") {
+    if (this->keypressed == 'z') {
       //using global array for now.
         capturedFrameArray[capturedFrameCount] = i;
         std::cout<< "Captured Frame Number is: " << capturedFrameArray[capturedFrameCount] << '\n';
@@ -276,9 +276,19 @@ OpenNI2Viewer<PointType>::run ()
      * check for pause
      * @author - nicole cranon
      */
-    if (this->keypressed == PAUSE) {
-      this->pause();
-    }
+    // if (this->keypressed == PAUSE || this->keypressed == toupper(PAUSE)) {
+    //   this->pause();
+    // }
+
+     switch (this->keypressed) {
+      case PAUSE:
+      case UPPER_PAUSE:
+        this->pause();
+        break;
+      case PLAY:
+        this->play();
+        break;
+     }
 
     /**
      * iterate through frames and check for user exit
@@ -297,6 +307,56 @@ OpenNI2Viewer<PointType>::run ()
   image_connection.disconnect ();
   if (rgb_data_)
     delete[] rgb_data_;
+}
+
+/**
+ * @description - is used for external classes and functions to check if the player is paused
+ * @author - nicole cranon
+ */
+template<typename PointType>
+bool
+OpenNI2Viewer<PointType>::is_paused () {
+  return this->paused;
+}
+
+/**
+ * @description - is used for external classes and functions to check if the player is playing
+ * @author - nicole cranon
+ */
+template<typename PointType>
+bool
+OpenNI2Viewer<PointType>::is_playing () {
+  return this->playing;
+}
+
+/**
+ * @description - is used for external classes and functions to check if the player is stopped
+ * @author - nicole cranon
+ */
+template<typename PointType>
+bool
+OpenNI2Viewer<PointType>::is_stopped () {
+  return this->stopped;
+}
+
+/**
+ * @description - is used for external classes and functions to check if the player is rewinding
+ * @author - nicole cranon
+ */
+template<typename PointType>
+bool
+OpenNI2Viewer<PointType>::is_rewinding () {
+  return this->rewinding;
+}
+
+/**
+ * @description - is used for external classes and functions to check if the player is fastforwarding
+ * @author - nicole cranon
+ */
+template<typename PointType>
+bool
+OpenNI2Viewer<PointType>::is_fastforwarding () {
+  return this->fastforwarding;
 }
 
 /**
