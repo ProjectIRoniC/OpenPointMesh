@@ -22,6 +22,15 @@ MainWindow::MainWindow( QWidget *parent ) :
     this->outputBuffer = new boost::lockfree::spsc_queue<std::string>( 200 );
     this->done = false;
 
+    // label that displays 'File'
+    this->ui->file_display_label->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    this->ui->file_display_label->setAlignment(Qt::AlignCenter);
+
+    // textbrowser that displays files that will be selected by the user
+    this->ui->textBrowser->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    this->ui->textBrowser->setAlignment(Qt::AlignLeft);
+
+
     outputMessageThread = new boost::thread( &MainWindow::processOutputQueue, this );
 
     // process the order in which we want tasks to be run
@@ -125,9 +134,13 @@ void MainWindow::openSlot()
     if( files.size() > 0 )
     {
         oniFileNames = files;
-
-        for( int j = 0; j < oniFileNames.size(); ++j )
-            appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
+        this->ui->textBrowser->setText("");
+        for( int j = 0; j < oniFileNames.size(); ++j ) {
+            // appendMessageToOutputBuffer( oniFileNames[j].toStdString() + " selected\n" );
+            this->ui->textBrowser->insertPlainText(oniFileNames[j] + ' ');
+            this->ui->textBrowser->insertHtml("<b>;</b> ");
+            this->ui->textBrowser->insertPlainText(" ");
+        }
         // update buttons
         this->ui->Browse_output->setEnabled(true);
 
