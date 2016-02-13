@@ -114,7 +114,18 @@ OpenNI2Viewer<PointType>::cloud_callback (const CloudConstPtr& cloud)
   FPS_CALC ("cloud callback");
   boost::mutex::scoped_lock lock (cloud_mutex_);
   cloud_ = cloud;
-  this->currentFrame += 1;  // iterate current frame
+
+  /**
+   * @ author - nicole cranon
+   * only move frame forward by one if it is playing 
+   */
+  if (is_playing()){
+    this->currentFrame += 1;  // iterate current frame
+  } else if (is_rewinding()) {
+    // handle frame count appropriately for a rewind
+  } else if (is_fastforwarding()) {
+    // handle frame count appropriately for a fastforward
+  }
   std::cout << "\nCurrent frame" << this->currentFrame;  // uncomment to print current frame
 }
 
@@ -182,6 +193,7 @@ OpenNI2Viewer<PointType>::run ()
   cloud_viewer_->setCameraFieldOfView (1.02259994f);
   boost::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&OpenNI2Viewer::cloud_callback, this, _1);
   boost::signals2::connection cloud_connection = grabber_.registerCallback (cloud_cb);
+  this->keypressed = PAUSE;
 
   boost::signals2::connection image_connection;
   if (grabber_.providesCallback<void (const boost::shared_ptr<pcl::io::openni2::Image>&)>())
@@ -199,7 +211,8 @@ OpenNI2Viewer<PointType>::run ()
 
   // while (currentFrame <= totalFrames && !cloud_viewer_->wasStopped () && (image_viewer_ && !image_viewer_->wasStopped ()))
   // {
-  for (unsigned i = 0; i < totalFrames; ++i)
+  for (unsigned i = 0; i < totalFrames;)
+  // while (currentFrame < totalFrames)
   {
     boost::shared_ptr<pcl::io::openni2::Image> image;
     CloudConstPtr cloud;
@@ -273,28 +286,27 @@ OpenNI2Viewer<PointType>::run ()
     }
       
     /**
-     * check for pause
+     * capture the current playback key pressed
      * @author - nicole cranon
      */
-    // if (this->keypressed == PAUSE || this->keypressed == toupper(PAUSE)) {
-    //   this->pause();
-    // }
-
      switch (this->keypressed) {
       case PAUSE:
       case UPPER_PAUSE:
         this->pause();
         break;
-      case PLAY:
+      default:
         this->play();
         break;
      }
 
     /**
-     * iterate through frames and check for user exit
+     * iterate through frames and check for user exit/stop
      * @author - nicole cranon
      */
-    i = currentFrame;
+    if (!is_paused()) {
+      i = currentFrame;
+    }
+
     if (cloud_viewer_->wasStopped () || (!image_viewer_ || image_viewer_->wasStopped ()))
     {
       break;
