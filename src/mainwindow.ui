@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
-    <height>419</height>
+    <width>771</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="palette">
@@ -139,9 +139,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>20</y>
       <width>751</width>
-      <height>321</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -637,8 +637,8 @@
     <widget class="QPushButton" name="Start">
      <property name="geometry">
       <rect>
-       <x>560</x>
-       <y>120</y>
+       <x>540</x>
+       <y>130</y>
        <width>172</width>
        <height>27</height>
       </rect>
@@ -650,8 +650,8 @@
     <widget class="QPushButton" name="Browse_output">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>120</y>
+       <x>30</x>
+       <y>130</y>
        <width>173</width>
        <height>27</height>
       </rect>
@@ -1213,9 +1213,9 @@
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>190</y>
-       <width>731</width>
+       <x>20</x>
+       <y>180</y>
+       <width>701</width>
        <height>111</height>
       </rect>
      </property>
@@ -1314,8 +1314,8 @@
     <widget class="QLabel" name="file_display_label">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>30</y>
+       <x>20</x>
+       <y>40</y>
        <width>41</width>
        <height>45</height>
       </rect>
@@ -1327,8 +1327,8 @@
     <widget class="QTextBrowser" name="textBrowser">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>30</y>
+       <x>70</x>
+       <y>40</y>
        <width>661</width>
        <height>45</height>
       </rect>
@@ -1488,6 +1488,40 @@
       <enum>QTextEdit::NoWrap</enum>
      </property>
     </widget>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>731</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame_3">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>119</y>
+       <width>731</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <zorder>frame_3</zorder>
+    <zorder>frame_2</zorder>
     <zorder>Browse_output</zorder>
     <zorder>Start</zorder>
     <zorder>plainTextEdit</zorder>
@@ -1500,7 +1534,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>776</width>
+     <width>771</width>
      <height>25</height>
     </rect>
    </property>

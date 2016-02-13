@@ -23,7 +23,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     this->done = false;
 
     // label that displays 'File'
-    this->ui->file_display_label->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    this->ui->file_display_label->setFrameStyle(QFrame::Sunken);
     this->ui->file_display_label->setAlignment(Qt::AlignCenter);
 
     // textbrowser that displays files that will be selected by the user
