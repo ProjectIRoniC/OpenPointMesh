@@ -1,25 +1,17 @@
-/*
- * CloudStitcher.cpp
- *
- *  Created on: Oct 12, 2015
- *      Author: matt
- */
-
-#include "../include/CloudStitcher.h"
+#include "CloudStitcher.h"
 
 namespace vba
 {
-
 	CloudStitcher::CloudStitcher()
 	{
 		this->pcd_filenames = new std::vector< std::string >();
 		this->worker_threads = new std::vector< CloudStitcher::CloudStitchingThread* >();
 		this->output_path = "";
-		this->temp_directories = new std::vector< std::string >();
 
 		this->num_threads = THREAD_1;
-		this->multithreading_enabled = false;
+		this->multithreading_enabled = true;
 		this->redirect_output_flag = false;
+		//this->filter_leaf_size = 0.1;
 
 	}
 
@@ -27,13 +19,11 @@ namespace vba
 	{
 		delete pcd_filenames;
 
-		for( unsigned i = 0 ; i < worker_threads->size() ; ++i )
+		for( int i = 0 ; i < worker_threads->size() ; ++i )
 		{
 			CloudStitcher::CloudStitchingThread* temp = this->worker_threads->at(i);
 			delete temp;
 		}
-
-		delete temp_directories;
 
 	}
 
@@ -96,7 +86,6 @@ namespace vba
 			std::stringstream output;
 			output << "Error: Given directory: " << directory_path << "does not exist.\n";
 			this->sendOutput( output.str() , true );
-			this->cleanupTempDirectories();
 			return -1;
 		}
 
@@ -122,13 +111,9 @@ namespace vba
 		{
 			this->num_threads = THREAD_8;
 		}
-		else if( num_files <= 160 && this->multithreading_enabled == true )
+		else if( num_files > 80 && this->multithreading_enabled == true )
 		{
-			this->num_threads = THREAD_16;
-		}
-		else if( num_files > 160 && this->multithreading_enabled == true )
-		{
-			this->num_threads = THREAD_16;
+			this->num_threads = THREAD_8;
 		}
 		else
 		{
@@ -171,11 +156,14 @@ namespace vba
 		return 0;
 	}
 
-	void CloudStitcher::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* buf) 
+
+	void CloudStitcher::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* buf)
 	{
 		this->output_buffer = buf;
 		this->redirect_output_flag = true;
 	}
+
+
 
 	int CloudStitcher::stitchPCDFiles( const std::string directory_path )
 	{
@@ -195,142 +183,51 @@ namespace vba
 
 		unsigned int file_count = this->getNumberofFilesRead();
 
-		//Since this function will be setup recursively we have to start with a base case to
-		//know when to stop and start rewinding the stack. If we only read in one file, then
-		//we know that all pcd files have been combined and we are finished. This would also
-		//apply if the user only supplied us with one pcd file.
+		//if there is only one file in the given directory, then stitching is not really necessary.
 		if( file_count == 1 )
 		{
-			//TODO we need to catch errors thrown by rename() like trying to put the file in a dir without the right access permissions
-
-			//send our single created file to the desired output location
-			try
-			{
-				boost::filesystem::rename( this->pcd_filenames->at(0) , this->output_path );
-			}
-			catch( boost::filesystem::filesystem_error const &e )
-			{
-				std::stringstream output( "Error: Problem moving final pcd file to output directory. Boost filesystem threw error: " );
-				output << e.what() << "\n";
-				this->sendOutput( output.str() , true );
-				this->cleanupTempDirectories();
-				return -1;
-			}
-
-			std::stringstream output;
-            output<< "Successfully outputted stitched pcd file to: " << this->output_path << "\n";
-			this->sendOutput( output.str() , false );
-
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud( new pcl::PointCloud<pcl::PointXYZRGB>() );
-	        pcl::io::loadPCDFile( this->output_path , *cloud );
-			std::string ply_path = this->output_path;
-			size_t position = ply_path.find( ".pcd" );
-			ply_path[ position ] = '.';
-			ply_path[ position + 1 ] = 'p';
-			ply_path[ position + 2 ] = 'l';
-			ply_path[ position + 3 ] = 'y';
-			pcl::io::savePLYFileASCII( ply_path , *cloud );
-
-			output.str("");
-			output << "Successfully outputed ply file to: " << ply_path << "\n";
-			this->sendOutput( output.str() , false );
-			
-			return 0;
-		}
-
-		//we will create a new temporary directory to contain the output of each recursive step.
-		//The first temp dir will be located in the original pcd directory. The second will be placed
-		//in the first temp dir and so on.
-		unsigned int temp_dir_count = this->temp_directories->size();
-
-		//if this is the first recursive step we will name the temp dir "temp_dir1"
-		if( temp_dir_count == 0 )
-		{
-			std::string temp_dir_name = this->pcd_files_directory;
-			temp_dir_name += "temp_dir1/";
-			this->temp_directories->push_back( temp_dir_name );
-			boost::filesystem::path temp_dir( temp_dir_name );
-
-			try
-			{
-				boost::filesystem::create_directory( temp_dir );
-			}
-			catch( boost::filesystem::filesystem_error const &e )
-			{
-				std::stringstream output;
-				output << "Error: Problem creating temporary directory. Boost error: " << e.what() << "\n";
-				this->sendOutput( output.str() , true );
-				this->cleanupTempDirectories();
-				return -1;
-			}
-		}
-
-		//if this is not the first recursive step then we will name the new temp dir based on how many
-		//times we have recursed
-		else
-		{
-			std::stringstream new_temp_dir_name;
-			new_temp_dir_name << this->pcd_files_directory;
-			new_temp_dir_name << "temp_dir";
-			new_temp_dir_name << ( temp_dir_count + 1 );
-			new_temp_dir_name << "/";
-
-			boost::filesystem::path temp_dir( new_temp_dir_name.str() );
-
-			try
-			{
-				boost::filesystem::create_directory( temp_dir );
-			}
-			catch( boost::filesystem::filesystem_error const &e )
-			{
-				std::stringstream output;
-				output << "Error: Problem creating temporary directory. Boost error: " << e.what() << "\n";
-				this->sendOutput( output.str() , true );
-				this->cleanupTempDirectories();
-				return -1;
-			}
-
-			//we have to keep track of the paths to all these temp dirs for cleanup later
-			this->temp_directories->push_back( new_temp_dir_name.str() );
-
+			this->sendOutput( "Error: Only 1 .pcd file was found in the directory. Stitching is not necessary.\n" , true );
+			return -1;
 		}
 
 
+		//The raw point cloud files typically contain very dense and noisy data. We will run some preprocessing filters
+		//over them to make them nicer. The clouds are filtered and then saved back into their original file.
+		//this->filterPointClouds();
 
+
+		//get all our threads setup with work they need to do
 		switch( this->num_threads )
 		{
 		case THREAD_1:
-			this->setupWorkerThreads( 1 , this->getNumberofFilesRead() , this->temp_directories->back() );
+			this->setupWorkerThreads( 1 , this->getNumberofFilesRead() );
 			break;
 
 		case THREAD_2:
-			this->setupWorkerThreads( 2 , this->getNumberofFilesRead() , this->temp_directories->back() );
+			this->setupWorkerThreads( 2 , this->getNumberofFilesRead() );
 			break;
 
 		case THREAD_4:
-			this->setupWorkerThreads( 4 , this->getNumberofFilesRead() , this->temp_directories->back() );
+			this->setupWorkerThreads( 4 , this->getNumberofFilesRead() );
 			break;
 
 		case THREAD_8:
-			this->setupWorkerThreads( 8 , this->getNumberofFilesRead() , this->temp_directories->back() );
-			break;
-
-		case THREAD_16:
-			this->setupWorkerThreads( 16 , this->getNumberofFilesRead() , this->temp_directories->back() );
+			this->setupWorkerThreads( 8 , this->getNumberofFilesRead() );
 			break;
 
 		default:
-			this->setupWorkerThreads( 1 , this->getNumberofFilesRead() , this->temp_directories->back() );
+			this->setupWorkerThreads( 1 , this->getNumberofFilesRead() );
 			break;
 		}
 
+
 		//just printing some info to the user
 		std::stringstream output;
-        output << "Read in " << this->pcd_filenames->size() << " files.\n";
+		output << "Read in " << this->pcd_filenames->size() << " files.\n";
 		this->sendOutput( output.str() , false );
 
 		output.str("");
-        output << "Spinning up " << this->worker_threads->size() << " threads.\n";
+		output << "Spinning up " << this->worker_threads->size() << " threads.\n";
 		this->sendOutput( output.str() , false );
 
 
@@ -342,41 +239,75 @@ namespace vba
 		}
 
 
-		//wait for all the threads to finish up there work and delete each thread from the container as
-		//it finishes
-		while( this->worker_threads->size() > 0 )
+		unsigned int active_thread_count = this->worker_threads->size();
+
+		//We spin in this while loop until all threads have reported they have finished work.
+		while( active_thread_count > 0 )
 		{
+			active_thread_count = this->worker_threads->size();
+
 			for( std::vector< CloudStitchingThread* >::iterator itr = this->worker_threads->begin() ; itr != this->worker_threads->end() ; ++itr )
 			{
 				CloudStitchingThread* temp = *itr;
 				if( temp->isFinished() )
 				{
-					worker_threads->erase( itr );
-					delete temp;
-					break;
+					active_thread_count--;
 				}
 			}
+
 		}
 
-		//make sure we clear out the pcd filenames held in the vector so they don't get mixed up with our next operation
-		this->pcd_filenames->clear();
-
-		//This is where we hit the recursive part. We now call this function again to start combining the newly stitched pcd files
-		//contained in the newly created temporary directory
-		int return_code = this->stitchPCDFiles( this->temp_directories->back() );
-
-		//If we have reached this section code, then we have hit the base case and are starting to unwind the stack. All we have to
-		//do is delete all of those temporary directories we created.
-		this->cleanupTempDirectories();
+		this->sendOutput( "-------All threads finished--------\n" , false );
 
 
-		return return_code;
+		PointCloud global_cloud;
+		PointCloud current_cloud;
+		Eigen::Matrix4f current_transform = Eigen::Matrix4f::Identity();
+		Eigen::Matrix4f global_transform = Eigen::Matrix4f::Identity();
+		CloudStitchingThread* current_thread;
+
+		current_thread = this->worker_threads->at( 0 );
+		current_cloud = current_thread->getStitchedPointCloud();
+		current_transform = current_thread->getFinalCloudTransform();
+
+		global_cloud += current_cloud;
+		global_transform *= current_transform;
+
+		for( unsigned int i = 1; i < this->worker_threads->size() ; i++ )
+		{
+			current_thread = this->worker_threads->at( i );
+
+			current_cloud = current_thread->getStitchedPointCloud();
+			pcl::transformPointCloud( current_cloud , current_cloud , global_transform );
+			global_cloud += current_cloud;
+			current_transform = current_thread->getFinalCloudTransform();
+			global_transform *= current_transform;
+
+		}
+
+		PointCloud::Ptr final_cloud( new PointCloud( global_cloud ));
+		vba::voxelGridFilter( final_cloud , final_cloud , 0.05 );
+		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 20 );
+
+		if( pcl::io::savePCDFile( this->output_path , *final_cloud , true ) == -1 )
+		{
+			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
+			return -1;
+		}
+
+		return 0;
 	}
+
+
 
 	void CloudStitcher::enableMultithreading( const bool choice )
 	{
 		this->multithreading_enabled = choice;
 	}
+
+
+
+
 
 	unsigned int CloudStitcher::getNumberofFilesRead()
 	{
@@ -388,10 +319,63 @@ namespace vba
 		return 0;
 	}
 
-	void CloudStitcher::setupWorkerThreads( unsigned int thread_count , unsigned int num_files , std::string output_dir )
+/*
+	int CloudStitcher::setFilterIntensity( unsigned int value )
+	{
+		//make sure value is between 0 and 20
+		if( value < 0 || value > 20 )
+		{
+			this->sendOutput( "Error: filter intensity value must be between 0 and 20.\n" , true );
+			return -1;
+		}
+
+		//We don't want to divide by zero below, so we check if the user entered zero.
+		if( value == 0 )
+		{
+			this->filter_leaf_size = 0.0;
+		}
+
+		else
+		{
+			//the actual value passed to the filter can be between 0.0 and 2.0
+			this->filter_leaf_size = float( 0.01 * value );
+		}
+
+		return 0;
+	}
+*/
+
+
+	/*
+	int CloudStitcher::filterPointClouds()
+	{
+		std::cout << "in filtering clouds function\n";
+		for( unsigned int i = 0 ; i < this->pcd_filenames->size() ; i++ )
+		{
+			std::stringstream output;
+			output << "Filtering cloud: " << i << " of " << this->pcd_filenames->size() << "\n";
+			this->sendOutput( output.str() , false );
+
+			PointCloud::Ptr target( new PointCloud() );
+			vba::openPCDFile( this->pcd_filenames->at( i ) , target );
+
+			vba::statisticalOutlierFilter( target , target , 1.0 , 5 );
+			vba::voxelGridFilter( target , target , this->filter_leaf_size );
+
+			pcl::io::savePCDFileASCII( this->pcd_filenames->at( i ) , *target );
+		}
+
+		return 0;
+	}
+
+	*/
+
+
+
+	void CloudStitcher::setupWorkerThreads( unsigned int thread_count , unsigned int num_files )
 	{
 		//offset is the number of pcd files that should be allocated to each thread
-		unsigned int offset = (int)std::ceil( num_files / thread_count );
+		unsigned int offset = (int)std::ceil( num_files / thread_count ) + 1;
 
 		//current offset will be a changing variable representing where in the filename array we are looking at
 		std::vector< std::string >::iterator current_offset = this->pcd_filenames->begin();
@@ -400,60 +384,26 @@ namespace vba
 		if( thread_count == 1 )
 		{
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , output_dir , this->output_buffer ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer ));
 		}
 
-        //otherwise we are going to divide up the filename array as evenly as possible among all the threads
+		//otherwise we are going to divide up the filename array as evenly as possible among all the threads
 		else
 		{
-			for( unsigned i = 0 ; i < thread_count - 1 ; ++i )
+			for( int i = 0 ; i < thread_count - 1 ; ++i )
 			{
 				std::vector< std::string >::iterator last = ( current_offset + offset );
 				std::vector< std::string > param_vec( current_offset , last );
-				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , output_dir , this->output_buffer ));
-				current_offset = last;
+				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer ));
+				current_offset = last - 1;
 			}
 
 			//to prevent a seg-fault we just copy whatever is left of the filename array into the last thread
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , output_dir , this->output_buffer ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer ));
 
 		}
 	}
-
-
-	int CloudStitcher::cleanupTempDirectories()
-	{
-		bool result = true;
-
-		//if there are no temporary directories in the array then we don't need to delete anything
-		if( this->temp_directories->size() == 0 )
-		{
-			return 0;
-		}
-
-		//use boost to remove each temporary dir from the filesystem and then delete the entry from temp_directories array
-		std::vector< std::string >::reverse_iterator itr;
-		for( itr = this->temp_directories->rbegin() ; itr != this->temp_directories->rend() ; ++itr )
-		{
-			try
-			{
-				boost::filesystem::remove_all( *itr );
-				this->temp_directories->erase( --(itr.base()) );
-			}
-			catch( boost::filesystem::filesystem_error const &e )
-			{
-				this->sendOutput( "Error: Failed to delete a temporary directory\n" , true );
-				result = false;
-			}
-		}
-
-		if( result == true )
-			return 0;
-		else
-			return -1;
-	}
-
 
 
 
@@ -480,31 +430,20 @@ namespace vba
 	}
 
 
-
-
-
-	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , std::string output_dir , boost::lockfree::spsc_queue<std::string>* _output_buffer )
+	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf )
 	{
 		//we will make a copy of the list of target filenames for this instance of the class
 		this->file_list = new std::vector< std::string >( files );
 		this->worker_thread_is_finished = false;
 
-		//make sure we save a copy of the path to the output directory
-		this->output_directory = output_dir;
+		this->output_buffer = buf;
 
-		//create the absolute path to the final pcd file that is a creation of all the stitching
-		this->output_filename = output_dir;
-		boost::filesystem::path filename( this->file_list->at(0) );
-		this->output_filename += filename.filename().string();
-
-		this->mPCDRegistration = new PCDRegistration( files , this->output_filename );
-		this->mPCDRegistration->setOutputBuffer( _output_buffer );
+		this->cloud_transform = Eigen::Matrix4f::Identity();
 	}
 
 	CloudStitcher::CloudStitchingThread::~CloudStitchingThread()
 	{
 		delete file_list;
-		delete mPCDRegistration;
 	}
 
 	void CloudStitcher::CloudStitchingThread::start()
@@ -539,7 +478,24 @@ namespace vba
 
 	void CloudStitcher::CloudStitchingThread::stitchTargetClouds()
 	{
-		this->mPCDRegistration->start();
+		PointCloud::Ptr output_cloud( new PointCloud );
+		vba::registerPointCloudSet( std::vector< std::string >( *file_list ) , output_cloud , this->cloud_transform , this->output_buffer );
+
+		this->finished_cloud = *output_cloud;
 	}
 
-} /* namespace vba */
+
+	PointCloud CloudStitcher::CloudStitchingThread::getStitchedPointCloud()
+	{
+		return this->finished_cloud;
+	}
+
+	Eigen::Matrix4f CloudStitcher::CloudStitchingThread::getFinalCloudTransform()
+	{
+		return this->cloud_transform;
+	}
+
+
+
+
+} //namespace vba
