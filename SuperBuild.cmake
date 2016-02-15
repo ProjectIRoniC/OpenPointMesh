@@ -110,8 +110,6 @@ SET( EXTERNAL_PROJECT_BUILD_TYPE "Release" CACHE STRING "Default build type for 
 SET_PROPERTY( CACHE EXTERNAL_PROJECT_BUILD_TYPE PROPERTY
 	STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 
-# OPTION( USE_SYSTEM_VTK "Build using an externally defined version of VTK" OFF )
-
 
 #-----------------------------------------------------------------------------
 # Common external projects CMake variables
@@ -190,7 +188,7 @@ STRING( REPLACE ";" "^" ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES "${${CMAKE_
 ## for i in SuperBuild/*; do  echo $i |sed 's/.*External_\([a-zA-Z]*\).*/\1/g'|fgrep -v cmake|fgrep -v Template; done|sort -u
 SET( ${PRIMARY_PROJECT_NAME}_DEPENDENCIES
 	PCL
-	# Qt4
+	#Qt
 	# VTK
 #	JPEG
 	${QT_DEPENDENT_PACKAGES}

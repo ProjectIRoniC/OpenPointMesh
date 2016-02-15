@@ -1,7 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
-# even if other External_${ExtProjName}.cmake files are sourced
-SET( extProjName OpenNI2 ) #The find_package known name
-SET( proj        OpenNI2 ) #This local name
+# even if other External_${ExtProjName}.cmake files are sourced by
+# ExternalProject_Include_Dependencies
+SET( extProjName OpenNI2 ) # The find_package known name
+SET( proj        OpenNI2 ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -63,14 +64,15 @@ IF( NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}"
 		CMAKE_GENERATOR ${gen}
 		CMAKE_ARGS -Wno-dev --no-warn-unused-cli
 		CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-		## We really do want to install in order to limit # of include paths INSTALL_COMMAND ""
+
 		DEPENDS
 			${${proj}_DEPENDENCIES}
 	)
 	
 	### --- Set binary information
-	SET( ${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-	SET( ${extProjName}_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include/openni2 )
+	SET( OPENNI2_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
+	SET( OPENNI2_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include/openni2 )
+	SET( OPENNI2_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
 	### --- End binary information
 ELSE()
 	IF( ${USE_SYSTEM_${extProjName}} )
@@ -84,11 +86,13 @@ ENDIF()
 
 mark_as_superbuild(
   VARS
-    ${extProjName}_DIR:PATH
-	${extProjName}_INCLUDE_DIR:PATH
+    OPENNI2_DIR:PATH
+	OPENNI2_INCLUDE_DIR:PATH
+	OPENNI2_LIBRARY_DIR:PATH
   LABELS
      "FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "OpenNI2_DIR:${${extProjName}_DIR}" )
-ExternalProject_Message( ${proj} "OpenNI2_INCLUDE_DIR:${${extProjName}_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "OPENNI2_DIR: ${OPENNI2_DIR}" )
+ExternalProject_Message( ${proj} "OPENNI2_INCLUDE_DIR: ${OPENNI2_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "OPENNI2_LIBRARY_DIR: ${OPENNI2_LIBRARY_DIR}" )

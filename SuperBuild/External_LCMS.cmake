@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName Eigen ) # The find_package known name
-SET( proj        Eigen ) # The local name
+SET( extProjName LCMS ) # The find_package known name
+SET( proj        LCMS ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -14,7 +14,7 @@ ENDIF()
 SET( ${proj}_DEPENDENCIES "" )
 
 # Include dependent projects if any
-ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
+ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
@@ -25,15 +25,13 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
-	-DEIGEN_TEST_NOQT:BOOL=ON
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL http://bitbucket.org/eigen/eigen/get/3.2.7.tar.gz )
-SET( ${proj}_MD5 76959f105cfbda3ba77889bc204f4bd2 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/RLovelett/eigen.git" )
-# SET( ${proj}_GIT_TAG "2efca7e71fff7f17fcba0658f640b6ce8a53d469" ) # 3.2.7ish
+SET( ${proj}_URL https://github.com/LuaDist/lcms/archive/1.19.tar.gz )
+SET( ${proj}_MD5 e4232b8213974761c553a0d92acac504 )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/lcms" )
+# SET( ${proj}_GIT_TAG "1.19" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
@@ -59,17 +57,23 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( EIGEN_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( EIGEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include/eigen3 )
+SET( LCMS_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
+SET( LCMS_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
+SET( LCMS_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( LCMS_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/liblcms.a )
 
 mark_as_superbuild(
 	VARS
-		EIGEN_DIR:PATH
-		EIGEN_INCLUDE_DIR:PATH
+		LCMS_DIR:PATH
+		LCMS_INCLUDE_DIR:PATH
+		LCMS_LIBRARY_DIR:PATH
+		LCMS_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
-	)
+)
 
-ExternalProject_Message( ${proj} "EIGEN_DIR: ${EIGEN_DIR}" )
-ExternalProject_Message( ${proj} "EIGEN_INCLUDE_DIR: ${EIGEN_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_DIR: ${LCMS_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_INCLUDE_DIR: ${LCMS_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_LIBRARY_DIR: ${LCMS_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_LIBRARY: ${LCMS_LIBRARY}" )
 ### --- End binary information

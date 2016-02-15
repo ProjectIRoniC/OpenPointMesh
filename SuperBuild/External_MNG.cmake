@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName Eigen ) # The find_package known name
-SET( proj        Eigen ) # The local name
+SET( extProjName MNG ) # The find_package known name
+SET( proj        MNG ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -11,10 +11,14 @@ IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
 ENDIF()
 
 # Set dependency list
-SET( ${proj}_DEPENDENCIES "" )
+SET( ${proj}_DEPENDENCIES
+	JPEG
+	LCMS
+	zlib
+)
 
 # Include dependent projects if any
-ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
+ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
@@ -25,15 +29,18 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
-	-DEIGEN_TEST_NOQT:BOOL=ON
+	-DZLIB_ROOT:PATH=${ZLIB_DIR}
+	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
+	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
+	-DLCMS_INCLUDE_DIR:PATH=${LCMS_INCLUDE_DIR}
+	-DLCMS_LIBRARY:PATH=${LCMS_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL http://bitbucket.org/eigen/eigen/get/3.2.7.tar.gz )
-SET( ${proj}_MD5 76959f105cfbda3ba77889bc204f4bd2 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/RLovelett/eigen.git" )
-# SET( ${proj}_GIT_TAG "2efca7e71fff7f17fcba0658f640b6ce8a53d469" ) # 3.2.7ish
+SET( ${proj}_URL https://github.com/LuaDist/libmng/archive/1.0.10.tar.gz )
+SET( ${proj}_MD5 e63cbc9ce44f12663e269b2268bce3bb )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libmng" )
+# SET( ${proj}_GIT_TAG "1.0.10" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
@@ -59,17 +66,23 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( EIGEN_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( EIGEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include/eigen3 )
+SET( MNG_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
+SET( MNG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
+SET( MNG_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( MNG_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libmng.a )
 
 mark_as_superbuild(
 	VARS
-		EIGEN_DIR:PATH
-		EIGEN_INCLUDE_DIR:PATH
+		MNG_DIR:PATH
+		MNG_INCLUDE_DIR:PATH
+		MNG_LIBRARY_DIR:PATH
+		MNG_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
-	)
+)
 
-ExternalProject_Message( ${proj} "EIGEN_DIR: ${EIGEN_DIR}" )
-ExternalProject_Message( ${proj} "EIGEN_INCLUDE_DIR: ${EIGEN_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "MNG_DIR: ${MNG_DIR}" )
+ExternalProject_Message( ${proj} "MNG_INCLUDE_DIR: ${MNG_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "MNG_LIBRARY_DIR: ${MNG_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "MNG_LIBRARY: ${MNG_LIBRARY}" )
 ### --- End binary information

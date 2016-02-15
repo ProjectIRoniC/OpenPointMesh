@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName Eigen ) # The find_package known name
-SET( proj        Eigen ) # The local name
+SET( extProjName TIFF ) # The find_package known name
+SET( proj        TIFF ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -11,10 +11,13 @@ IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
 ENDIF()
 
 # Set dependency list
-SET( ${proj}_DEPENDENCIES "" )
+SET( ${proj}_DEPENDENCIES
+	JPEG
+	zlib
+)
 
 # Include dependent projects if any
-ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
+ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
@@ -25,15 +28,18 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
-	-DEIGEN_TEST_NOQT:BOOL=ON
+	-DBUILD_SHARED_LIBS:BOOL=OFF
+	-DJPEG:BOOL=ON
+	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
+	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
+	-DZLIB_ROOT:PATH=${ZLIB_DIR}
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL http://bitbucket.org/eigen/eigen/get/3.2.7.tar.gz )
-SET( ${proj}_MD5 76959f105cfbda3ba77889bc204f4bd2 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/RLovelett/eigen.git" )
-# SET( ${proj}_GIT_TAG "2efca7e71fff7f17fcba0658f640b6ce8a53d469" ) # 3.2.7ish
+SET( ${proj}_URL https://github.com/LuaDist/libtiff/archive/3.8.2.tar.gz )
+SET( ${proj}_MD5 c1d8ad4ee235bdef497a23a7d3f51a90 )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libtiff" )
+# SET( ${proj}_GIT_TAG "3.8.2" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
@@ -59,17 +65,26 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( EIGEN_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( EIGEN_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include/eigen3 )
+SET( TIFF_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
+SET( TIFF_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
+SET( TIFF_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( TIFF_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libtiff.a )
+SET( TIFF_LIBRARYXX ${CMAKE_BINARY_DIR}/${proj}-install/lib/libtiffxx.a )
 
 mark_as_superbuild(
 	VARS
-		EIGEN_DIR:PATH
-		EIGEN_INCLUDE_DIR:PATH
+		TIFF_DIR:PATH
+		TIFF_INCLUDE_DIR:PATH
+		TIFF_LIBRARY_DIR:PATH
+		TIFF_LIBRARY:FILEPATH
+		TIFF_LIBRARYXX:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
-	)
+)
 
-ExternalProject_Message( ${proj} "EIGEN_DIR: ${EIGEN_DIR}" )
-ExternalProject_Message( ${proj} "EIGEN_INCLUDE_DIR: ${EIGEN_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "TIFF_DIR: ${TIFF_DIR}" )
+ExternalProject_Message( ${proj} "TIFF_INCLUDE_DIR: ${TIFF_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "TIFF_LIBRARY_DIR: ${TIFF_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "TIFF_LIBRARY: ${TIFF_LIBRARY}" )
+ExternalProject_Message( ${proj} "TIFF_LIBRARYXX: ${TIFF_LIBRARYXX}" )
 ### --- End binary information
