@@ -41,7 +41,7 @@ int registerPointCloudSet( const std::vector< std::string > file_list , PointClo
 		output_stream.str( "" );
 		output_stream << "Registering cloud " << i - 1 << " of " << file_list.size() << "\n";
 		std::cout << output_stream.str();
-		//buf->push( output_stream.str() );
+		buf->push( output_stream.str() );
 
 		//we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
 		vba::pairAlign( source, target, pairTransform );
@@ -50,6 +50,7 @@ int registerPointCloudSet( const std::vector< std::string > file_list , PointClo
 		GlobalTransform = GlobalTransform * pairTransform;
 
 		//transform the target cloud using the accumulated transformations and the one we just got from pairAlign
+		std::cout << "Z Translation: " << GlobalTransform( 2 , 2 ) << "\n";
 		pcl::transformPointCloud (*target, *target, GlobalTransform);
 
 		//add cloud to the total model. This will append the target's points to the whole cloud we are building up

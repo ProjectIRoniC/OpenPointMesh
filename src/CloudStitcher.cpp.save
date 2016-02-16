@@ -226,7 +226,7 @@ namespace vba
 		output.str("");
 		output << "Spinning up " << this->worker_threads->size() << " threads.\n";
 		this->sendOutput( output.str() , false );
-        const clock_t begin_time = std::clock();
+
 
 		//spin up all the allocated threads
 		for( unsigned int i = 0 ; i < this->worker_threads->size() ; ++i )
@@ -291,11 +291,6 @@ namespace vba
 			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
 			return -1;
 		}
-
-		float elapsed_time = float( std::clock() - begin_time ) / CLOCKS_PER_SEC;
-		output.str("");
-		output << "Finished in " << elapsed_time << " seconds.\n";
-		this->sendOutput( output.str() , false );
 
 		return 0;
 	}
@@ -412,7 +407,6 @@ namespace vba
 		//we will make a copy of the list of target filenames for this instance of the class
 		this->file_list = new std::vector< std::string >( files );
 		this->worker_thread_is_finished = false;
-		this->files_finished = files_finished;
 
 		this->output_buffer = buf;
 
@@ -488,6 +482,12 @@ namespace vba
             vba::voxelGridFilter( source , source , 0.05 );
             vba::voxelGridFilter( target , target , 0.05 );
 
+            //send some output about the progress of stitching so far
+            output_stream.str( "" );
+            output_stream << "Cloud
+            output_buffer->push( output_stream.str() );
+            //buf->push( output_stream.str() );
+
             //we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
             vba::pairAlign( source, target, pairTransform );
 
@@ -499,12 +499,6 @@ namespace vba
 
             //add cloud to the total model. This will append the target's points to the whole cloud we are building up
             *global_cloud += *target;
-
-             //send some output about the progress of stitching so far
-             //possible race condition here
-            output_stream.str( "" );
-            output_stream << "Registered Cloud " << ++*this->files_finished << "\n";
-            output_buffer->push( output_stream.str() );
 
         }
 

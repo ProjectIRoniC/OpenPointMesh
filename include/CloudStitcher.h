@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <ctime>
 
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
@@ -128,12 +129,13 @@ class CloudStitcher
 		 * @return: 0 if the set was successful. -1 if the user entered a bad value.
 		 *
 		 */
-		//int setFilterIntensity( unsigned int value );
+		int setFilterIntensity( unsigned int value );
 
 	private:
 
 		std::string pcd_files_directory;
 		std::string output_path;
+		unsigned int files_finished;
 
 		std::vector<std::string>* pcd_filenames;
 
@@ -158,15 +160,6 @@ class CloudStitcher
 		int setPCDDirectory( std::string directory_path );
 
 
-		/*Function used by the class to filter dense and noisy data from the point clouds. This function will iterate
-		 * over all .pcd files in the given directory and filter those clouds. The new clouds will be saved back into
-		 * their original files.
-		 *
-		 * @param: none
-		 *
-		 * @return: 0 on success and -1 otherwise
-		 */
-		//int filterPointClouds();
 
 
 		/*This is a helper function used internally within CloudStitcher. It subdivides all the pcd
@@ -203,7 +196,7 @@ class CloudStitcher
 				 * @param: a copy of the vector containing the pcd files to stich together
 				 * @return: none
 				 */
-				CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf );
+				CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished );
 
 				/*Default destructor that deallocates the objects allocated dynamically throughout this instances
 				 * lifespan
@@ -256,6 +249,7 @@ class CloudStitcher
 
 				bool worker_thread_is_finished;
 				std::vector< std::string >* file_list;
+				unsigned int* files_finished;
 
 				boost::thread worker_thread;
 				boost::thread exit_detect_thread;
