@@ -12,10 +12,10 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	#Boost
-	#Eigen
-	#FLANN
-	#qhull	
+	Boost
+	Eigen
+	FLANN
+	qhull	
 	Qt
 	VTK
 	# OpenNI2

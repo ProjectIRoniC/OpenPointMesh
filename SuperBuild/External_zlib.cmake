@@ -61,7 +61,7 @@ ExternalProject_Add( ${proj}
 SET( ZLIB_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
 SET( ZLIB_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
 SET( ZLIB_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( ZLIB_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libzlib.a )
+SET( ZLIB_LIBRARY z )
 	
 mark_as_superbuild(
 	VARS
@@ -78,3 +78,19 @@ ExternalProject_Message( ${proj} "ZLIB_INCLUDE_DIR: ${ZLIB_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY_DIR: ${ZLIB_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY: ${ZLIB_LIBRARY}" )
 ### --- End binary information
+
+# zlib names the library file incorrectly on Windows for what dependents expect
+# this custom step is to rename the library after the install step
+IF( WIN32 )
+	SET( ${proj}_RENAME_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_zlib_renamezlib.cmake )
+	
+	ExternalProject_Add_Step( ${proj} "renamelibraries"
+		COMMAND ${CMAKE_COMMAND}
+			-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
+			-DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+			-P ${${proj}_RENAME_SCRIPT}
+		
+		DEPENDEES
+			install
+	)
+ENDIF()

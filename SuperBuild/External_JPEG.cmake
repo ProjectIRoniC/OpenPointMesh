@@ -60,7 +60,7 @@ ExternalProject_Add( ${proj}
 SET( JPEG_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
 SET( JPEG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
 SET( JPEG_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( JPEG_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libjpeg.a )
+SET( JPEG_LIBRARY jpeg )
 
 mark_as_superbuild(
 	VARS

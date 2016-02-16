@@ -188,7 +188,7 @@ STRING( REPLACE ";" "^" ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES "${${CMAKE_
 ## for i in SuperBuild/*; do  echo $i |sed 's/.*External_\([a-zA-Z]*\).*/\1/g'|fgrep -v cmake|fgrep -v Template; done|sort -u
 SET( ${PRIMARY_PROJECT_NAME}_DEPENDENCIES
 	PCL
-	#Qt
+	Qt
 	# VTK
 #	JPEG
 	${QT_DEPENDENT_PACKAGES}

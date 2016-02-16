@@ -12,21 +12,40 @@ SET( QT_OPTIONS
 	-no-accessibility
 	-no-openvg
 	-no-qt3support
+	
 	-system-zlib
-	-I ${ZLIB_INCLUDE_DIR}
-	-L ${ZLIB_LIBRARY_DIR}
-	-system-libtiff
-	-I ${TIFF_INCLUDE_DIR}
-	-L ${TIFF_LIBRARY_DIR}
-	-system-libpng
-	-I ${PNG_INCLUDE_DIR}
-	-L ${PNG_LIBRARY_DIR}
-	-system-libmng
-	-I ${MNG_INCLUDE_DIR}
-	-L ${MNG_LIBRARY_DIR}
 	-system-libjpeg
+	-system-libtiff
+	-system-libpng
+	-qt-libmng
+	
+	# Dependency directories
+	-I ${ZLIB_INCLUDE_DIR}
 	-I ${JPEG_INCLUDE_DIR}
+	-I ${TIFF_INCLUDE_DIR}
+	-I ${PNG_INCLUDE_DIR}
+	-I ${LCMS_INCLUDE_DIR}
+	-I ${MNG_INCLUDE_DIR}
+	
+	-L ${ZLIB_LIBRARY_DIR}
 	-L ${JPEG_LIBRARY_DIR}
+	-L ${TIFF_LIBRARY_DIR}
+	-L ${PNG_LIBRARY_DIR}
+	-L ${LCMS_LIBRARY_DIR}
+	-L ${MNG_LIBRARY_DIR}
+	
+	
+	# Libraries to use
+	# IMPORTANT:	* libraries must be listed after all include directories
+	#				* libraries that support other libraries must be listed first
+	#				* all previously linked libraries must be included (ex. LCMS for MNG)
+	-l ${ZLIB_LIBRARY}
+	-l ${JPEG_LIBRARY}
+	-l ${TIFF_LIBRARY}
+	-l ${TIFFXX_LIBRARY}
+	-l ${PNG_LIBRARY}
+	-l ${LCMS_LIBRARY}
+	-l ${MNG_LIBRARY}
 )
 
 IF( WIN32 )

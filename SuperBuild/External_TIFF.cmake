@@ -29,10 +29,11 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	-DBUILD_SHARED_LIBS:BOOL=OFF
+	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
 	-DJPEG:BOOL=ON
 	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
 	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
-	-DZLIB_ROOT:PATH=${ZLIB_DIR}
 )
 
 # Download tar source when possible to speed up build time
@@ -68,8 +69,8 @@ ExternalProject_Add( ${proj}
 SET( TIFF_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
 SET( TIFF_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
 SET( TIFF_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( TIFF_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libtiff.a )
-SET( TIFF_LIBRARYXX ${CMAKE_BINARY_DIR}/${proj}-install/lib/libtiffxx.a )
+SET( TIFF_LIBRARY tiff )
+SET( TIFFXX_LIBRARY tiffxx )
 
 mark_as_superbuild(
 	VARS
@@ -77,7 +78,7 @@ mark_as_superbuild(
 		TIFF_INCLUDE_DIR:PATH
 		TIFF_LIBRARY_DIR:PATH
 		TIFF_LIBRARY:FILEPATH
-		TIFF_LIBRARYXX:FILEPATH
+		TIFFXX_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -86,5 +87,5 @@ ExternalProject_Message( ${proj} "TIFF_DIR: ${TIFF_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_INCLUDE_DIR: ${TIFF_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY_DIR: ${TIFF_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY: ${TIFF_LIBRARY}" )
-ExternalProject_Message( ${proj} "TIFF_LIBRARYXX: ${TIFF_LIBRARYXX}" )
+ExternalProject_Message( ${proj} "TIFFXX_LIBRARY: ${TIFFXX_LIBRARY}" )
 ### --- End binary information

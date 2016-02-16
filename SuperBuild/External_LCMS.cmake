@@ -11,7 +11,11 @@ IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
 ENDIF()
 
 # Set dependency list
-SET( ${proj}_DEPENDENCIES "" )
+SET( ${proj}_DEPENDENCIES 
+		zlib
+		TIFF
+		JPEG
+)
 
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
@@ -60,7 +64,7 @@ ExternalProject_Add( ${proj}
 SET( LCMS_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
 SET( LCMS_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
 SET( LCMS_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( LCMS_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/liblcms.a )
+SET( LCMS_LIBRARY lcms )
 
 mark_as_superbuild(
 	VARS

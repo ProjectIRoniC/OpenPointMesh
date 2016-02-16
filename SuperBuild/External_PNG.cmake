@@ -66,7 +66,7 @@ ExternalProject_Add( ${proj}
 SET( PNG_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
 SET( PNG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
 SET( PNG_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( PNG_LIBRARY ${CMAKE_BINARY_DIR}/${proj}-install/lib/libpng.a )
+SET( PNG_LIBRARY png )
 
 mark_as_superbuild(
 	VARS
