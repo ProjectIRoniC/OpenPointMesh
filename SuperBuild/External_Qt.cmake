@@ -69,7 +69,7 @@ ExternalProject_Add( ${proj}
 #						-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
 #						-P ${${proj}_BUILD_SCRIPT}
 	
-	# INSTALL_COMMAND ""
+	INSTALL_COMMAND ""
 
 	DEPENDS
 		${${proj}_DEPENDENCIES}
