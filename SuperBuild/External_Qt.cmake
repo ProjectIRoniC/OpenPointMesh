@@ -23,8 +23,8 @@ SET( ${proj}_DEPENDENCIES
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
 ### --- Project specific additions here
+SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Qt_configureqt.cmake )
-SET( ${proj}_BUILD_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Qt_buildqt.cmake )
 
 SET( ${proj}_URL https://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
 SET( ${proj}_MD5 2edbe4d6c2eff33ef91732602f3518eb )
@@ -62,14 +62,8 @@ ExternalProject_Add( ${proj}
 						-DLCMS_LIBRARY_DIR:PATH=${LCMS_LIBRARY_DIR}
 						-DLCMS_LIBRARY:FILEPATH=${LCMS_LIBRARY}
 						-P ${${proj}_CONFIGURE_SCRIPT}
-	BUILD_COMMAND make
-#	BUILD_COMMAND ${CMAKE_COMMAND}
-#						-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
-#						-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
-#						-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
-#						-P ${${proj}_BUILD_SCRIPT}
 	
-	INSTALL_COMMAND ""
+	BUILD_COMMAND make
 
 	DEPENDS
 		${${proj}_DEPENDENCIES}

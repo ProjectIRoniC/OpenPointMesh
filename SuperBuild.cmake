@@ -1,12 +1,12 @@
 #-----------------------------------------------------------------------------
-ENABLE_LANGUAGE( C )	# not sure if this is needed
+# Enable compiler language support
+#-----------------------------------------------------------------------------
+ENABLE_LANGUAGE( C )
 ENABLE_LANGUAGE( CXX )
 
-#-----------------------------------------------------------------------------
-# INCLUDE( SlicerMacroGetOperatingSystemArchitectureBitness )	# not sure if this is needed
 
 #-----------------------------------------------------------------------------
-# Where should the superbuild source files be downloaded to?
+# Setup a source cache so projects can share downloaded sources
 # By keeping this outside of the build tree, you can share one
 # set of external source trees for multiple build trees
 #-----------------------------------------------------------------------------
@@ -42,32 +42,16 @@ IF( NOT ${CMAKE_PROJECT_NAME}_USE_GIT_PROTOCOL )
 	ENDFUNCTION()
 ENDIF()
 
-CMAKE_DEPENDENT_OPTION( ${CMAKE_PROJECT_NAME}_USE_CTKAPPLAUNCHER "CTKAppLauncher used with python" ON
-  "NOT ${CMAKE_PROJECT_NAME}_USE_SYSTEM_python" OFF )
-
 FIND_PACKAGE( Git REQUIRED )
 
-# I don't know who removed the Find_Package for QT, but it needs to be here
-# in order to build VTK if ${PRIMARY_PROJECT_NAME}_USE_QT is set.
-IF( ${PRIMARY_PROJECT_NAME}_USE_QT )
-	CMAKE_DEPENDENT_OPTION(
-		BUILD_DTIPrep "BUILD_DTIPrep option" OFF "${PRIMARY_PROJECT_NAME}_USE_QT" ON
-	)
-	SET( QT_DEPENDENT_PACKAGES ) # vv package can also be built but was causing problems
-	IF( BUILD_DTIPrep )  # Do not build DTIPrep until it behave better. Hans 2015-01-30
-		SET( QT_DEPENDENT_PACKAGES DTIPrep ) # vv package can also be built but was causing problems
-	ENDIF()
-	FIND_PACKAGE( Qt4 REQUIRED )
-ELSE()
-	SET( QT_DEPENDENT_PACKAGES "" )
-ENDIF()
+#CMAKE_DEPENDENT_OPTION( ${CMAKE_PROJECT_NAME}_USE_CTKAPPLAUNCHER "CTKAppLauncher used with python" ON
+#  "NOT ${CMAKE_PROJECT_NAME}_USE_SYSTEM_python" OFF )
+
 
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
 #-----------------------------------------------------------------------------
 INCLUDE( ExternalProject )
-#INCLUDE( MacroCheckExternalProjectDependency )
-#INCLUDE( MacroEmptyExternalProject )
 
 # Compute -G arg for configuring external projects with the same CMake generator:
 IF( CMAKE_EXTRA_GENERATOR )
@@ -92,20 +76,6 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
-# OPTION( BUILD_STYLE_UTILS "Build uncrustify, cppcheck, & KWStyle" OFF )
-# CMAKE_DEPENDENT_OPTION(
-#	USE_SYSTEM_Uncrustify "Use system Uncrustify program" OFF
-#	"BUILD_STYLE_UTILS" OFF
-#	)
-# CMAKE_DEPENDENT_OPTION(
-#	USE_SYSTEM_KWStyle "Use system KWStyle program" OFF
-#	"BUILD_STYLE_UTILS" OFF
-#	)
-# CMAKE_DEPENDENT_OPTION(
-#	USE_SYSTEM_Cppcheck "Use system Cppcheck program" OFF
-#	"BUILD_STYLE_UTILS" OFF
-#	)
-
 SET( EXTERNAL_PROJECT_BUILD_TYPE "Release" CACHE STRING "Default build type for support libraries" )
 SET_PROPERTY( CACHE EXTERNAL_PROJECT_BUILD_TYPE PROPERTY
 	STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
@@ -115,38 +85,11 @@ SET_PROPERTY( CACHE EXTERNAL_PROJECT_BUILD_TYPE PROPERTY
 # Common external projects CMake variables
 #-----------------------------------------------------------------------------
 SET( CMAKE_INCLUDE_DIRECTORIES_BEFORE OFF CACHE BOOL "Set default to prepend include directories." )
-
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Write compile_commands.json" )
 
 
-IF( ${PRIMARY_PROJECT_NAME}_USE_QT )
-	MARK_AS_SUPERBUILD(
-		VARS
-			${PRIMARY_PROJECT_NAME}_USE_QT:BOOL
-			QT_QMAKE_EXECUTABLE:PATH
-			QT_MOC_EXECUTABLE:PATH
-			QT_UIC_EXECUTABLE:PATH
-		ALL_PROJECTS
-	)
-ENDIF()
-MARK_AS_SUPERBUILD( ${PRIMARY_PROJECT_NAME}_USE_QT )
-
 SET( extProjName ${PRIMARY_PROJECT_NAME} )
 SET( proj        ${PRIMARY_PROJECT_NAME} )
-
-
-#-----------------------------------------------------------------------------
-# Set CMake OSX variable to pass down the external projects
-#-----------------------------------------------------------------------------
-# IF( APPLE )
-#	MARK_AS_SUPERBUILD(
-#		VARS
-#			CMAKE_OSX_ARCHITECTURES:STRING
-#			CMAKE_OSX_SYSROOT:PATH
-#			CMAKE_OSX_DEPLOYMENT_TARGET:STRING
-#		ALL_PROJECTS
-#		)
-# ENDIF()
 
 SET( ${PRIMARY_PROJECT_NAME}_CLI_RUNTIME_DESTINATION  bin )
 SET( ${PRIMARY_PROJECT_NAME}_CLI_LIBRARY_DESTINATION  lib )
@@ -154,17 +97,13 @@ SET( ${PRIMARY_PROJECT_NAME}_CLI_ARCHIVE_DESTINATION  lib )
 SET( ${PRIMARY_PROJECT_NAME}_CLI_INSTALL_RUNTIME_DESTINATION  bin )
 SET( ${PRIMARY_PROJECT_NAME}_CLI_INSTALL_LIBRARY_DESTINATION  lib )
 SET( ${PRIMARY_PROJECT_NAME}_CLI_INSTALL_ARCHIVE_DESTINATION  lib )
+
+
 #-----------------------------------------------------------------------------
 # Add external project CMake args
 #-----------------------------------------------------------------------------
-
 MARK_AS_SUPERBUILD(
 	VARS
-#		BUILD_EXAMPLES:BOOL
-#		BUILD_TESTING:BOOL
-#		ITK_VERSION_MAJOR:STRING
-#		ITK_DIR:PATH
-
 		${PRIMARY_PROJECT_NAME}_CLI_LIBRARY_OUTPUT_DIRECTORY:PATH
 		${PRIMARY_PROJECT_NAME}_CLI_ARCHIVE_OUTPUT_DIRECTORY:PATH
 		${PRIMARY_PROJECT_NAME}_CLI_RUNTIME_OUTPUT_DIRECTORY:PATH
@@ -179,38 +118,30 @@ MARK_AS_SUPERBUILD(
 )
 
 
-STRING( REPLACE ";" "^" ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES "${${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES}" )
+# STRING( REPLACE ";" "^" ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES "${${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES}" )
 
 #------------------------------------------------------------------------------
 # ${PRIMARY_PROJECT_NAME} dependency list
 #------------------------------------------------------------------------------
-
-## for i in SuperBuild/*; do  echo $i |sed 's/.*External_\([a-zA-Z]*\).*/\1/g'|fgrep -v cmake|fgrep -v Template; done|sort -u
 SET( ${PRIMARY_PROJECT_NAME}_DEPENDENCIES
-	PCL
+	#PCL
 	Qt
 	# VTK
-#	JPEG
-	${QT_DEPENDENT_PACKAGES}
 )
 
-# IF( BUILD_STYLE_UTILS )
-#	LIST( APPEND ${PRIMARY_PROJECT_NAME}_DEPENDENCIES Cppcheck KWStyle ) #Uncrustify)
-# ENDIF()
+# Include dependent projects if any
+ExternalProject_Include_Dependencies( ${proj} DEPENDS_VAR ${PRIMARY_PROJECT_NAME}_DEPENDENCIES )
 
 
 #-----------------------------------------------------------------------------
-# Enable and setup External project global properties
+# Setup common c/cxx flags for external projects
 #-----------------------------------------------------------------------------
-
-SET( ep_common_c_flags "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS}" )
-SET( ep_common_cxx_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS}" )
-
-EXTERNALPROJECT_INCLUDE_DEPENDENCIES( ${proj} DEPENDS_VAR ${PRIMARY_PROJECT_NAME}_DEPENDENCIES )
+SET( ep_common_c_flags "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS} ${REMOVE_WARNINGS_FLAGS_C}" )
+SET( ep_common_cxx_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS} ${REMOVE_WARNINGS_FLAGS_CXX}" )
 
 
 #------------------------------------------------------------------------------
-# Configure and build ${PROJECT_NAME}
+# Configure and build ${PRIMARY_PROJECT_NAME}
 #------------------------------------------------------------------------------
 SET( proj ${PRIMARY_PROJECT_NAME} )
 EXTERNALPROJECT_ADD( ${proj}

@@ -1,0 +1,15 @@
+
+SET( MNG_CONFIGURE_COMMAND
+	sh ./autogen.sh
+)
+	
+SET( MNG_OPTIONS
+	--with-zlib=${ZLIB_DIR}
+	--with-jpeg=${JPEG_DIR}
+	--prefix=${INSTALL_DIR}
+)
+
+EXECUTE_PROCESS( COMMAND ${MNG_CONFIGURE_COMMAND} ${MNG_OPTIONS} 
+			WORKING_DIRECTORY ${BUILD_DIR} RESULT_VARIABLE build_result )
+
+RETURN( ${build_result} )

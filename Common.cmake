@@ -23,8 +23,7 @@ MESSAGE( STATUS "-- CXX Compiler:     ${CMAKE_CXX_COMPILER}" )
 # cmake includes
 #-----------------------------------------------------------------------------
 INCLUDE( CMakeDependentOption )
-#INCLUDE( ExternalProjectDependency )
-
+INCLUDE( ExternalProjectDependency )
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -36,18 +35,10 @@ IF( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
 	SET_PROPERTY( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 ENDIF()
 
-# Set make command for external projects not using cmake
-#IF( WIN32 )
-#	SET( ${PRIMARY_PROJECT_NAME}_NONCMAKE_BUILD_COMMAND "mingw32-make")
-#ELSE()
-#	SET( ${PRIMARY_PROJECT_NAME}_NONCMAKE_BUILD_COMMAND "make")
-#ENDIF()
-
 
 #-----------------------------------------------------------------------------
 # Build option(s)
 #-----------------------------------------------------------------------------
-
 
 
 
@@ -66,18 +57,6 @@ IF( PLATFORM_CHECK )
 		MESSAGE( FATAL_ERROR "Only Mac OSX >= 10.5 are supported !" )
 	ENDIF()
 ENDIF()
-
-
-#-----------------------------------------------------------------------------
-#IF( NOT COMMAND SETIFEMPTY )
-#	MACRO( SETIFEMPTY )
-#		SET( KEY ${ARGV0} )
-#		SET( VALUE ${ARGV1} )
-#		IF( NOT ${KEY} )
-#			SET( ${ARGV} )
-#		ENDIF()
-#	ENDMACRO()
-#ENDIF()
 
 
 #-----------------------------------------------------------------------------
@@ -116,9 +95,29 @@ IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 ENDIF()
 
 
-#-------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 # Augment compiler flags
-#-------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+
+# On systems that support dynamic linking, this prevents linking with the
+# shared libraries. On other systems, this option has no effect.  
+IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-static" )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static" )
+ENDIF()
+IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-static" )
+	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static" )
+ENDIF()
+
+# On systems that provide libgcc as a shared library, these options force
+# the use of either the shared or static version, respectively. If no
+# shared version of libgcc was built when the compiler was configured,
+# these options have no effect.
+IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-static-libgcc" )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc" )
+ENDIF()
+IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-static-libgcc" )
+	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc" )
+ENDIF()
 
 
 MARK_AS_SUPERBUILD(

@@ -24,7 +24,6 @@ SET( QT_OPTIONS
 	-I ${JPEG_INCLUDE_DIR}
 	-I ${TIFF_INCLUDE_DIR}
 	-I ${PNG_INCLUDE_DIR}
-	-I ${LCMS_INCLUDE_DIR}
 	-I ${MNG_INCLUDE_DIR}
 	
 	# Library Directories
@@ -32,26 +31,7 @@ SET( QT_OPTIONS
 	-L ${JPEG_LIBRARY_DIR}
 	-L ${TIFF_LIBRARY_DIR}
 	-L ${PNG_LIBRARY_DIR}
-	-L ${LCMS_LIBRARY_DIR}
 	-L ${MNG_LIBRARY_DIR}
-	
-	
-	# Libraries to use
-	# IMPORTANT:	* libraries must be listed after all include directories
-	#				* libraries that are dependent on other libraries must also be listed,
-	#						for example, Qt does not have lcms as a dependency, but since lcms
-	#						is a dependent of the mng library it must also be included for linking
-	#				* the library that needs symbols must be first, then the library
-	#						that resolves the symbol, in our project mng uses the dependencies
-	#						lcms, zlib and jpeg, so -lmng needs to come before -llcms, and -llcms
-	#						needs to come before -ljpeg and -lz
-	-l ${MNG_LIBRARY}
-	-l ${LCMS_LIBRARY}
-	-l ${PNG_LIBRARY}
-	-l ${TIFF_LIBRARY}
-	-l ${TIFFXX_LIBRARY}
-	-l ${JPEG_LIBRARY}
-	-l ${ZLIB_LIBRARY}
 )
 
 IF( WIN32 )
