@@ -65,6 +65,8 @@ ExternalProject_Add( ${proj}
 	
 	BUILD_COMMAND make
 
+	INSTALL_COMMAND ""
+	
 	DEPENDS
 		${${proj}_DEPENDENCIES}
 )
