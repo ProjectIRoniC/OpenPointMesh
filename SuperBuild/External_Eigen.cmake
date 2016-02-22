@@ -19,12 +19,14 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_CMAKE_OPTIONS
+	# CMake Build ARGS
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	# EIGEN ARGS
 	-DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
 	-DEIGEN_TEST_NOQT:BOOL=ON
 )
@@ -53,9 +55,7 @@ ExternalProject_Add( ${proj}
 	CMAKE_GENERATOR ${gen}
 	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
 	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information

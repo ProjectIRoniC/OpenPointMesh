@@ -10,14 +10,6 @@ LIST( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/CMake )
 ENABLE_LANGUAGE( C )
 ENABLE_LANGUAGE( CXX )
 
-MESSAGE( STATUS "CMake Information" )
-MESSAGE( STATUS "-- Generator:        ${CMAKE_GENERATOR}" )
-MESSAGE( STATUS "-- Make Program:     ${CMAKE_MAKE_PROGRAM}" )
-MESSAGE( STATUS "-- C Compiler ID:    ${CMAKE_C_COMPILER_ID}" )
-MESSAGE( STATUS "-- C Compiler:       ${CMAKE_C_COMPILER}" )
-MESSAGE( STATUS "-- CXX Compiler ID:  ${CMAKE_CXX_COMPILER_ID}" )
-MESSAGE( STATUS "-- CXX Compiler:     ${CMAKE_CXX_COMPILER}" )
-
 
 #-----------------------------------------------------------------------------
 # cmake includes
@@ -39,7 +31,7 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Build option(s)
 #-----------------------------------------------------------------------------
-
+SET( BUILD_SHARED_LIBS OFF )
 
 
 #-----------------------------------------------------------------------------
@@ -85,7 +77,7 @@ MARK_AS_SUPERBUILD(
 # Add needed flag for gnu on linux like enviroments to build static common
 # libs suitable for linking with shared object libs.
 #-----------------------------------------------------------------------------
-IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" )
 	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fPIC" )
 		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
 	ENDIF()
@@ -93,7 +85,6 @@ IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
 		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC" )
 	ENDIF()
 ENDIF()
-
 
 #-----------------------------------------------------------------------------
 # Augment compiler flags
@@ -112,13 +103,12 @@ ENDIF()
 # the use of either the shared or static version, respectively. If no
 # shared version of libgcc was built when the compiler was configured,
 # these options have no effect.
-IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-static-libgcc" )
-	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc" )
+IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++" )
 ENDIF()
 IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-static-libgcc" )
 	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc" )
 ENDIF()
-
 
 MARK_AS_SUPERBUILD(
 	VARS
@@ -127,7 +117,6 @@ MARK_AS_SUPERBUILD(
 		BUILD_SHARED_LIBS:BOOL
 		CMAKE_MODULE_PATH:PATH
 		CMAKE_BUILD_TYPE:STRING
-		# BUILD_SHARED_LIBS:BOOL
 		CMAKE_INCLUDE_DIRECTORIES_BEFORE:BOOL
 		CMAKE_CXX_COMPILER:PATH
 		CMAKE_CXX_FLAGS:STRING

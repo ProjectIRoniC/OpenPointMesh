@@ -11,6 +11,7 @@ SET( BOOST_OPTIONS
 	threading=multi			# single,multi		: thread safety
 	address-model=64		# 32,64				: bit type
 	runtime-link=static		# shared,static		: version of c/c++ runtimes
+	--without-test			# disable building test
 )
 
 IF( WIN32 )

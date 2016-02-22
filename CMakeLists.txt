@@ -25,7 +25,6 @@ ENDFOREACH()
 #-----------------------------------------------------------------------------
 SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH} )
 INCLUDE( ExternalProject )
-#INCLUDE( ExternalProjectDependency )
 
 
 #-----------------------------------------------------------------------------
@@ -56,13 +55,14 @@ MARK_AS_ADVANCED( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 #-----------------------------------------------------------------------------
 INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake )
 
+
 #-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------
 IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 	PROJECT( SuperBuild_${PRIMARY_PROJECT_NAME} )  # <- NOTE: Project name for pre-requisites is different form main project
 	IF( NOT CMAKE_CXX_STANDARD )
-		SET( CMAKE_CXX_STANDARD 98 ) # Supported values are ``98``, ``11`` and ``14``.
+		SET( CMAKE_CXX_STANDARD 14 ) # Supported values are ``98``, ``11`` and ``14``.
 	ENDIF()
 	#--------------------------------------------------------------------------
 	# Sanity checks
@@ -85,7 +85,7 @@ IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 ELSE()
 	PROJECT( ${PRIMARY_PROJECT_NAME} ) # <- NOTE: Here is the main project name setting
 	IF( NOT CMAKE_CXX_STANDARD )
-		SET( CMAKE_CXX_STANDARD 98 ) # Supported values are ``98``, ``11`` and ``14``.
+		SET( CMAKE_CXX_STANDARD 14 ) # Supported values are ``98``, ``11`` and ``14``.
 	ENDIF()
 	INCLUDE( "${CMAKE_CURRENT_SOURCE_DIR}/${PRIMARY_PROJECT_NAME}.cmake" )
 	RETURN()

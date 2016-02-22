@@ -25,6 +25,7 @@ SET( QT_OPTIONS
 	-I ${TIFF_INCLUDE_DIR}
 	-I ${PNG_INCLUDE_DIR}
 	-I ${MNG_INCLUDE_DIR}
+	-I ${LCMS_INCLUDE_DIR}
 	
 	# Library Directories
 	-L ${ZLIB_LIBRARY_DIR}
@@ -32,6 +33,10 @@ SET( QT_OPTIONS
 	-L ${TIFF_LIBRARY_DIR}
 	-L ${PNG_LIBRARY_DIR}
 	-L ${MNG_LIBRARY_DIR}
+	-L ${LCMS_LIBRARY_DIR}
+	
+	# Explicit libraries to include
+	-l ${LCMS_LIBRARY}
 )
 
 IF( WIN32 )

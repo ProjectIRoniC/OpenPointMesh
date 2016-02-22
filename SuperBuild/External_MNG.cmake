@@ -13,6 +13,7 @@ ENDIF()
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
 	JPEG
+	LCMS
 	zlib
 )
 
@@ -21,7 +22,28 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
-SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_MNG_configuremng.cmake )
+SET( ${proj}_CMAKE_OPTIONS
+	# CMake Build ARGS
+	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+	# ZLIB ARGS
+	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+	-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
+	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
+	# JPEG ARGS
+	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
+	-DJPEG_LIBRARY_DIR:PATH=${JPEG_LIBRARY_DIR}
+	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
+	# LCMS ARGS
+	-DLCMS_INCLUDE_DIR:PATH=${LCMS_INCLUDE_DIR}
+	-DLCMS_LIBRARY_DIR:PATH=${LCMS_LIBRARY_DIR}
+	-DLCMS_LIBRARY:PATH=${LCMS_LIBRARY}
+)
 
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/libmng/archive/1.0.10.tar.gz )
@@ -37,24 +59,17 @@ ExternalProject_Add( ${proj}
 	# GIT_REPOSITORY ${${proj}_REPOSITORY}
 	# GIT_TAG ${${proj}_GIT_TAG}
 	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
-	BUILD_IN_SOURCE 1
-	
+	BINARY_DIR ${proj}-build
+	LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
+	LOG_BUILD     0  # Wrap build in script to to ignore log output from dashboards
+	LOG_TEST      0  # Wrap test in script to to ignore log output from dashboards
+	LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	CONFIGURE_COMMAND ${CMAKE_COMMAND}
-						-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
-						-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
-						-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
-						-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
-						-DZLIB_DIR:PATH=${ZLIB_DIR}
-						-DJPEG_DIR:PATH=${JPEG_DIR}
-						-P ${${proj}_CONFIGURE_SCRIPT}
-	
-	BUILD_COMMAND make
-	
-	INSTALL_COMMAND make install
-
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	INSTALL_DIR ${${proj}_INSTALL_DIR}
+	CMAKE_GENERATOR ${gen}
+	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
+	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -78,17 +93,3 @@ ExternalProject_Message( ${proj} "MNG_INCLUDE_DIR: ${MNG_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "MNG_LIBRARY_DIR: ${MNG_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "MNG_LIBRARY: ${MNG_LIBRARY}" )
 ### --- End binary information
-
-# MNG autogen.sh is no longer maintained so it is in a folder called unmaintained
-# this custom step is to move autogen.sh to the build directory
-SET( ${proj}_MOVE_AUTOGEN ${CMAKE_CURRENT_LIST_DIR}/External_MNG_moveautogen.cmake )
-	
-ExternalProject_Add_Step( ${proj} "moveautogen"
-	COMMAND ${CMAKE_COMMAND}
-		-DMNG_BUILD_DIR:PATH=${SOURCE_DOWNLOAD_CACHE}/${proj}
-		-DMNG_AUTOGEN_DIR:PATH=${SOURCE_DOWNLOAD_CACHE}/${proj}/unmaintained
-		-P ${${proj}_MOVE_AUTOGEN}
-	
-	DEPENDEES
-		download
-)

@@ -19,13 +19,14 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_CMAKE_OPTIONS
-	#C++11 shouldn't be needed
-	#-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	#-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
+	# CMake Build ARGS
+	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 )
 
 # Download tar source when possible to speed up build time
@@ -52,9 +53,7 @@ ExternalProject_Add( ${proj}
 	CMAKE_GENERATOR ${gen}
 	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
 	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-	
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -84,13 +83,12 @@ ExternalProject_Message( ${proj} "ZLIB_LIBRARY: ${ZLIB_LIBRARY}" )
 IF( WIN32 )
 	SET( ${proj}_RENAME_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_zlib_renamezlib.cmake )
 	
-	ExternalProject_Add_Step( ${proj} "renamelibraries"
+	ExternalProject_Add_Step( ${proj} "rename libraries"
 		COMMAND ${CMAKE_COMMAND}
 			-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
 			-DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 			-P ${${proj}_RENAME_SCRIPT}
 		
-		DEPENDEES
-			install
+		DEPENDEES install
 	)
 ENDIF()

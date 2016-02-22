@@ -21,19 +21,26 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
-SET( ${proj}_CMAKE_OPTIONS
-	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
-	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
-	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DBUILD_SHARED_LIBS:BOOL=OFF
+
+SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_TIFF_configuretiff.cmake )
+SET( ${proj}_CONFIGURE_COMMAND
+	${CMAKE_COMMAND}
+	# CMake Build ARGS
+	-DTIFF_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DTIFF_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	#-DTIFF_CPP_FLAGS:STRING=${LCMS_CPP_FLAGS}
+	-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
+	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
+	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
+	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
+	# ZLIB ARGS
 	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
-	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
-	-DJPEG:BOOL=ON
-	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
+	-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
+	# JPEG ARGS
 	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
+	-DJPEG_LIBRARY_DIR:PATH=${JPEG_LIBRARY_DIR}
+	# Use the configure script
+	-P ${${proj}_CONFIGURE_SCRIPT}
 )
 
 # Download tar source when possible to speed up build time
@@ -50,19 +57,12 @@ ExternalProject_Add( ${proj}
 	# GIT_REPOSITORY ${${proj}_REPOSITORY}
 	# GIT_TAG ${${proj}_GIT_TAG}
 	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
-	BINARY_DIR ${proj}-build
-	LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD     0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST      0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
+	BUILD_IN_SOURCE 1
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	INSTALL_DIR ${${proj}_INSTALL_DIR}
-	CMAKE_GENERATOR ${gen}
-	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
-	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	CONFIGURE_COMMAND ${${proj}_CONFIGURE_COMMAND}
+	BUILD_COMMAND make
+	INSTALL_COMMAND make install
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -89,3 +89,15 @@ ExternalProject_Message( ${proj} "TIFF_LIBRARY_DIR: ${TIFF_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY: ${TIFF_LIBRARY}" )
 ExternalProject_Message( ${proj} "TIFFXX_LIBRARY: ${TIFFXX_LIBRARY}" )
 ### --- End binary information
+
+# tiff config relies on config.guess, since some dependent files are out of date we are going
+# to update them to the latest version
+SET( ${proj}_UPDATE_CONFIG_GUESS_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_updateguess.cmake )
+
+ExternalProject_Add_Step( ${proj} "update config.guess"
+	COMMAND ${CMAKE_COMMAND}
+		-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}/config
+		-P ${${proj}_UPDATE_CONFIG_GUESS_SCRIPT}
+	
+	DEPENDEES download
+)

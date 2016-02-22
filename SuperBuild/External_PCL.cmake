@@ -16,7 +16,7 @@ SET( ${proj}_DEPENDENCIES
 	Eigen
 	FLANN
 	qhull	
-	Qt
+	#Qt
 	VTK
 	# OpenNI2
 )
@@ -27,15 +27,30 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_CMAKE_OPTIONS
+	# CMake Build ARGS
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+	# PCL Build ARGS
+	-DPCL_SHARED_LIBS:BOOL=OFF
+	-DBUILD_tools:BOOL=ON
 	-DBUILD_EXAMPLES:BOOL=OFF
 	-DBUILD_TESTING:BOOL=OFF
 	-DBUILD_TESTS:BOOL=OFF
+	-DWITH_DOCS:BOOL=OFF
+	# Boost ARGS
+	-DBOOST_ROOT:PATH=${BOOST_DIR}
+	# EIGEN ARGS
+	-DEIGEN_INCLUDE_DIR:PATH=${EIGEN_INCLUDE_DIR}
+	# FLANN ARGS
+	
+	# QHULL ARGS
+	
+	# VTK ARGS
 )
 
 # Download tar source when possible to speed up build time
@@ -63,9 +78,7 @@ ExternalProject_Add( ${proj}
 	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
 	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
 	INSTALL_COMMAND ""
-	
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information

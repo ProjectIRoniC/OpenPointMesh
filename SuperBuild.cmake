@@ -44,9 +44,6 @@ ENDIF()
 
 FIND_PACKAGE( Git REQUIRED )
 
-#CMAKE_DEPENDENT_OPTION( ${CMAKE_PROJECT_NAME}_USE_CTKAPPLAUNCHER "CTKAppLauncher used with python" ON
-#  "NOT ${CMAKE_PROJECT_NAME}_USE_SYSTEM_python" OFF )
-
 
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
@@ -80,13 +77,24 @@ SET( EXTERNAL_PROJECT_BUILD_TYPE "Release" CACHE STRING "Default build type for 
 SET_PROPERTY( CACHE EXTERNAL_PROJECT_BUILD_TYPE PROPERTY
 	STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 
+#-----------------------------------------------------------------------------
+# Setup common c/cxx flags for external projects
+#-----------------------------------------------------------------------------
+SET( EP_COMMON_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS}" )
+SET( EP_COMMON_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS}" )
+
+MARK_AS_SUPERBUILD(
+	VARS
+		EP_COMMON_C_FLAGS:STRING
+		EP_COMMON_CXX_FLAGS:STRING
+	ALL_PROJECTS
+)
 
 #-----------------------------------------------------------------------------
 # Common external projects CMake variables
 #-----------------------------------------------------------------------------
 SET( CMAKE_INCLUDE_DIRECTORIES_BEFORE OFF CACHE BOOL "Set default to prepend include directories." )
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Write compile_commands.json" )
-
 
 SET( extProjName ${PRIMARY_PROJECT_NAME} )
 SET( proj        ${PRIMARY_PROJECT_NAME} )
@@ -118,26 +126,17 @@ MARK_AS_SUPERBUILD(
 )
 
 
-# STRING( REPLACE ";" "^" ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES "${${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARNAMES}" )
-
 #------------------------------------------------------------------------------
 # ${PRIMARY_PROJECT_NAME} dependency list
 #------------------------------------------------------------------------------
 SET( ${PRIMARY_PROJECT_NAME}_DEPENDENCIES
-	#PCL
+	PCL
 	Qt
-	# VTK
+	VTK
 )
 
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} DEPENDS_VAR ${PRIMARY_PROJECT_NAME}_DEPENDENCIES )
-
-
-#-----------------------------------------------------------------------------
-# Setup common c/cxx flags for external projects
-#-----------------------------------------------------------------------------
-SET( ep_common_c_flags "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS} ${REMOVE_WARNINGS_FLAGS_C}" )
-SET( ep_common_cxx_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS} ${REMOVE_WARNINGS_FLAGS_CXX}" )
 
 
 #------------------------------------------------------------------------------
@@ -152,13 +151,12 @@ EXTERNALPROJECT_ADD( ${proj}
 	DOWNLOAD_COMMAND ""
 	UPDATE_COMMAND ""
 	CMAKE_GENERATOR ${gen}
-	CMAKE_ARGS
-		--no-warn-unused-cli    # HACK Only expected variables should be passed down.
+	CMAKE_ARGS --no-warn-unused-cli    # HACK Only expected variables should be passed down.
 	CMAKE_CACHE_ARGS
-			-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-			-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
-			-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-			-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+		-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+		-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+		-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+		-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 		-D${PRIMARY_PROJECT_NAME}_SUPERBUILD:BOOL=OFF    #NOTE: VERY IMPORTANT reprocess top level CMakeList.txt
 	INSTALL_COMMAND ""
 )

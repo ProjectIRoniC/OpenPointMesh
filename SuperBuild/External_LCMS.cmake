@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName JPEG ) # The find_package known name
-SET( proj        JPEG ) # The local name
+SET( extProjName LCMS ) # The find_package known name
+SET( proj        LCMS ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -11,7 +11,11 @@ IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
 ENDIF()
 
 # Set dependency list
-SET( ${proj}_DEPENDENCIES "" )
+SET( ${proj}_DEPENDENCIES
+	JPEG
+	TIFF
+	zlib
+)
 
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
@@ -27,13 +31,25 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+	# ZLIB ARGS
+	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+	-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
+	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
+	# JPEG ARGS
+	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
+	-DJPEG_LIBRARY_DIR:PATH=${JPEG_LIBRARY_DIR}
+	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
+	# TIFF ARGS
+	-DTIFF_INCLUDE_DIR:PATH=${TIFF_INCLUDE_DIR}
+	-DTIFF_LIBRARY_DIR:PATH=${TIFF_LIBRARY_DIR}
+	-DTIFF_LIBRARY:PATH=${TIFF_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL https://github.com/LuaDist/libjpeg/archive/8.4.0.tar.gz )
-SET( ${proj}_MD5 5785d8496af6d40df2bd1722efc69a85 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libjpeg" )
-# SET( ${proj}_GIT_TAG "8.4.0" )
+SET( ${proj}_URL https://github.com/LuaDist/lcms/archive/1.19.tar.gz )
+SET( ${proj}_MD5 e4232b8213974761c553a0d92acac504 )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/lcms" )
+# SET( ${proj}_GIT_TAG "1.19" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
@@ -57,23 +73,36 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( JPEG_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( JPEG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
-SET( JPEG_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
-SET( JPEG_LIBRARY jpeg )
+SET( LCMS_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
+SET( LCMS_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
+SET( LCMS_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( LCMS_LIBRARY lcms )
 
 mark_as_superbuild(
 	VARS
-		JPEG_DIR:PATH
-		JPEG_INCLUDE_DIR:PATH
-		JPEG_LIBRARY_DIR:PATH
-		JPEG_LIBRARY:FILEPATH
+		LCMS_DIR:PATH
+		LCMS_INCLUDE_DIR:PATH
+		LCMS_LIBRARY_DIR:PATH
+		LCMS_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "JPEG_DIR: ${JPEG_DIR}" )
-ExternalProject_Message( ${proj} "JPEG_INCLUDE_DIR: ${JPEG_INCLUDE_DIR}" )
-ExternalProject_Message( ${proj} "JPEG_LIBRARY_DIR: ${JPEG_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "JPEG_LIBRARY: ${JPEG_LIBRARY}" )
+ExternalProject_Message( ${proj} "LCMS_DIR: ${LCMS_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_INCLUDE_DIR: ${LCMS_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_LIBRARY_DIR: ${LCMS_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_LIBRARY: ${LCMS_LIBRARY}" )
 ### --- End binary information
+
+# lcms config relies on config.guess, since some dependent files are out of date we are going
+# to update them to the latest version
+SET( ${proj}_UPDATE_CONFIG_GUESS_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_updateguess.cmake )
+
+ExternalProject_Add_Step( ${proj} "update config.guess"
+	COMMAND ${CMAKE_COMMAND}
+		-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
+		-P ${${proj}_UPDATE_CONFIG_GUESS_SCRIPT}
+	
+	DEPENDEES download
+)
+

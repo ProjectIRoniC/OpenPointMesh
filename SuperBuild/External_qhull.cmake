@@ -19,12 +19,14 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_CMAKE_OPTIONS
+	# CMake Build ARGS
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-	-DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 )
 
 # The commits on github look useful but they don't release versions on github
@@ -37,6 +39,7 @@ ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
 	GIT_REPOSITORY ${${proj}_REPOSITORY}
 	GIT_TAG ${${proj}_GIT_TAG}
+	UPDATE_COMMAND ""	# we are skipping update so we don't have to build every time
 	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
 	BINARY_DIR ${proj}-build
 	LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
@@ -48,9 +51,7 @@ ExternalProject_Add( ${proj}
 	CMAKE_GENERATOR ${gen}
 	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
 	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information

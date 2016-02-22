@@ -20,12 +20,36 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 
 ### --- Project specific additions here
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
-SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Boost_configureboost.cmake )
-SET( ${proj}_BUILD_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Boost_buildboost.cmake )
 
 IF( CMAKE_COMPILER_IS_CLANGXX )
 	SET( CLANG_ARG -DCMAKE_COMPILER_IS_CLANGXX:BOOL=ON )
 ENDIF()
+
+SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Boost_configureboost.cmake )
+SET( ${proj}_CONFIGURE_COMMAND
+	${CMAKE_COMMAND}
+	# CLANG ARGS
+	${CLANG_ARG}
+	# CMake Build ARGS
+	-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
+	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
+	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
+	# Use the configure script
+	-P ${${proj}_CONFIGURE_SCRIPT}
+)
+
+SET( ${proj}_BUILD_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Boost_buildboost.cmake )
+SET( ${proj}_BUILD_COMMAND
+	${CMAKE_COMMAND}
+	# CMake Build ARGS
+	-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
+	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
+	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
+	# Boost ARGS
+	-DBOOST_INSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
+	# Use the build script
+	-P ${${proj}_BUILD_SCRIPT}
+)
 
 # Boost Git has too many repos and is too slow, so we download instead
 SET( BOOST_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
@@ -43,37 +67,20 @@ ExternalProject_Add( ${proj}
 	# GIT_TAG ${${proj}_GIT_TAG}
 	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
 	BUILD_IN_SOURCE 1
-
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	CONFIGURE_COMMAND ${CMAKE_COMMAND}
-						${CLANG_ARG}
-						-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
-						-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
-						-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
-						-P ${${proj}_CONFIGURE_SCRIPT}
-	
-	BUILD_COMMAND ${CMAKE_COMMAND}
-						-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
-						-DBOOST_INSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
-						-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
-						-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
-						-P ${${proj}_BUILD_SCRIPT}
-	
+	CONFIGURE_COMMAND ${${proj}_CONFIGURE_COMMAND}
+	BUILD_COMMAND ${${proj}_BUILD_COMMAND}
 	INSTALL_COMMAND ""
-	
-	DEPENDS
-		${${proj}_DEPENDENCIES}
+	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( BOOST_ROOT ${CMAKE_BINARY_DIR}/${proj} )
 SET( BOOST_DIR ${CMAKE_BINARY_DIR}/${proj} )
 SET( BOOST_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}/lib )
 SET( BOOST_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}/boost )
 
 mark_as_superbuild(
 	VARS
-		BOOST_ROOT:PATH
 		BOOST_DIR:PATH
 		BOOST_LIBRARY_DIR:PATH
 		BOOST_INCLUDE_DIR:PATH
@@ -81,7 +88,6 @@ mark_as_superbuild(
 		"FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "BOOST_ROOT: ${BOOST_ROOT}" )
 ExternalProject_Message( ${proj} "BOOST_DIR: ${BOOST_DIR}" )
 ExternalProject_Message( ${proj} "BOOST_LIBRARY_DIR: ${BOOST_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "BOOST_INCLUDE_DIR: ${BOOST_INCLUDE_DIR}" )
