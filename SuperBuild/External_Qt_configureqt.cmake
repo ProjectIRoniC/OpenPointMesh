@@ -62,7 +62,7 @@ IF( WIN32 )
 	ENDIF()
 ELSE()
 	SET( QT_CONFIGURE_COMMAND
-		./configure
+		sh ./configure
 	)
 ENDIF()
 

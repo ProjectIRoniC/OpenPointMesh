@@ -21,73 +21,63 @@ SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
-IF( NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" ) )
-	### --- Project specific additions here
-	SET( ${proj}_CMAKE_OPTIONS
-		# CMake Build ARGS
-		-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-		-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-		-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-		-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-		-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
-		-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-		-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-		#-DBUILD_EXAMPLES:BOOL=OFF
-		#-DBUILD_TESTING:BOOL=OFF
-		#-DBUILD_TESTS:BOOL=OFF
-	)
+### --- Project specific additions here
+SET( ${proj}_CMAKE_OPTIONS
+	# CMake Build ARGS
+	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+)
 
-	SET( ${proj}_BUILD_COMMAND
-		msbuild
-		${CMAKE_CURRENT_BINARY_DIR}/${proj}/OpenNI.sln
-		/p:Configuration=Release
-	)
-	
-	SET( ${proj}_CONFIGURE_COMMAND
-		devenv
-		${CMAKE_CURRENT_BINARY_DIR}/${proj}/OpenNI.sln
-		/upgrade
-	)
+#SET( ${proj}_BUILD_COMMAND
+#	msbuild
+#	${CMAKE_CURRENT_BINARY_DIR}/${proj}/OpenNI.sln
+#	/p:Configuration=Release
+#)
 
-	SET( ${proj}_REPOSITORY "${git_protocol}://github.com/occipital/OpenNI2.git" )
-	SET( ${proj}_GIT_TAG ca2cdcf39d49332fa9462188a952ff9953e9e1d9 )  # 2.2.0-debian
-	### --- End Project specific additions
-  
-	ExternalProject_Add( ${proj}
-		${${proj}_EP_ARGS}
-		URL		${${proj}_URL}
-		URL_MD5	${${proj}_MD5}
-		# GIT_REPOSITORY	${${proj}_REPOSITORY}
-		# GIT_TAG 			${${proj}_GIT_TAG}
-		SOURCE_DIR	${${proj}_SOURCE_DIR}
-		BINARY_DIR	${${proj}_BUILD_DIR}
-		INSTALL_DIR	${${proj}_INSTALL_DIR}
-		LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
-		LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
-		LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
-		LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
-		${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-		CMAKE_GENERATOR		${gen}
-		CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
-		CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
-		DEPENDS	${${proj}_DEPENDENCIES}
-	)
-	
-	### --- Set binary information
-	SET( OPENNI2_DIR ${${proj}_INSTALL_DIR} )
-	SET( OPENNI2_BUILD_DIR ${${proj}_BUILD_DIR} )
-	SET( OPENNI2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-	SET( OPENNI2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-	### --- End binary information
-ELSE()
-	IF( ${USE_SYSTEM_${extProjName}} )
-		FIND_PACKAGE( ${extProjName} ${${extProjName}_REQUIRED_VERSION} REQUIRED )
-		MESSAGE( STATUS "USING the system ${extProjName}, set ${extProjName}_DIR=${${extProjName}_DIR}" )
-	ENDIF()
-	# The project is provided using ${extProjName}_DIR, nevertheless since other
-	# project may depend on ${extProjName}, let's add an 'empty' one
-	ExternalProject_Add_Empty( ${proj} "${${proj}_DEPENDENCIES}" )
-ENDIF()
+#SET( ${proj}_CONFIGURE_COMMAND
+#	devenv
+#	${CMAKE_CURRENT_BINARY_DIR}/${proj}/OpenNI.sln
+#	/upgrade
+#)
+
+# Download tar source when possible to speed up build time
+SET( ${proj}_URL https://github.com/occipital/OpenNI2/archive/v2.2.0-debian.tar.gz )
+SET( ${proj}_MD5 bdb95be379150c6bd0433f8a6862ee7f )
+#SET( ${proj}_REPOSITORY "${git_protocol}://github.com/occipital/OpenNI2.git" )
+#SET( ${proj}_GIT_TAG v2.2.0-debian )  # 2.2.0-debian
+### --- End Project specific additions
+
+ExternalProject_Add( ${proj}
+	${${proj}_EP_ARGS}
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	# GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# GIT_TAG 			${${proj}_GIT_TAG}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
+	BINARY_DIR	${${proj}_BUILD_DIR}
+	INSTALL_DIR	${${proj}_INSTALL_DIR}
+	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
+	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
+	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
+	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
+	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	CMAKE_GENERATOR		${gen}
+	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
+	DEPENDS	${${proj}_DEPENDENCIES}
+)
+
+### --- Set binary information
+SET( OPENNI2_DIR ${${proj}_INSTALL_DIR} )
+SET( OPENNI2_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( OPENNI2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( OPENNI2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+### --- End binary information
 
 mark_as_superbuild(
   VARS

@@ -81,11 +81,11 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( QT_DIR ${${proj}_INSTALL_DIR} )
+SET( QT_DIR ${${proj}_BUILD_DIR} )
 SET( QT_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( QT_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( QT_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-SET( QT_QMAKE_EXECUTABLE ${CMAKE_BINARY_DIR}/${proj}/bin/qmake.exe )
+SET( QT_INCLUDE_DIR ${${proj}_BUILD_DIR}/include )
+SET( QT_LIBRARY_DIR ${${proj}_BUILD_DIR}/lib )
+SET( QT_QMAKE_EXECUTABLE ${${proj}_BUILD_DIR}/bin/qmake.exe )
 
 mark_as_superbuild(
 	VARS
