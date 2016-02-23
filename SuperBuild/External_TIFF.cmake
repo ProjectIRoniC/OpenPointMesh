@@ -19,16 +19,18 @@ SET( ${proj}_DEPENDENCIES
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
-### --- Project specific additions here
+# Set directories
+SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
+### --- Project specific additions here
 SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_TIFF_configuretiff.cmake )
 SET( ${proj}_CONFIGURE_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
 	-DTIFF_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DTIFF_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	#-DTIFF_CPP_FLAGS:STRING=${LCMS_CPP_FLAGS}
 	-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
 	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
@@ -52,29 +54,30 @@ SET( ${proj}_MD5 c1d8ad4ee235bdef497a23a7d3f51a90 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL ${${proj}_URL}
-	URL_MD5 ${${proj}_MD5}
-	# GIT_REPOSITORY ${${proj}_REPOSITORY}
-	# GIT_TAG ${${proj}_GIT_TAG}
-	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	# GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# GIT_TAG			${${proj}_GIT_TAG}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
 	BUILD_IN_SOURCE 1
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	CONFIGURE_COMMAND ${${proj}_CONFIGURE_COMMAND}
-	BUILD_COMMAND make
-	INSTALL_COMMAND make install
+	CONFIGURE_COMMAND	${${proj}_CONFIGURE_COMMAND}
+	INSTALL_COMMAND		make install
 	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( TIFF_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( TIFF_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
-SET( TIFF_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( TIFF_DIR ${${proj}_INSTALL_DIR} )
+SET( TIFF_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( TIFF_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( TIFF_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( TIFF_LIBRARY tiff )
 SET( TIFFXX_LIBRARY tiffxx )
 
 mark_as_superbuild(
 	VARS
 		TIFF_DIR:PATH
+		TIFF_BUILD_DIR:PATH
 		TIFF_INCLUDE_DIR:PATH
 		TIFF_LIBRARY_DIR:PATH
 		TIFF_LIBRARY:FILEPATH
@@ -84,6 +87,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "TIFF_DIR: ${TIFF_DIR}" )
+ExternalProject_Message( ${proj} "TIFF_BUILD_DIR: ${TIFF_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_INCLUDE_DIR: ${TIFF_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY_DIR: ${TIFF_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY: ${TIFF_LIBRARY}" )

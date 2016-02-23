@@ -4,14 +4,14 @@ SET( BOOST_BUILD_COMMAND
 )
 
 SET( BOOST_OPTIONS
-	-q
-	-j 5					# number of commands to run parallel
-	variant=debug,release	# debug,release		: build type
-	link=static				# shared,static 	: link type
-	threading=multi			# single,multi		: thread safety
-	address-model=64		# 32,64				: bit type
-	runtime-link=static		# shared,static		: version of c/c++ runtimes
-	--without-test			# disable building test
+	variant=debug,release			# debug,release		: build type
+	link=static						# shared,static 	: link type
+	threading=multi					# single,multi		: thread safety
+	address-model=64				# 32,64				: bit type
+	runtime-link=static				# shared,static		: version of c/c++ runtimes
+	--without-test					# disable building test
+	--build-dir=${BUILD_DIR}		# location of boost build files
+	--prefix=${BOOST_INSTALL_DIR}	# location of boost installation
 )
 
 IF( WIN32 )
@@ -22,7 +22,7 @@ IF( WIN32 )
 	ENDIF()
 ENDIF()
 
-EXECUTE_PROCESS( COMMAND ${BOOST_BUILD_COMMAND} ${BOOST_OPTIONS} install --prefix=${BOOST_INSTALL_DIR}
+EXECUTE_PROCESS( COMMAND ${BOOST_BUILD_COMMAND} ${BOOST_OPTIONS} install
 		WORKING_DIRECTORY ${BUILD_DIR} RESULT_VARIABLE build_result )
 
 RETURN( ${build_result} )

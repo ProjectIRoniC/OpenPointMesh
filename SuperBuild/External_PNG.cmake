@@ -18,8 +18,12 @@ SET( ${proj}_DEPENDENCIES
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
-### --- Project specific additions here
+# Set directories
+SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
+
+### --- Project specific additions here
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -46,33 +50,35 @@ SET( ${proj}_MD5 47f5f8c0488f41f4e71d1c9e922c79d4 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL ${${proj}_URL}
-	URL_MD5 ${${proj}_MD5}
-	# GIT_REPOSITORY ${${proj}_REPOSITORY}
-	# GIT_TAG ${${proj}_GIT_TAG}
-	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
-	BINARY_DIR ${proj}-build
-	LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD     0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST      0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	# GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# GIT_TAG 			${${proj}_GIT_TAG}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
+	BINARY_DIR	${${proj}_BUILD_DIR}
+	INSTALL_DIR	${${proj}_INSTALL_DIR}
+	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
+	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
+	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
+	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	INSTALL_DIR ${${proj}_INSTALL_DIR}
-	CMAKE_GENERATOR ${gen}
-	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
-	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-	DEPENDS ${${proj}_DEPENDENCIES}
+	CMAKE_GENERATOR		${gen}
+	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
+	DEPENDS	${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( PNG_DIR ${CMAKE_BINARY_DIR}/${proj}-install )
-SET( PNG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
-SET( PNG_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( PNG_DIR ${${proj}_INSTALL_DIR} )
+SET( PNG_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( PNG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( PNG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( PNG_LIBRARY png )
 
 mark_as_superbuild(
 	VARS
 		PNG_DIR:PATH
+		PNG_BUILD_DIR:PATH
 		PNG_INCLUDE_DIR:PATH
 		PNG_LIBRARY_DIR:PATH
 		PNG_LIBRARY:FILEPATH
@@ -81,6 +87,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "PNG_DIR: ${PNG_DIR}" )
+ExternalProject_Message( ${proj} "PNG_BUILD_DIR: ${PNG_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "PNG_INCLUDE_DIR: ${PNG_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "PNG_LIBRARY_DIR: ${PNG_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "PNG_LIBRARY: ${PNG_LIBRARY}" )

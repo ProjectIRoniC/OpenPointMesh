@@ -22,6 +22,11 @@ SET( ${proj}_DEPENDENCIES
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
+# Set directories
+SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
+SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
+
 ### --- Project specific additions here
 SET( EXTERNAL_PROJECT_OPTIONAL_ARGS )
 
@@ -36,15 +41,6 @@ ELSE()
 		-DVTK_USE_COCOA:BOOL=ON # Default to Cocoa, VTK/CMakeLists.txt will enable Carbon and disable cocoa if needed
 		-DVTK_USE_X:BOOL=OFF
 	)
-ENDIF()
-
-# Setup parallel builds if possible
-IF( CMAKE_GENERATOR MATCHES ".*Makefiles.*" )
-	# Use $(MAKE) as build command to propagate parallel make option
-	SET( CUSTOM_BUILD_COMMAND BUILD_COMMAND "$(MAKE)" )
-	SET( make_command_definition -DMAKE_COMMAND=$(MAKE) )
-ELSE()
-	SET( make_command_definition -DMAKE_COMMAND=${CMAKE_MAKE_PROGRAM} )
 ENDIF()
 
 # Qt ARGS
@@ -77,7 +73,7 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
-	-DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 	#-DCMAKE_INCLUDE_DIRECTORIES_BEFORE:BOOL=OFF
 	# VTK Build ARGS
@@ -123,27 +119,34 @@ SET( ${proj}_MD5 b2f6fcc29fb42231bc2b025eccb41122 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
-	BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
-	URL ${${proj}_URL}
-	URL_MD5 ${${proj}_MD5}
-	# GIT_REPOSITORY ${${proj}_REPOSITORY}
-	# GIT_TAG ${${proj}_GIT_TAG}
-	${CUSTOM_BUILD_COMMAND}
-	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
-	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-	INSTALL_COMMAND ""
-	DEPENDS ${${proj}_DEPENDENCIES}
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	# GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# GIT_TAG 			${${proj}_GIT_TAG}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
+	BINARY_DIR	${${proj}_BUILD_DIR}
+	INSTALL_DIR	${${proj}_INSTALL_DIR}
+	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
+	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
+	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
+	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
+	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	CMAKE_GENERATOR		${gen}
+	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
+	DEPENDS	${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
-SET( VTK_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-install/include )
-SET( VTK_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib )
+SET( VTK_DIR ${${proj}_INSTALL_DIR} )
+SET( VTK_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( VTK_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( VTK_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 
 mark_as_superbuild(
 	VARS
 		VTK_DIR:PATH
+		VTK_BUILD_DIR:PATH
 		VTK_INCLUDE_DIR:PATH
 		VTK_LIBRARY_DIR:PATH
 	LABELS
@@ -151,6 +154,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "VTK_DIR: ${VTK_DIR}" )
+ExternalProject_Message( ${proj} "VTK_BUILD_DIR: ${VTK_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "VTK_INCLUDE_DIR: ${VTK_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "VTK_LIBRARY_DIR: ${VTK_LIBRARY_DIR}" )
 ### --- End binary information

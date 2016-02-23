@@ -22,12 +22,17 @@ SET( ${proj}_DEPENDENCIES
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
+# Set directories
+SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj} )
+SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj} )
+SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
+
 ### --- Project specific additions here
 SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Qt_configureqt.cmake )
 SET( ${proj}_CONFIGURE_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
-	-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
+	-DBUILD_DIR:PATH=${${proj}_BUILD_DIR}
 	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
 	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
 	# ZLIB ARGS
@@ -65,26 +70,27 @@ SET( ${proj}_MD5 2edbe4d6c2eff33ef91732602f3518eb )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL ${${proj}_URL}
-	URL_MD5 ${${proj}_MD5}
-	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
 	BUILD_IN_SOURCE 1
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	CONFIGURE_COMMAND ${${proj}_CONFIGURE_COMMAND}
-	BUILD_COMMAND make -j5
-	INSTALL_COMMAND ""
+	CONFIGURE_COMMAND	${${proj}_CONFIGURE_COMMAND}
+	INSTALL_COMMAND		""
 	DEPENDS ${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( QT_DIR ${CMAKE_BINARY_DIR}/${proj} )
-SET( QT_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}/include )
-SET( QT_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}/lib )
+SET( QT_DIR ${${proj}_INSTALL_DIR} )
+SET( QT_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( QT_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( QT_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( QT_QMAKE_EXECUTABLE ${CMAKE_BINARY_DIR}/${proj}/bin/qmake.exe )
 
 mark_as_superbuild(
 	VARS
 		QT_DIR:PATH
+		QT_BUILD_DIR:PATH
 		QT_INCLUDE_DIR:PATH
 		QT_LIBRARY_DIR:PATH
 		QT_QMAKE_EXECUTABLE:FILEPATH
@@ -93,6 +99,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "QT_DIR: ${QT_DIR}" )
+ExternalProject_Message( ${proj} "QT_BUILD_DIR: ${QT_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "QT_INCLUDE_DIR: ${QT_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "QT_LIBRARY_DIR: ${QT_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "QT_QMAKE_EXECUTABLE: ${QT_QMAKE_EXECUTABLE}" )

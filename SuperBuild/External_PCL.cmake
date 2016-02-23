@@ -24,8 +24,12 @@ SET( ${proj}_DEPENDENCIES
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
 
-### --- Project specific additions here
+# Set directories
+SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
+
+### --- Project specific additions here
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -44,13 +48,17 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DWITH_DOCS:BOOL=OFF
 	# Boost ARGS
 	-DBOOST_ROOT:PATH=${BOOST_DIR}
+	-DBoost_INCLUDE_DIR:PATH=${BOOST_INCLUDE_DIR}
 	# EIGEN ARGS
 	-DEIGEN_INCLUDE_DIR:PATH=${EIGEN_INCLUDE_DIR}
 	# FLANN ARGS
-	
+	-DFLANN_INCLUDE_DIR:PATH=${FLANN_INCLUDE_DIR}
+	-DFLANN_LIBRARY:FILEPATH=${FLANN_LIBRARY}
 	# QHULL ARGS
-	
+	-DQHULL_INCLUDE_DIR:PATH=${QHULL_INCLUDE_DIR}
+	-DQHULL_LIBRARY:FILEPATH=${QHULL_LIBRARY}
 	# VTK ARGS
+	-DVTK_DIR:PATH=${VTK_BUILD_DIR}
 )
 
 # Download tar source when possible to speed up build time
@@ -62,33 +70,34 @@ SET( ${proj}_MD5 02c72eb6760fcb1f2e359ad8871b9968 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL ${${proj}_URL}
-	URL_MD5 ${${proj}_MD5}
-	# GIT_REPOSITORY ${${proj}_REPOSITORY}
-	# GIT_TAG ${${proj}_GIT_TAG}
-	SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj}
-	BINARY_DIR ${proj}-build
-	LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD     0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST      0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
+	URL		${${proj}_URL}
+	URL_MD5	${${proj}_MD5}
+	# GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# GIT_TAG 			${${proj}_GIT_TAG}
+	SOURCE_DIR	${${proj}_SOURCE_DIR}
+	BINARY_DIR	${${proj}_BUILD_DIR}
+	INSTALL_DIR	${${proj}_INSTALL_DIR}
+	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
+	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
+	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
+	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
 	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-	INSTALL_DIR ${${proj}_INSTALL_DIR}
-	CMAKE_GENERATOR ${gen}
-	CMAKE_ARGS -Wno-dev --no-warn-unused-cli
-	CMAKE_CACHE_ARGS ${${proj}_CMAKE_OPTIONS}
-	INSTALL_COMMAND ""
-	DEPENDS ${${proj}_DEPENDENCIES}
+	CMAKE_GENERATOR		${gen}
+	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
+	DEPENDS	${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
-SET( PCL_DIR ${CMAKE_BINARY_DIR}/${proj}-build )
-SET( PCL_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${proj}-build/include/pcl )
-SET( PCL_LIBRARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build/lib )
+SET( PCL_DIR ${${proj}_INSTALL_DIR} )
+SET( PCL_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( PCL_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( PCL_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 
 mark_as_superbuild(
 	VARS
 		PCL_DIR:PATH
+		PCL_BUILD_DIR:PATH
 		PCL_INCLUDE_DIR:PATH
 		PCL_LIBRARY_DIR:PATH
 	LABELS
@@ -96,6 +105,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "PCL_DIR: ${PCL_DIR}" )
+ExternalProject_Message( ${proj} "PCL_BUILD_DIR: ${PCL_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "PCL_INCLUDE_DIR: ${PCL_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "PCL_LIBRARY_DIR: ${PCL_LIBRARY_DIR}" )
 ### --- End binary information
