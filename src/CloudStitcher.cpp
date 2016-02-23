@@ -488,11 +488,27 @@ namespace vba
             //original is 0.05
             vba::voxelGridFilter( source , source , this->filter_leaf_size );
             vba::voxelGridFilter( target , target , this->filter_leaf_size );
-            vba::statisticalOutlierFilter( source , source , 1.0 , 5 );
-            vba::statisticalOutlierFilter( target , target , 1.0 , 5 );
+            vba::statisticalOutlierFilter( source , source , 1.0 , 20 );
+            vba::statisticalOutlierFilter( target , target , 1.0 , 20 );
 
             //we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
             vba::pairAlign( source, target, pairTransform );
+
+
+            //We are making some changes to the resulting Transformation matrix to try and refine the accuracy of the model.
+            //Mostly getting rid of x and y translations as well as all rotations.
+            pairTransform( 0 , 0 ) = 1.0f;
+            pairTransform( 0 , 1 ) = 0.0f;
+            pairTransform( 0 , 2 ) = 0.0f;
+            pairTransform( 0 , 3 ) = 0.0f;
+            pairTransform( 1 , 0 ) = 0.0f;
+            pairTransform( 1 , 1 ) = 1.0f;
+            pairTransform( 1 , 2 ) = 0.0f;
+            pairTransform( 1 , 3 ) = 0.0f;
+            pairTransform( 2 , 0 ) = 0.0f;
+            pairTransform( 2 , 1 ) = 0.0f;
+            pairTransform( 2 , 2 ) = 1.0f;
+
 
             //update the global transform with the pairTransform returned from aligning the two clouds
             GlobalTransform = GlobalTransform * pairTransform;
@@ -507,7 +523,8 @@ namespace vba
              //possible race condition here
             output_stream.str( "" );
             output_stream << "Registered Cloud " << ++*this->files_finished << "\n";
-            output_buffer->push( output_stream.str() );
+            //output_buffer->push( output_stream.str() );
+            std::cout << output_stream.str();
 
         }
 
