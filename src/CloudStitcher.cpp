@@ -283,7 +283,7 @@ namespace vba
 		}
 
 		PointCloud::Ptr final_cloud( new PointCloud( global_cloud ));
-		vba::voxelGridFilter( final_cloud , final_cloud , 0.05 );
+		vba::voxelGridFilter( final_cloud , final_cloud , this->filter_leaf_size );
 		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 20 );
 
 		if( pcl::io::savePCDFile( this->output_path , *final_cloud , true ) == -1 )
@@ -322,7 +322,7 @@ namespace vba
 	}
 
 
-	int CloudStitcher::setFilterIntensity( unsigned int value )
+	int CloudStitcher::setFilterResolution( unsigned int value )
 	{
 		//make sure value is between 0 and 20
 		if( value < 0 || value > 20 )
@@ -343,6 +343,8 @@ namespace vba
 			this->filter_leaf_size = float( 0.01 * value );
 		}
 
+		std::cout << "filter size set to: " << this->filter_leaf_size << "\n";
+
 		return 0;
 	}
 
@@ -361,7 +363,7 @@ namespace vba
 		if( thread_count == 1 )
 		{
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 		}
 
 		//otherwise we are going to divide up the filename array as evenly as possible among all the threads
@@ -371,13 +373,13 @@ namespace vba
 			{
 				std::vector< std::string >::iterator last = ( current_offset + offset );
 				std::vector< std::string > param_vec( current_offset , last );
-				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 				current_offset = last - 1;
 			}
 
 			//to prevent a seg-fault we just copy whatever is left of the filename array into the last thread
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 
 		}
 	}
@@ -407,12 +409,13 @@ namespace vba
 	}
 
 
-	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished )
+	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished , float filter_res )
 	{
 		//we will make a copy of the list of target filenames for this instance of the class
 		this->file_list = new std::vector< std::string >( files );
 		this->worker_thread_is_finished = false;
 		this->files_finished = files_finished;
+		this->filter_leaf_size = filter_res;
 
 		this->output_buffer = buf;
 
@@ -483,10 +486,10 @@ namespace vba
             pcl::removeNaNFromPointCloud( *target , *target , indices );
 
             //original is 0.05
+            vba::voxelGridFilter( source , source , this->filter_leaf_size );
+            vba::voxelGridFilter( target , target , this->filter_leaf_size );
             vba::statisticalOutlierFilter( source , source , 1.0 , 5 );
             vba::statisticalOutlierFilter( target , target , 1.0 , 5 );
-            vba::voxelGridFilter( source , source , 0.05 );
-            vba::voxelGridFilter( target , target , 0.05 );
 
             //we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
             vba::pairAlign( source, target, pairTransform );

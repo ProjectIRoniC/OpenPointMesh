@@ -129,7 +129,7 @@ class CloudStitcher
 		 * @return: 0 if the set was successful. -1 if the user entered a bad value.
 		 *
 		 */
-		int setFilterIntensity( unsigned int value );
+		int setFilterResolution( unsigned int value );
 
 	private:
 
@@ -196,7 +196,7 @@ class CloudStitcher
 				 * @param: a copy of the vector containing the pcd files to stich together
 				 * @return: none
 				 */
-				CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished );
+				CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished , float filter_res );
 
 				/*Default destructor that deallocates the objects allocated dynamically throughout this instances
 				 * lifespan
@@ -250,6 +250,7 @@ class CloudStitcher
 				bool worker_thread_is_finished;
 				std::vector< std::string >* file_list;
 				unsigned int* files_finished;
+				float filter_leaf_size;
 
 				boost::thread worker_thread;
 				boost::thread exit_detect_thread;
