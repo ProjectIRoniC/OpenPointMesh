@@ -299,8 +299,8 @@ vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const o
 	const float centerY = ((float)depthHeight - 1.f) / 2.f;
 
 	// Use field of view to calculate focal length
-	const float focalLength_x = ((float)depthWidth / 2) / tan( fieldOfView_X );
-	const float focalLength_y = ((float)depthHeight / 2) / tan( fieldOfView_Y );
+	const float focalLength_x = ((float)depthWidth / 2) / tan( (float)fieldOfView_X / 2 );
+	const float focalLength_y = ((float)depthHeight / 2) / tan( (float)fieldOfView_Y / 2 );
 	
 	// Get inverse focal length for calculations below
 	const float inverseFocalLength_x = 1.0f / focalLength_x;
