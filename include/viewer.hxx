@@ -1,11 +1,15 @@
 #include <cctype>
 
+#ifndef _OPENNI2VIEWER
+#define _OPENNI2VIEWER
+
 template <typename PointType>
 class OpenNI2Viewer
 {
 public:
   typedef pcl::PointCloud<PointType> Cloud;
   typedef typename Cloud::ConstPtr CloudConstPtr;
+
 
   OpenNI2Viewer (pcl::io::OpenNI2Grabber& grabber, unsigned totalFrames)
     : cloud_viewer_ (new pcl::visualization::PCLVisualizer ("PCL OpenNI2 cloud"))
@@ -15,7 +19,7 @@ public:
     , currentFrame (0)
     , totalFrames (totalFrames)
   {
-    this->pause();  // start the viewer in paused state
+    //this->pause();  // start the viewer in paused state
   }
 
   void
@@ -125,7 +129,7 @@ private:
    * @description - uses --- to pause playback
    * @author - nicole cranon
    */
-  void 
+  void
   pause ();
 
   /**
@@ -161,4 +165,16 @@ private:
    */
   void 
   stop ();
+
+  /**
+   * @function launchOniViewer
+   * @description - initializes and launches the viewer
+   * @author - nicole cranon
+   */
+  void
+  launchOniViewer (std::string& oniFilename);
 };
+
+#include "../src/viewer.tem"
+#endif
+

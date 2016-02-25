@@ -8,6 +8,7 @@
 #include "../include/CloudStitcher.h"
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
+#include "../include/viewer.h"
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -134,6 +135,26 @@ void MainWindow::exitSlot()
 void MainWindow::omitFramesSlot()
 {
     std::cout << "inside omitframesslot\n";
+    std::string device_id ("");
+    /**
+        * frame tracking
+        * @author - nicole cranon
+        */
+    unsigned totalFrames = 0;
+
+    if (this->oniFileNames.length() > 0)
+    {
+        device_id = oniFileNames[0].toStdString();
+        pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+        pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+
+        pcl::io::OpenNI2Grabber grabber (device_id.c_str(), depth_mode, image_mode);
+        unsigned totalFrames = grabber.getDevice()->getDepthFrameCount();
+
+        OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
+        //openni_viewer.run();
+        std::cout << "\nEND OF RUN FUNCTION\n";
+    }
 }
 
 void MainWindow::filterAccuracySlot()

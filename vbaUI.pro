@@ -28,7 +28,17 @@ SOURCES += src/main.cpp\
     src/PCDRegistration.cpp \
     build/CMakeFiles/3.2.2/CompilerIdC/CMakeCCompilerId.c \
     build/CMakeFiles/feature_tests.c \
-    src/MeshConstructor.cpp
+    src/MeshConstructor.cpp \
+    build/CMakeFiles/3.4.0-rc2/CompilerIdCXX/CMakeCXXCompilerId.cpp \
+    build/include/moc_CloudRegistrationFunctions.cxx \
+    build/include/moc_filesystemHelper.cxx \
+    build/include/moc_MeshConstructor.cxx \
+    build/include/moc_PointCloudFilters.cxx \
+    build/include/moc_viewer.cxx \
+    src/CloudRegistrationFunctions.cpp \
+    src/filesystemHelper.cpp \
+    src/PointCloudFilters.cpp \
+    build/CMakeFiles/3.4.0-rc2/CompilerIdC/CMakeCCompilerId.c
 
 HEADERS  += include/mainwindow.h \
     build/ui_mainwindow.h \
@@ -36,7 +46,13 @@ HEADERS  += include/mainwindow.h \
     include/errorMsgHandler.h \
     include/oni-to-pcd.h \
     include/PCDRegistration.h \
-    include/MeshConstructor.h
+    include/MeshConstructor.h \
+    include/CloudRegistrationFunctions.h \
+    include/filesystemHelper.h \
+    include/PointCloudFilters.h \
+    include/viewer.h \
+    include/viewer.hxx \
+    src/viewer.tem
 
 FORMS    += src/mainwindow.ui
 

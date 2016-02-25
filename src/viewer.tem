@@ -107,6 +107,7 @@ printHelp (int, char **argv)
 #endif
 }
 
+
 template <typename PointType>
 void
 OpenNI2Viewer<PointType>::cloud_callback (const CloudConstPtr& cloud)
@@ -438,6 +439,18 @@ OpenNI2Viewer<PointType>::fastforward () {
 boost::shared_ptr<pcl::visualization::PCLVisualizer> cld;
 boost::shared_ptr<pcl::visualization::ImageViewer> img;
 
+template<typename PointType>
+void OpenNI2Viewer<PointType>::launchOniViewer (std::string& oniFilename) {
+//  pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+//  pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+
+//  pcl::io::OpenNI2Grabber grabber (oniFilename.c_str(), depth_mode, image_mode);
+//  unsigned totalFrames = grabber.getDevice()->getDepthFrameCount();
+
+//  OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
+//  openni_viewer.run();
+//  std::cout << "\nEND OF RUN FUNCTION\n";
+}
 // here for viewer testing purposes should be removed upon integration with project
 /* ---[ */
 // int
