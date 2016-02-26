@@ -19,7 +19,7 @@ public:
     , currentFrame (0)
     , totalFrames (totalFrames)
   {
-    //this->pause();  // start the viewer in paused state
+    this->pause();  // start the viewer in paused state
   }
 
   void

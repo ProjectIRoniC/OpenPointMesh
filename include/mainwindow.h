@@ -136,6 +136,13 @@ signals:
      * Post: nextStep has been called
      */
     void start( int );
+
+    /*
+     * Sginal that marks the end of the omit frames component
+     * Post: nextstep is called with passed int
+     */
+    void omitFramesFinished(int);
+
     /*
      * Signal that marks the end of onitToPcd conversion.
      * Post: nextStep is called
@@ -155,6 +162,7 @@ signals:
 
 
 
+
 private:
 
     /*
@@ -165,7 +173,8 @@ private:
     static const int ONITOPCD = 0;
     static const int CLOUDSTITCHER = 1;
     static const int MESHCONSTRUCTOR = 2;
-    static const int FINISHED = 3;
+    static const int OMITFRAMES = 3;
+    static const int FINISHED = 4;
 
     /*
      * Main ui
@@ -235,6 +244,15 @@ private:
      * Post: point cloud file has been converted to single mesh file
      */
     void meshConstructorController();
+
+    /*
+     * Controller for omit frames component.
+     * Pre:  oniFileNames contains a list of oni files.
+     *       a viewer will be presented to the user so that they may select what
+     *       frames to omit
+     * Post: the viewer has been called with each file in oniFileNames
+     */
+    void omitFramesController();
     /*
      * Stops and deletes task thread.
      */

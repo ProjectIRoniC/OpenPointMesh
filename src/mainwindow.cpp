@@ -35,12 +35,14 @@ MainWindow::MainWindow( QWidget *parent ) :
     outputMessageThread = new boost::thread( &MainWindow::processOutputQueue, this );
 
     // process the order in which we want tasks to be run
+    // can be refactored. redundant
     connect( this, SIGNAL(appendToConsole(QString)), ui->plainTextEdit, SLOT(insertPlainText(QString)) );
     connect( this, SIGNAL(start(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(oniToPCDFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(appendToConsole(QString)), this, SLOT(ensureCursorVisible(QString)) );
     connect( this, SIGNAL(cloudStitcherFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(meshConstructorFinished(int)), this, SLOT(nextStep(int)) );
+    connect( this, SIGNAL(omitFramesFinished(int)), this , SLOT(nextStep(int)) );
 
     // set initial values for varibles
     outputFolderName = QString( "" );
@@ -66,8 +68,10 @@ MainWindow::MainWindow( QWidget *parent ) :
     /* Omit Frames */
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
     omitFramesAct->setShortcuts(QKeySequence::Find);
-    omitFramesAct->setStatusTip(tr("Select frames to omit"));
+    omitFramesAct->setStatusTip(tr("Select frames to omit on start"));
+    omitFramesAct->setCheckable(true);
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
+
 
     /* Filter Accuracy */
     filterAccuracyAct = new QAction(tr("&Filter Accuracy"), this);
@@ -134,27 +138,8 @@ void MainWindow::exitSlot()
 
 void MainWindow::omitFramesSlot()
 {
-    std::cout << "inside omitframesslot\n";
-    std::string device_id ("");
-    /**
-        * frame tracking
-        * @author - nicole cranon
-        */
-    unsigned totalFrames = 0;
-
-    if (this->oniFileNames.length() > 0)
-    {
-        device_id = oniFileNames[0].toStdString();
-        pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
-        pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
-
-        pcl::io::OpenNI2Grabber grabber (device_id.c_str(), depth_mode, image_mode);
-        unsigned totalFrames = grabber.getDevice()->getDepthFrameCount();
-
-        OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
-        //openni_viewer.run();
-        std::cout << "\nEND OF RUN FUNCTION\n";
-    }
+    /* omitFrameAct retains the check status so nothing else needs to be
+       done in the function. Placeholder for future development*/
 }
 
 void MainWindow::filterAccuracySlot()
@@ -213,6 +198,10 @@ void MainWindow::nextStep( const int& step )
 {
     switch( step ) {
 
+    case OMITFRAMES:
+        clearTaskThread();
+        taskThread = new boost::thread( &MainWindow::omitFramesController, this );
+        break;
     case ONITOPCD:
         setButtonsAllDisabledState();
         clearTaskThread();
@@ -294,6 +283,42 @@ void MainWindow::cloudStitcherController()
     emit cloudStitcherFinished( MESHCONSTRUCTOR );
 }
 
+void oniFramesHelper(std::string oniFileName)
+{
+    std::string device_id ("");
+    /**
+    * frame tracking
+    * @author - nicole cranon
+    */
+
+    device_id = oniFileName;
+    pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+    pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+
+    pcl::io::OpenNI2Grabber grabber (device_id.c_str(), depth_mode, image_mode);
+    unsigned totalFrames = grabber.getDevice()->getDepthFrameCount();
+
+    OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
+    openni_viewer.run();
+}
+
+void MainWindow::omitFramesController()
+{
+    if(this->omitFramesAct->isChecked() == false){
+        appendMessageToOutputBuffer("Skipping omit frames stage. " + omitFramesAct->iconText().toStdString() + " not selected");
+        emit omitFramesFinished( ONITOPCD );
+        return;
+    }
+    appendMessageToOutputBuffer( "Start ...\n" + omitFramesAct->iconText().toStdString() );
+
+    for(int i =0; i < oniFileNames.length(); ++ i)
+    {
+        oniFramesHelper(oniFileNames[i].toStdString());
+    }
+
+    emit omitFramesFinished( ONITOPCD );
+}
+
 void MainWindow::processOutputQueue()
 {
     std::string temp = "";
@@ -371,7 +396,7 @@ void MainWindow::on_Browse_output_clicked()
 
 void MainWindow::on_Start_clicked()
 {
-    emit start( ONITOPCD );
+    emit start(OMITFRAMES );
 }
 
 // ** Helper Functions ** //
