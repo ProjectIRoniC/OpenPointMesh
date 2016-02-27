@@ -213,7 +213,7 @@ void MainWindow::nextStep( const int& step )
         std::cout << "before cleartaskthread onitopcd\n";
         clearTaskThread();
         std::cout << "after cleartaskthreadonitopcd\n";
-        return;
+        return; // TODO remove output statements
         taskThread = new boost::thread( &MainWindow::oniToPCDController, this );
         std::cout << "after new thread onitopcdcontroller\n";
         break;
@@ -330,12 +330,12 @@ void MainWindow::omitFramesController()
     //
     std::string device_id ("");
     //
-    //for(int i =0; i < oniFileNames.length(); ++ i)
-    //{
-        device_id = oniFileNames[0].toStdString();
+    for(int i =0; i < oniFileNames.length(); ++ i)
+    {
+        device_id = oniFileNames[i].toStdString();
         std::string oniFilename = device_id;
         oniFramesHelper(oniFilename);
-    //}
+    }
         std::cout << "after return from oniframhelper\n" << std::flush;
 
     emit omitFramesFinished( ONITOPCD );
