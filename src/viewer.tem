@@ -294,7 +294,7 @@ OpenNI2Viewer<PointType>::run ()
       case UPPER_PAUSE:
         this->pause();
         break;
-      default:
+      case PLAY:
         this->play();
         break;
      }
@@ -417,6 +417,12 @@ OpenNI2Viewer<PointType>::rewind () {
   this->rewinding = true;
   this->fastforwarding = false;
   this->stopped = false;
+}
+
+template <typename PointType>
+OpenNI2Viewer<PointType>::~OpenNI2Viewer() {
+    //cloud_viewer_->close();
+    //image_viewer_->close();
 }
 
 /**

@@ -64,6 +64,11 @@ public:
    */
   bool is_fastforwarding ();
 
+  /**
+   * @description - is used in the destruction of this object and its resources
+   * @author - Paul Rodriguez
+   */
+  ~OpenNI2Viewer();
 
   /**
   * @brief starts the main loop

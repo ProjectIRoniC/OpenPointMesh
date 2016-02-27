@@ -138,8 +138,14 @@ void MainWindow::exitSlot()
 
 void MainWindow::omitFramesSlot()
 {
-    /* omitFrameAct retains the check status so nothing else needs to be
-       done in the function. Placeholder for future development*/
+    /* omitFrameAct retains the check status */
+    /* send message to output */
+    if(omitFramesAct->isChecked()) {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " enabled\n");
+    }
+    else {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " disabled\n");
+    }
 }
 
 void MainWindow::filterAccuracySlot()
@@ -199,13 +205,17 @@ void MainWindow::nextStep( const int& step )
     switch( step ) {
 
     case OMITFRAMES:
+        setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::omitFramesController, this );
         break;
     case ONITOPCD:
-        setButtonsAllDisabledState();
+        std::cout << "before cleartaskthread onitopcd\n";
         clearTaskThread();
+        std::cout << "after cleartaskthreadonitopcd\n";
+        return;
         taskThread = new boost::thread( &MainWindow::oniToPCDController, this );
+        std::cout << "after new thread onitopcdcontroller\n";
         break;
     case CLOUDSTITCHER :
         clearTaskThread();
@@ -283,13 +293,19 @@ void MainWindow::cloudStitcherController()
     emit cloudStitcherFinished( MESHCONSTRUCTOR );
 }
 
-void oniFramesHelper(std::string oniFileName)
+
+void oniFramesHelper(std::string& oniFilename)
 {
-    std::string device_id ("");
-    /**
-    * frame tracking
-    * @author - nicole cranon
-    */
+    pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+    pcl::io::OpenNI2Grabber::Mode image_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
+
+    pcl::io::OpenNI2Grabber grabber (oniFilename.c_str(), depth_mode, image_mode);
+    unsigned totalFrames = grabber.getDevice()->getDepthFrameCount();
+
+    OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
+    openni_viewer.run();
+    std::cout << "after run\n";
+    /*
 
     device_id = oniFileName;
     pcl::io::OpenNI2Grabber::Mode depth_mode = pcl::io::OpenNI2Grabber::OpenNI_Default_Mode;
@@ -300,6 +316,7 @@ void oniFramesHelper(std::string oniFileName)
 
     OpenNI2Viewer<pcl::PointXYZRGBA> openni_viewer (grabber, totalFrames);
     openni_viewer.run();
+    */
 }
 
 void MainWindow::omitFramesController()
@@ -310,11 +327,16 @@ void MainWindow::omitFramesController()
         return;
     }
     appendMessageToOutputBuffer( "Start ...\n" + omitFramesAct->iconText().toStdString() );
-
-    for(int i =0; i < oniFileNames.length(); ++ i)
-    {
-        oniFramesHelper(oniFileNames[i].toStdString());
-    }
+    //
+    std::string device_id ("");
+    //
+    //for(int i =0; i < oniFileNames.length(); ++ i)
+    //{
+        device_id = oniFileNames[0].toStdString();
+        std::string oniFilename = device_id;
+        oniFramesHelper(oniFilename);
+    //}
+        std::cout << "after return from oniframhelper\n" << std::flush;
 
     emit omitFramesFinished( ONITOPCD );
 }
