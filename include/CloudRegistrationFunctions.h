@@ -64,7 +64,6 @@ public:
   	  }
   	};
 
-int registerPointCloudSet( const std::vector< std::string > file_list , PointCloud::Ptr output_cloud , Eigen::Matrix4f& final_transform , boost::lockfree::spsc_queue<std::string>* buf );
 
 int openPCDFile( std::string filename , PointCloud::Ptr cloud );
 
@@ -73,6 +72,17 @@ int openPCDFile( std::string filename , PointCloud::Ptr cloud );
 
 
 void pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform );
+
+
+
+void pairAlign2(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform );
+
+
+void pairAlign3(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform );
+
+
+void pairAlign4(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f &final_transform );
+
 
 
 
