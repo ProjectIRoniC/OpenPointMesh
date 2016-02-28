@@ -284,7 +284,7 @@ namespace vba
 
 		PointCloud::Ptr final_cloud( new PointCloud( global_cloud ));
 		vba::voxelGridFilter( final_cloud , final_cloud , this->filter_leaf_size );
-		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 20 );
+		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 30 );
 
 		if( pcl::io::savePCDFile( this->output_path , *final_cloud , true ) == -1 )
 		{
@@ -488,8 +488,8 @@ namespace vba
             //original is 0.05
             vba::voxelGridFilter( source , source , this->filter_leaf_size );
             vba::voxelGridFilter( target , target , this->filter_leaf_size );
-            vba::statisticalOutlierFilter( source , source , 1.0 , 20 );
-            vba::statisticalOutlierFilter( target , target , 1.0 , 20 );
+            vba::statisticalOutlierFilter( source , source , 1.0 , 30 );
+            vba::statisticalOutlierFilter( target , target , 1.0 , 30 );
 
             //we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
             vba::pairAlign( source, target, pairTransform );
@@ -508,6 +508,7 @@ namespace vba
             pairTransform( 2 , 0 ) = 0.0f;
             pairTransform( 2 , 1 ) = 0.0f;
             pairTransform( 2 , 2 ) = 1.0f;
+            //std::cout << "Z-transform: " << pairTransform( 2 , 3 ) << "\n";
 
 
             //update the global transform with the pairTransform returned from aligning the two clouds
@@ -523,8 +524,8 @@ namespace vba
              //possible race condition here
             output_stream.str( "" );
             output_stream << "Registered Cloud " << ++*this->files_finished << "\n";
-            //output_buffer->push( output_stream.str() );
-            std::cout << output_stream.str();
+            output_buffer->push( output_stream.str() );
+            //std::cout << output_stream.str();
 
         }
 
