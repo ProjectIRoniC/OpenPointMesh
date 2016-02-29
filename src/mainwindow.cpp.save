@@ -148,6 +148,7 @@ void MainWindow::filterAccuracySlot()
 {
     accuracyControlMenu->setAccuracyValue( this->accuracy_control_value );
     accuracyControlMenu->show();
+
 }
 
 void MainWindow::meshAccuracySlot()
@@ -170,6 +171,7 @@ void MainWindow::viewWikiSlot()
 void MainWindow::onAccuracyControlDialogClose()
 {
     this->accuracy_control_value = this->accuracyControlMenu->getAccuracyValue();
+    std::cout << "accuracy value: " << this->accuracy_control_value << "\n";
 }
 
 /*
@@ -274,7 +276,6 @@ void MainWindow::cloudStitcherController()
     appendMessageToOutputBuffer( "Start point cloud stitching...\n" );
     vba::CloudStitcher* mCloudStitcher = new vba::CloudStitcher;
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
-	mCloudStitcher->setFilterResolution( this->accuracy_control_value );
 
 	// Loop through each input file
 	for( int h = 0; h < oniFileNames.size(); ++h )
