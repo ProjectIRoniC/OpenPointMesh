@@ -274,6 +274,7 @@ void MainWindow::cloudStitcherController()
     appendMessageToOutputBuffer( "Start point cloud stitching...\n" );
     vba::CloudStitcher* mCloudStitcher = new vba::CloudStitcher;
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
+	mCloudStitcher->setFilterResolution( this->accuracy_control_value );
 
 	// Loop through each input file
 	for( int h = 0; h < oniFileNames.size(); ++h )
