@@ -14,24 +14,21 @@ AccuracyControlMenu::~AccuracyControlMenu()
 
 }
 
-void AccuracyControlMenu::setAccuracyValue( QMainWindow* mainwindow , unsigned int value )
+void AccuracyControlMenu::setAccuracyValue( unsigned int value )
 {
-    this->main_window = mainwindow;
     this->accuracy_value = value;
 
-    ui.accuracy_slider.setValue( value );
+    ui.accuracy_slider->setSliderPosition( value );
 }
 
 
 void AccuracyControlMenu::accept()
 {
-    this->main_window->setAccuracyControlValue( ui.accuracy_slider.getValue() );
-    this->accuracy_value = ui.accuracy_slider.getValue();
+    this->accuracy_value = ui.accuracy_slider->sliderPosition();
+
+    this->close();
+    emit accepted();
 }
 
-void AccuracyControlMenu::reject()
-{
-    this->accuracy_value = 5;
-}
 
 

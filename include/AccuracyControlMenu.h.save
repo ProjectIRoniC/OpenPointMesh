@@ -2,7 +2,9 @@
 #define ACCURACYCONTROLMENU_H
 
 #include <QDialog>
+#include <QMainWindow>
 #include "ui_AccuracyControlMenu.h"
+#include "mainwindow.h"
 
 class AccuracyControlMenu : public QDialog
 {
@@ -12,15 +14,18 @@ public:
 	AccuracyControlMenu(QWidget *parent);
 	~AccuracyControlMenu();
 
-	void setGLLight( OpenGLFrame *gl , OpenGLFrame::Light *l ,  QString lightNumber );
+	void setAccuracyValue( MainWindow* mainwindow , unsigned int value );
+	unsigned int getAccuracyValue
 
 public slots:
-	void applyLightChanges();
+	void accept();
 
 private:
-	Ui::Light_Dialog ui;
-	OpenGLFrame::Light *light;
-	OpenGLFrame *openGLFrame;
+	Ui::AccuracyControlMenu ui;
+	MainWindow* main_window;
+
+	unsigned int accuracy_value;
+
 };
 
 #endif // LIGHTEDITMENU_H

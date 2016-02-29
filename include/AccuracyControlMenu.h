@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include "ui_AccuracyControlMenu.h"
 
+
 class AccuracyControlMenu : public QDialog
 {
 	Q_OBJECT
@@ -13,15 +14,14 @@ public:
 	AccuracyControlMenu(QWidget *parent);
 	~AccuracyControlMenu();
 
-	void setAccuracyValue( QMainWindow* mainwindow , unsigned int value );
+	void setAccuracyValue( unsigned int value );
+	unsigned int getAccuracyValue() {return this->accuracy_value;}
 
 public slots:
 	void accept();
-	void reject();
 
 private:
 	Ui::AccuracyControlMenu ui;
-	QMainWindow* main_window;
 
 	unsigned int accuracy_value;
 

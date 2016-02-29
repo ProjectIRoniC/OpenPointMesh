@@ -8,6 +8,7 @@
 #include "../include/CloudStitcher.h"
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
+#include "../include/AccuracyControlMenu.h"
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -112,10 +113,17 @@ MainWindow::MainWindow( QWidget *parent ) :
     helpMenu->addAction(viewWikiAct);
     helpMenu->addSeparator();
 
+    accuracyControlMenu = new AccuracyControlMenu( this );
+    connect( accuracyControlMenu , SIGNAL( accepted() ) , this , SLOT( onAccuracyControlDialogClose() ));
+
     // Set initial button state
     setInitialButtonState();
 
+    this->accuracy_control_value = 5;
+
 }
+
+
 
 /*
  * ***************************Action button Controls***************************
@@ -138,9 +146,9 @@ void MainWindow::omitFramesSlot()
 
 void MainWindow::filterAccuracySlot()
 {
-    std::cout << "inside filteraccuracyslot\n";
-    
-    
+    accuracyControlMenu->setAccuracyValue( this->accuracy_control_value );
+    accuracyControlMenu->show();
+
 }
 
 void MainWindow::meshAccuracySlot()
@@ -158,6 +166,12 @@ void MainWindow::aboutSlot()
 void MainWindow::viewWikiSlot()
 {
     std::cout << "inside view wiki slot\n";
+}
+
+void MainWindow::onAccuracyControlDialogClose()
+{
+    this->accuracy_control_value = this->accuracyControlMenu->getAccuracyValue();
+    std::cout << "accuracy value: " << this->accuracy_control_value << "\n";
 }
 
 /*
@@ -182,6 +196,7 @@ MainWindow::~MainWindow()
     delete outputMessageThread;
     delete taskThread;
     delete ui;
+    delete accuracyControlMenu;
     // TODO add cleanup for threads
 }
 
@@ -261,7 +276,7 @@ void MainWindow::cloudStitcherController()
     appendMessageToOutputBuffer( "Start point cloud stitching...\n" );
     vba::CloudStitcher* mCloudStitcher = new vba::CloudStitcher;
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
-    
+
 	// Loop through each input file
 	for( int h = 0; h < oniFileNames.size(); ++h )
 	{
@@ -270,7 +285,7 @@ void MainWindow::cloudStitcherController()
         appendMessageToOutputBuffer( "Output final point cloud to " + mCloudStitcher->getOutputPath() + '\n');
 		mCloudStitcher->stitchPCDFiles( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "") );
 	}
-    
+
     delete mCloudStitcher;
     emit cloudStitcherFinished( MESHCONSTRUCTOR );
 }
@@ -311,19 +326,19 @@ void MainWindow::oniToPCDController()
         appendMessageToOutputBuffer( "ERROR: Please browse for an .ONI file before clicking start.\n" );
         return;
     }
-	
+
     appendMessageToOutputBuffer( "Start oni data output...\n" );
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
 	unsigned frameSkipMod = 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
-	
+
 	// Loop through each input file
 	for( int i = 0; i < oniFileNames.size(); ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
 	}
-	
+
     emit oniToPCDFinished( CLOUDSTITCHER );
 
 }

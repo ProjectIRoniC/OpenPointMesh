@@ -113,6 +113,9 @@ MainWindow::MainWindow( QWidget *parent ) :
     helpMenu->addAction(viewWikiAct);
     helpMenu->addSeparator();
 
+    accuracyControlMenu = new AccuracyControlMenu( this );
+    connect( accuracyControlMenu , SIGNAL( accepted() ) , this , SLOT( onAccuracyControlDialogClose() ));
+
     // Set initial button state
     setInitialButtonState();
 
@@ -120,11 +123,7 @@ MainWindow::MainWindow( QWidget *parent ) :
 
 }
 
-void MainWindow::setAccuracyControlValue( unsigned int value )
-{
-    if( value >= 0 && value <= 20 )
-        this->accuracy_control_value = value;
-}
+
 
 /*
  * ***************************Action button Controls***************************
@@ -147,11 +146,8 @@ void MainWindow::omitFramesSlot()
 
 void MainWindow::filterAccuracySlot()
 {
-    std::cout << "inside filteraccuracyslot\n";
-
-    AccuracyControlMenu* acm = new AccuracyControlMenu();
-    acm->setAccuracyValue( this , this->accuracy_control_value );
-    acm->show();
+    accuracyControlMenu->setAccuracyValue( this->accuracy_control_value );
+    accuracyControlMenu->show();
 }
 
 void MainWindow::meshAccuracySlot()
@@ -169,6 +165,11 @@ void MainWindow::aboutSlot()
 void MainWindow::viewWikiSlot()
 {
     std::cout << "inside view wiki slot\n";
+}
+
+void MainWindow::onAccuracyControlDialogClose()
+{
+    this->accuracy_control_value = this->accuracyControlMenu->getAccuracyValue();
 }
 
 /*
@@ -193,6 +194,7 @@ MainWindow::~MainWindow()
     delete outputMessageThread;
     delete taskThread;
     delete ui;
+    delete accuracyControlMenu;
     // TODO add cleanup for threads
 }
 

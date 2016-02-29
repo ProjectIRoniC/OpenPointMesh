@@ -8,6 +8,7 @@
 #include <QPlainTextEdit>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
+#include "AccuracyControlMenu.h"
 
 
 class QAction;
@@ -38,11 +39,6 @@ public:
      */
     ~MainWindow();
 
-    /*
-     *Pre: uses value to set the private variable accuracy_control_value
-     *Post: sets the private variable to desired value
-    */
-    void setAccuracyControlValue( unsigned int value );
 
 private:
     /*
@@ -125,6 +121,8 @@ private slots:
 
 
     void on_oni_browse_button_clicked();
+
+    void onAccuracyControlDialogClose();
 
 signals:
     /*
@@ -218,6 +216,12 @@ private:
     QMenu *fileMenu;
     QMenu *settingMenu;
     QMenu *helpMenu;
+
+
+    /*
+     * Dialog Boxes
+     */
+     AccuracyControlMenu* accuracyControlMenu;
 
     /*
      * Marks the completion of the last step of controller constants
