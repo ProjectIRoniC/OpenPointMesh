@@ -1,3 +1,13 @@
+##############################################################################
+# Top level CMakeLists file for the SuperBuild.
+#
+# This file is responsible for setting up the SuperBuild process which runs
+# in two phases. The first phase runs SuperBuild.cmake which sets up the
+# building of the dependencies of the Primary Project OpenPointMesh.  When
+# SuperBuild.cmake is complete the second phase begins where this file is
+# recursively called, but processes the Primary Project cmake file
+# OpenPointMesh.cmake instead of SuperBuild.cmake.
+##############################################################################
 #-----------------------------------------------------------------------------
 # CMake Policy settings
 # 3.1.0 NEEDED for CMAKE_CXX_STANDARD support
@@ -24,7 +34,6 @@ ENDFOREACH()
 # Add the CMake Module Path
 #-----------------------------------------------------------------------------
 SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH} )
-INCLUDE( ExternalProject )
 
 
 #-----------------------------------------------------------------------------
@@ -51,7 +60,7 @@ MARK_AS_ADVANCED( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 
 
 #-----------------------------------------------------------------------------
-# Common build features for both the superbuild and the main build
+# Common variables and functionality for the Primary and Dependency Projects
 #-----------------------------------------------------------------------------
 INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake )
 
@@ -60,13 +69,8 @@ INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake )
 # Superbuild script
 #-----------------------------------------------------------------------------
 IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
-	PROJECT( SuperBuild_${PRIMARY_PROJECT_NAME} )  # <- NOTE: Project name for pre-requisites is different form main project
-	IF( NOT CMAKE_CXX_STANDARD )
-		SET( CMAKE_CXX_STANDARD 14 ) # Supported values are ``98``, ``11`` and ``14``.
-	ENDIF()
-	#--------------------------------------------------------------------------
+	PROJECT( SuperBuild_${PRIMARY_PROJECT_NAME} )  # <- NOTE: Project name for pre-requisites is different from main project
 	# Sanity checks
-	#--------------------------------------------------------------------------
 	IF( WIN32 )
 		SET( ${PROJECT_NAME}_ROOT_DIR_MAX_LENGTH 40 )
 		IF( NOT ${PROJECT_NAME}_SUPERBUILD )
@@ -84,9 +88,6 @@ IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 	RETURN()
 ELSE()
 	PROJECT( ${PRIMARY_PROJECT_NAME} ) # <- NOTE: Here is the main project name setting
-	IF( NOT CMAKE_CXX_STANDARD )
-		SET( CMAKE_CXX_STANDARD 14 ) # Supported values are ``98``, ``11`` and ``14``.
-	ENDIF()
 	INCLUDE( "${CMAKE_CURRENT_SOURCE_DIR}/${PRIMARY_PROJECT_NAME}.cmake" )
 	RETURN()
 ENDIF()

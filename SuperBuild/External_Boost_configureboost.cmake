@@ -1,9 +1,7 @@
 
 # bootstrap.bat has no options, the options are given to ./b2 when BUILDING
 # see External_Boost_buildboost.cmake for configure options
-SET( BOOST_CONFIGURE_COMMAND
-	bootstrap.bat
-)
+SET( BOOST_CONFIGURE_COMMAND bootstrap.bat )
 
 # Set explicitly to mingw since boost will assume MSVC on WIN32
 IF( WIN32 )
@@ -15,6 +13,11 @@ IF( WIN32 )
 ENDIF()
 
 EXECUTE_PROCESS( COMMAND ${BOOST_CONFIGURE_COMMAND}
-			WORKING_DIRECTORY ${BUILD_DIR} RESULT_VARIABLE boostrap_result )
+			WORKING_DIRECTORY ${SOURCE_DIR} RESULT_VARIABLE bootstrap_result )
 
+IF( NOT "${bootstrap_result}" STREQUAL "0" )
+	MESSAGE( STATUS "Boost bootstrap.bat Failed!!!" )
+	MESSAGE( FATAL_ERROR "bootstrap_result='${bootstrap_result}'" )
+ENDIF()
+			
 RETURN( ${bootstrap_result} )

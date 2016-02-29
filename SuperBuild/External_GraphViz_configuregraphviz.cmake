@@ -1,41 +1,39 @@
 
-SET( TIFF_CONFIGURE_COMMAND sh ./configure )
+SET( GRAPHVIZ_CONFIGURE_COMMAND sh ./configure )
 
-SET( TIFF_OPTIONS
-	CFLAGS=${TIFF_C_FLAGS}
-	CXXFLAGS=${TIFF_CXX_FLAGS}
-	--prefix=${INSTALL_DIR}
-	--enable-dependency-tracking
-	--enable-cxx
-	# ZLIB ARGS
+SET( GRAPHVIZ_OPTIONS
+	CFLAGS=${GRAPHVIZ_C_FLAGS}
+	CXXFLAGS=${GRAPHVIZ_CXX_FLAGS}
 	--with-zlib
 	--with-zlib-include-dir=${ZLIB_INCLUDE_DIR}
 	--with-zlib-lib-dir=${ZLIB_LIBRARY_DIR}
-	# JPEG ARGS
-	--disable-jpeg
+	--with-png
+	--with-png-include-dir=${PNG_INCLUDE_DIR}
+	--with-png-lib-dir=${PNG_LIBRARY_DIR}
+	--prefix=${INSTALL_DIR}
 )
 
 IF( CMAKE_POSITION_INDEPENDENT_CODE )
-	LIST( APPEND TIFF_OPTIONS --with-pic )	# produce position independent code
+	LIST( APPEND GRAPHVIZ_OPTIONS --with-pic )	# produce position independent code
 ENDIF()
 
 IF( BUILD_SHARED_LIBS )
-	LIST( APPEND TIFF_OPTIONS
+	LIST( APPEND GRAPHVIZ_OPTIONS
 		--enable-shared		# enable shared libraries
 		--disable-static	# disable static libraries
 	)
 ELSE()
-	LIST( APPEND TIFF_OPTIONS
+	LIST( APPEND GRAPHVIZ_OPTIONS
 		--disable-shared	# disable shared libraries
 		--enable-static		# enable static libraries
 	)
 ENDIF()
 
-EXECUTE_PROCESS( COMMAND ${TIFF_CONFIGURE_COMMAND} ${TIFF_OPTIONS} 
+EXECUTE_PROCESS( COMMAND ${GRAPHVIZ_CONFIGURE_COMMAND} ${GRAPHVIZ_OPTIONS} 
 			WORKING_DIRECTORY ${SOURCE_DIR} RESULT_VARIABLE configure_result )
 
 IF( NOT "${configure_result}" STREQUAL "0" )
-	MESSAGE( STATUS "TIFF Configure Failed!!!" )
+	MESSAGE( STATUS "GraphViz Configure Failed!!!" )
 	MESSAGE( FATAL_ERROR "configure_result='${configure_result}'" )
 ENDIF()
 			

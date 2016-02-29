@@ -26,27 +26,20 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
+SET( LCMS_CMAKE_PREFIX_PATH
+	${JPEG_DIR}
+	${TIFF_DIR}
+	${ZLIB_DIR}
+)
+
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
-	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_PREFIX_PATH:PATH=${LCMS_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 	# ZLIB ARGS
-	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
-	-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
-	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
-	# JPEG ARGS
-	-DJPEG_INCLUDE_DIR:PATH=${JPEG_INCLUDE_DIR}
-	-DJPEG_LIBRARY_DIR:PATH=${JPEG_LIBRARY_DIR}
-	-DJPEG_LIBRARY:PATH=${JPEG_LIBRARY}
-	# TIFF ARGS
-	-DTIFF_INCLUDE_DIR:PATH=${TIFF_INCLUDE_DIR}
-	-DTIFF_LIBRARY_DIR:PATH=${TIFF_LIBRARY_DIR}
-	-DTIFF_LIBRARY:PATH=${TIFF_LIBRARY}
+	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
@@ -58,22 +51,23 @@ SET( ${proj}_MD5 e4232b8213974761c553a0d92acac504 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL		${${proj}_URL}
-	URL_MD5	${${proj}_MD5}
+	URL					${${proj}_URL}
+	URL_MD5				${${proj}_MD5}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
-	SOURCE_DIR	${${proj}_SOURCE_DIR}
-	BINARY_DIR	${${proj}_BUILD_DIR}
-	INSTALL_DIR	${${proj}_INSTALL_DIR}
-	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
-	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	SOURCE_DIR			${${proj}_SOURCE_DIR}
+	BINARY_DIR			${${proj}_BUILD_DIR}
+	INSTALL_DIR			${${proj}_INSTALL_DIR}
+	LOG_DOWNLOAD		${EP_LOG_DOWNLOAD}
+	LOG_UPDATE			${EP_LOG_UPDATE}
+	LOG_CONFIGURE		${EP_LOG_CONFIGURE}
+	LOG_BUILD			${EP_LOG_BUILD}
+	LOG_TEST			${EP_LOG_TEST}
+	LOG_INSTALL			${EP_LOG_INSTALL}
 	CMAKE_GENERATOR		${gen}
-	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_ARGS			${EP_CMAKE_ARGS}
 	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
-	DEPENDS	${${proj}_DEPENDENCIES}
+	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -81,7 +75,7 @@ SET( LCMS_DIR ${${proj}_INSTALL_DIR} )
 SET( LCMS_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( LCMS_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( LCMS_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-SET( LCMS_LIBRARY lcms )
+SET( LCMS_LIBRARY_NAME lcms )
 
 mark_as_superbuild(
 	VARS
@@ -89,7 +83,7 @@ mark_as_superbuild(
 		LCMS_BUILD_DIR:PATH
 		LCMS_INCLUDE_DIR:PATH
 		LCMS_LIBRARY_DIR:PATH
-		LCMS_LIBRARY:FILEPATH
+		LCMS_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -98,18 +92,16 @@ ExternalProject_Message( ${proj} "LCMS_DIR: ${LCMS_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_BUILD_DIR: ${LCMS_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_INCLUDE_DIR: ${LCMS_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_LIBRARY_DIR: ${LCMS_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "LCMS_LIBRARY: ${LCMS_LIBRARY}" )
 ### --- End binary information
 
 # lcms config relies on config.guess, since some dependent files are out of date we are going
 # to update them to the latest version
-SET( ${proj}_UPDATE_CONFIG_GUESS_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_updateguess.cmake )
-
 ExternalProject_Add_Step( ${proj} "update config.guess"
 	COMMAND ${CMAKE_COMMAND}
-		-DBUILD_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}
-		-P ${${proj}_UPDATE_CONFIG_GUESS_SCRIPT}
+		-DUPDATE_GUESS_IN_DIR:PATH=${${proj}_SOURCE_DIR}
+		-P ${UPDATE_CONFIG_GUESS_SCRIPT}
 	
 	DEPENDEES download
+	DEPENDERS configure
 )
 

@@ -24,11 +24,8 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 ### --- Project specific additions here
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
-	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# EIGEN ARGS
 	-DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
@@ -44,22 +41,23 @@ SET( ${proj}_MD5 76959f105cfbda3ba77889bc204f4bd2 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL		${${proj}_URL}
-	URL_MD5	${${proj}_MD5}
+	URL					${${proj}_URL}
+	URL_MD5				${${proj}_MD5}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
-	SOURCE_DIR	${${proj}_SOURCE_DIR}
-	BINARY_DIR	${${proj}_BUILD_DIR}
-	INSTALL_DIR	${${proj}_INSTALL_DIR}
-	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
-	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	SOURCE_DIR			${${proj}_SOURCE_DIR}
+	BINARY_DIR			${${proj}_BUILD_DIR}
+	INSTALL_DIR			${${proj}_INSTALL_DIR}
+	LOG_DOWNLOAD		${EP_LOG_DOWNLOAD}
+	LOG_UPDATE			${EP_LOG_UPDATE}
+	LOG_CONFIGURE		${EP_LOG_CONFIGURE}
+	LOG_BUILD			${EP_LOG_BUILD}
+	LOG_TEST			${EP_LOG_TEST}
+	LOG_INSTALL			${EP_LOG_INSTALL}
 	CMAKE_GENERATOR		${gen}
-	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_ARGS			${EP_CMAKE_ARGS}
 	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
-	DEPENDS	${${proj}_DEPENDENCIES}
+	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information

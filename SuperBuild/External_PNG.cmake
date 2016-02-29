@@ -24,21 +24,20 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
+SET( PNG_CMAKE_PREFIX_PATH
+	${ZLIB_DIR}
+)
+
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
-	-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+	-DCMAKE_PREFIX_PATH:PATH=${PNG_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-	# ZLIB ARGS
-	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
-	-DZLIB_LIBRARY:PATH=${ZLIB_LIBRARY}
 	# PNG ARGS
 	-DPNG_SHARED:BOOL=OFF
 	-DPNG_TESTS:BOOL=OFF
+	# ZLIB ARGS
+	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
@@ -50,22 +49,23 @@ SET( ${proj}_MD5 47f5f8c0488f41f4e71d1c9e922c79d4 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL		${${proj}_URL}
-	URL_MD5	${${proj}_MD5}
+	URL					${${proj}_URL}
+	URL_MD5				${${proj}_MD5}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
-	SOURCE_DIR	${${proj}_SOURCE_DIR}
-	BINARY_DIR	${${proj}_BUILD_DIR}
-	INSTALL_DIR	${${proj}_INSTALL_DIR}
-	LOG_CONFIGURE	0  # Wrap configure in script to ignore log output from dashboards
-	LOG_BUILD		0  # Wrap build in script to to ignore log output from dashboards
-	LOG_TEST		0  # Wrap test in script to to ignore log output from dashboards
-	LOG_INSTALL		0  # Wrap install in script to to ignore log output from dashboards
-	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	SOURCE_DIR			${${proj}_SOURCE_DIR}
+	BINARY_DIR			${${proj}_BUILD_DIR}
+	INSTALL_DIR			${${proj}_INSTALL_DIR}
+	LOG_DOWNLOAD		${EP_LOG_DOWNLOAD}
+	LOG_UPDATE			${EP_LOG_UPDATE}
+	LOG_CONFIGURE		${EP_LOG_CONFIGURE}
+	LOG_BUILD			${EP_LOG_BUILD}
+	LOG_TEST			${EP_LOG_TEST}
+	LOG_INSTALL			${EP_LOG_INSTALL}
 	CMAKE_GENERATOR		${gen}
-	CMAKE_ARGS			-Wno-dev --no-warn-unused-cli
+	CMAKE_ARGS			${EP_CMAKE_ARGS}
 	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
-	DEPENDS	${${proj}_DEPENDENCIES}
+	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -73,7 +73,6 @@ SET( PNG_DIR ${${proj}_INSTALL_DIR} )
 SET( PNG_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( PNG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( PNG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-SET( PNG_LIBRARY png )
 
 mark_as_superbuild(
 	VARS
@@ -81,7 +80,6 @@ mark_as_superbuild(
 		PNG_BUILD_DIR:PATH
 		PNG_INCLUDE_DIR:PATH
 		PNG_LIBRARY_DIR:PATH
-		PNG_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -90,5 +88,4 @@ ExternalProject_Message( ${proj} "PNG_DIR: ${PNG_DIR}" )
 ExternalProject_Message( ${proj} "PNG_BUILD_DIR: ${PNG_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "PNG_INCLUDE_DIR: ${PNG_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "PNG_LIBRARY_DIR: ${PNG_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "PNG_LIBRARY: ${PNG_LIBRARY}" )
 ### --- End binary information

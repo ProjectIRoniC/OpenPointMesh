@@ -12,6 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
+	#Python
 	zlib
 )
 
@@ -34,9 +35,11 @@ SET( ${proj}_CONFIGURE_COMMAND
 	# CLANG ARGS
 	${CLANG_ARG}
 	# CMake Build ARGS
-	-DBUILD_DIR:PATH=${${proj}_BUILD_DIR}
+	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
+	-DCMAKE_C_STANDARD:STRING=${CMAKE_C_STANDARD}
 	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
+	-DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
 	# Use the configure script
 	-P ${${proj}_CONFIGURE_SCRIPT}
 )
@@ -45,11 +48,18 @@ SET( ${proj}_BUILD_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_Boost_buildboost.cm
 SET( ${proj}_BUILD_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
+	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DBUILD_DIR:PATH=${${proj}_BUILD_DIR}
 	-DCMAKE_C_COMPILER_ID:STRING=${CMAKE_C_COMPILER_ID}
 	-DCMAKE_CXX_COMPILER_ID:STRING=${CMAKE_CXX_COMPILER_ID}
+	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
 	# Boost ARGS
 	-DBOOST_INSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
+	# Python ARGS
+	-DPYTHON_INCLUDE_DIRS:PATH=${PYTHON_INCLUDE_DIRS}
+	# ZLIB ARGS
+	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 	# Use the build script
 	-P ${${proj}_BUILD_SCRIPT}
 )
@@ -63,17 +73,23 @@ SET( ${proj}_MD5 28f58b9a33469388302110562bdf6188 )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL 	${${proj}_URL}
-	URL_MD5	${${proj}_MD5}
+	URL 				${${proj}_URL}
+	URL_MD5				${${proj}_MD5}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG			${${proj}_GIT_TAG}
-	SOURCE_DIR	${${proj}_SOURCE_DIR}
-	BUILD_IN_SOURCE 1
-	${cmakeversion_external_update} "${cmakeversion_external_update_value}"
+	SOURCE_DIR			${${proj}_SOURCE_DIR}
+	BINARY_DIR			${${proj}_BUILD_DIR}
+	INSTALL_DIR			${${proj}_INSTALL_DIR}
+	LOG_DOWNLOAD		${EP_LOG_DOWNLOAD}
+	LOG_UPDATE			${EP_LOG_UPDATE}
+	LOG_CONFIGURE		${EP_LOG_CONFIGURE}
+	LOG_BUILD			${EP_LOG_BUILD}
+	LOG_TEST			${EP_LOG_TEST}
+	LOG_INSTALL			${EP_LOG_INSTALL}
 	CONFIGURE_COMMAND	${${proj}_CONFIGURE_COMMAND}
 	BUILD_COMMAND		${${proj}_BUILD_COMMAND}
-	INSTALL_COMMAND		""
-	DEPENDS ${${proj}_DEPENDENCIES}
+	INSTALL_COMMAND		"" # Boost b2 already installs, so we skip reapeating the install
+	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
