@@ -25,13 +25,12 @@ void AccuracyControlMenu::setAccuracyValue( QMainWindow* mainwindow , unsigned i
 
 void AccuracyControlMenu::accept()
 {
-    this->main_window->setAccuracyControlValue( ui.accuracy_slider.getValue() );
-    this->accuracy_value = ui.accuracy_slider.getValue();
+    
 }
 
 void AccuracyControlMenu::reject()
 {
-    this->accuracy_value = 5;
+
 }
 
 

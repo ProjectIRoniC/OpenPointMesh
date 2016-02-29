@@ -8,6 +8,7 @@
 #include "../include/CloudStitcher.h"
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
+#include "../include/AccuracyControlMenu.h"
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -115,6 +116,14 @@ MainWindow::MainWindow( QWidget *parent ) :
     // Set initial button state
     setInitialButtonState();
 
+    this->accuracy_control_value = 5;
+
+}
+
+void MainWindow::setAccuracyControlValue( unsigned int value )
+{
+    if( value >= 0 && value <= 20 )
+        this->accuracy_control_value = value;
 }
 
 /*
@@ -140,7 +149,9 @@ void MainWindow::filterAccuracySlot()
 {
     std::cout << "inside filteraccuracyslot\n";
 
-
+    AccuracyControlMenu* acm = new AccuracyControlMenu();
+    acm->setAccuracyValue( this , this->accuracy_control_value );
+    acm->show();
 }
 
 void MainWindow::meshAccuracySlot()

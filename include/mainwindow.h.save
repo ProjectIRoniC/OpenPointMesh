@@ -37,7 +37,7 @@ public:
      * Destructor
      */
     ~MainWindow();
-
+    
     /*
      *Pre: uses value to set the private variable accuracy_control_value
      *Post: sets the private variable to desired value
