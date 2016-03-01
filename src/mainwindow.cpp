@@ -9,6 +9,7 @@
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
+#include "../include/AboutDialog.h"
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -125,6 +126,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     accuracyControlMenu = new AccuracyControlMenu( this );
     connect( accuracyControlMenu , SIGNAL( accepted() ) , this , SLOT( onAccuracyControlDialogClose() ));
 
+    aboutDialog = new AboutDialog( this );
+
     // Set initial button state
     setInitialButtonState();
 
@@ -188,14 +191,16 @@ void MainWindow::sampleFrameRateSlot()
 
 void MainWindow::aboutSlot()
 {
-    QMessageBox::about(this, tr("About Menu"),
-            tr("This <b>messagebox</b> example shows how we can create "
-               "an about page or instructions."));
+    //QMessageBox::about(this, tr("About Menu"),
+     //       tr("This <b>messagebox</b> example shows how we can create "
+     //          "an about page or instructions."));
+
+    aboutDialog->show();
 }
 
 void MainWindow::viewWikiSlot()
 {
-    std::cout << "inside view wiki slot\n";
+    QDesktopServices::openUrl( QUrl( "https://github.com/ProjectIRoniC/OpenPointMesh/wiki" ));
 }
 
 void MainWindow::onAccuracyControlDialogClose()
@@ -226,6 +231,7 @@ MainWindow::~MainWindow()
     delete taskThread;
     delete ui;
     delete accuracyControlMenu;
+    delete aboutDialog;
     // TODO add cleanup for threads
 }
 

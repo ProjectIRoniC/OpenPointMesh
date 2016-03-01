@@ -6,8 +6,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPlainTextEdit>
+#include <QDesktopService>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
+#include "AccuracyControlMenu.h"
+#include "AboutDialog.h"
 
 
 class QAction;
@@ -37,12 +40,7 @@ public:
      * Destructor
      */
     ~MainWindow();
-    
-    /*
-     *Pre: uses value to set the private variable accuracy_control_value
-     *Post: sets the private variable to desired value
-    */
-    void setAccuracyControlValue( unsigned int value );
+
 
 private:
     /*
@@ -114,6 +112,13 @@ private slots:
     void exitSlot();
 
     /*
+     * Post: Opens a new window for the user to input a sample rate.
+     *       Must be a number. Rules for this number are defined within
+     *       oni-to-pcd class.
+     */
+    void sampleFrameRateSlot();
+
+    /*
      * Not Implemented
      */
     void omitFramesSlot();
@@ -125,6 +130,8 @@ private slots:
 
 
     void on_oni_browse_button_clicked();
+
+    void onAccuracyControlDialogClose();
 
 signals:
     /*
@@ -174,6 +181,11 @@ private:
     static const int FINISHED = 3;
 
     /*
+     * if the user has changed the sampleing rate
+     */
+    bool hasSamplingRate;
+    int samplingRate;
+    /*
      * Main ui
      */
     Ui::MainWindow *ui;
@@ -209,6 +221,7 @@ private:
     QAction *omitFramesAct;
     QAction *filterAccuracyAct;
     QAction *meshAccuracyAct;
+    QAction *sampleRateAct;
     QAction *aboutAct;
     QAction *viewWikiAct;
 
@@ -218,6 +231,13 @@ private:
     QMenu *fileMenu;
     QMenu *settingMenu;
     QMenu *helpMenu;
+
+
+    /*
+     * Dialog Boxes
+     */
+     AccuracyControlMenu* accuracyControlMenu;
+     AboutDialog* aboutDialog;
 
     /*
      * Marks the completion of the last step of controller constants
