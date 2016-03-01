@@ -129,6 +129,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     setInitialButtonState();
 
     this->accuracy_control_value = 5;
+    this->samplingRate = vba::DEFAULT_FRAME_SKIP;
+    this->hasSamplingRate = false;
 
 }
 
@@ -166,12 +168,22 @@ void MainWindow::meshAccuracySlot()
 
 void MainWindow::sampleFrameRateSlot()
 {
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                         tr("User name:"), QLineEdit::Normal,
-                                         QDir::home().dirName(), &ok);
-    if (ok && !text.isEmpty())
-        QMessageBox::information(this, "response", "This is what the user wrote : " + text);
+    do {
+        hasSamplingRate = false;
+        samplingRate = QInputDialog::getInt(this,
+                                        tr("QInputDialog::getInt()"),
+                                        "label",
+                                        samplingRate,
+                                        vba::DEFAULT_FRAME_SKIP,
+                                        vba::MAX_FRAME_SKIP,
+                                        1,
+                                        &hasSamplingRate);
+
+        if (hasSamplingRate && vba::OniToPcd::minimumSamplingRate(samplingRate))
+        {
+            return;
+        }
+    } while( hasSamplingRate && !vba::OniToPcd::minimumSamplingRate(samplingRate));
 }
 
 void MainWindow::aboutSlot()
@@ -347,7 +359,7 @@ void MainWindow::oniToPCDController()
 
     appendMessageToOutputBuffer( "Start oni data output...\n" );
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
-	unsigned frameSkipMod = 25;
+    unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
 
 	// Loop through each input file

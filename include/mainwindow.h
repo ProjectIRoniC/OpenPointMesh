@@ -179,6 +179,11 @@ private:
     static const int FINISHED = 3;
 
     /*
+     * if the user has changed the sampleing rate
+     */
+    bool hasSamplingRate;
+    int samplingRate;
+    /*
      * Main ui
      */
     Ui::MainWindow *ui;
