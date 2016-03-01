@@ -72,6 +72,15 @@ namespace vba
 			 * @return: 0 if the operation was successful, -1 if not.
 			 */
 			int outputOniData( const std::string inputFile );
+
+			/*Public facing function that checks if a value meets the minimum frame sampling rate
+			 *
+			 * @param: The positive integer frame sampling rate to check
+			 *
+			 * @return: returns true if the value provided meets or is greater than the minimum value
+			 *			returns false if the value provided is less than the minimum value
+			 */
+			bool minimumSamplingRate (int sampleRate);
 			
 		private:
 			/*Performs class setup actions
