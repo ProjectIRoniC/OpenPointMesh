@@ -214,6 +214,11 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 	return 0;
 }
 
+bool vba::OniToPcd::minimumSamplingRate (int sampleRate) 
+{
+	return sampleRate >= vba::DEFAULT_FRAME_SKIP;
+}
+
 void vba::OniToPcd::init()
 {
 	// Check frame skip
