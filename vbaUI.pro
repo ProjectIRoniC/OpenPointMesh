@@ -36,7 +36,13 @@ HEADERS  += include/mainwindow.h \
     include/errorMsgHandler.h \
     include/oni-to-pcd.h \
     include/PCDRegistration.h \
-    include/MeshConstructor.h
+    include/MeshConstructor.h \
+    include/AccuracyControlMenu.h \
+    include/CloudRegistrationFunctions.h \
+    include/filesystemHelper.h \
+    include/PointCloudFilters.h \
+    include/viewer.h \
+    include/viewer.hxx
 
 FORMS    += src/mainwindow.ui
 

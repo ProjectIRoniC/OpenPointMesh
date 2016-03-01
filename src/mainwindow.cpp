@@ -9,6 +9,8 @@
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
+#include <QMessageBox>
+#include <QInputDialog>
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -81,6 +83,12 @@ MainWindow::MainWindow( QWidget *parent ) :
     meshAccuracyAct->setStatusTip(tr("Select mesh creation accuracy"));
     connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
 
+    /* Change the samplerate for an oni video*/
+    sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
+    sampleRateAct->setShortcuts(QKeySequence::Save);
+    sampleRateAct->setStatusTip(tr("Changes sample frame rate (per second)"));
+    connect(sampleRateAct, SIGNAL(triggered()), this, SLOT(sampleFrameRateSlot()));
+
     /* About */
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setShortcuts(QKeySequence::SelectAll);
@@ -105,6 +113,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     fileMenu->addAction(exitAct);
 
     settingMenu->addAction(omitFramesAct);
+    settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
     settingMenu->addAction(meshAccuracyAct);
     settingMenu->addSeparator();
@@ -153,6 +162,16 @@ void MainWindow::filterAccuracySlot()
 void MainWindow::meshAccuracySlot()
 {
     std::cout << "inside mesh accuracy slot\n";
+}
+
+void MainWindow::sampleFrameRateSlot()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                         tr("User name:"), QLineEdit::Normal,
+                                         QDir::home().dirName(), &ok);
+    if (ok && !text.isEmpty())
+        QMessageBox::information(this, "response", "This is what the user wrote : " + text);
 }
 
 void MainWindow::aboutSlot()
