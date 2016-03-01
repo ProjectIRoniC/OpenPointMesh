@@ -9,6 +9,7 @@
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
 #include "AccuracyControlMenu.h"
+#include "AboutDialog.h"
 
 
 class QAction;
@@ -235,6 +236,7 @@ private:
      * Dialog Boxes
      */
      AccuracyControlMenu* accuracyControlMenu;
+     AboutDialog* aboutDialog;
 
     /*
      * Marks the completion of the last step of controller constants
