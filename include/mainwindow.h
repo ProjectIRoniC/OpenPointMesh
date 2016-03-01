@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPlainTextEdit>
+#include <QDesktopServices>
+#include <QUrl>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
 #include "AccuracyControlMenu.h"

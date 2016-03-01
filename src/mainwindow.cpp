@@ -200,7 +200,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::viewWikiSlot()
 {
-    std::cout << "inside view wiki slot\n";
+    QDesktopServices::openUrl( QUrl( "https://github.com/ProjectIRoniC/OpenPointMesh/wiki" ));
 }
 
 void MainWindow::onAccuracyControlDialogClose()
