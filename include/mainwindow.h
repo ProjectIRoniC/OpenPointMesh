@@ -110,6 +110,13 @@ private slots:
     void exitSlot();
 
     /*
+     * Post: Opens a new window for the user to input a sample rate.
+     *       Must be a number. Rules for this number are defined within
+     *       oni-to-pcd class.
+     */
+    void sampleFrameRateSlot();
+
+    /*
      * Not Implemented
      */
     void omitFramesSlot();
@@ -172,6 +179,11 @@ private:
     static const int FINISHED = 3;
 
     /*
+     * if the user has changed the sampleing rate
+     */
+    bool hasSamplingRate;
+    int samplingRate;
+    /*
      * Main ui
      */
     Ui::MainWindow *ui;
@@ -207,6 +219,7 @@ private:
     QAction *omitFramesAct;
     QAction *filterAccuracyAct;
     QAction *meshAccuracyAct;
+    QAction *sampleRateAct;
     QAction *aboutAct;
     QAction *viewWikiAct;
 

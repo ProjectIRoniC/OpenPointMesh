@@ -28,7 +28,8 @@ namespace vba
 			uint32_t long_value;
 		} RGBValue;
 		
-	const int DEFAULT_FRAME_SKIP = 10;
+    static const int DEFAULT_FRAME_SKIP = 10;
+    static const int MAX_FRAME_SKIP = 100;
 	
 	class OniToPcd
 	{
@@ -63,7 +64,7 @@ namespace vba
 			 *
 			 * @param: number of frames to skip, if less than 10, 10 will be set by default
 			 */
-			void setFrameSkip( const int framesToSkip );
+            void setFrameSkip( const int framesToSkip );
 			
 			/*Public facing function that reads an oni file and exports data as excel docs and point clouds
 			 *
@@ -72,6 +73,16 @@ namespace vba
 			 * @return: 0 if the operation was successful, -1 if not.
 			 */
 			int outputOniData( const std::string inputFile );
+
+			/*Public facing function that checks if a value meets the minimum frame sampling rate
+			 *
+			 * @param: The positive integer frame sampling rate to check
+			 *
+			 * @return: returns true if the value provided meets or is greater than the minimum value
+			 *			returns false if the value provided is less than the minimum value
+			 */
+            static bool minimumSamplingRate (int sampleRate);
+
 			
 		private:
 			/*Performs class setup actions
@@ -128,7 +139,7 @@ namespace vba
 			void fillBufferDepth( const unsigned newWidth, const unsigned newHeight, unsigned short* depth_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef depthFrameReference, unsigned line_step = 0 );
 			
 			// Private Data Members
-			unsigned frameSkip;
+            unsigned frameSkip;
 			std::string outputDirPath;
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;
 			bool redirectOutputFlag;

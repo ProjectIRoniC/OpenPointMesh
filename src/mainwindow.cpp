@@ -9,6 +9,8 @@
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
+#include <QMessageBox>
+#include <QInputDialog>
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -81,6 +83,12 @@ MainWindow::MainWindow( QWidget *parent ) :
     meshAccuracyAct->setStatusTip(tr("Select mesh creation accuracy"));
     connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
 
+    /* Change the samplerate for an oni video*/
+    sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
+    sampleRateAct->setShortcuts(QKeySequence::Save);
+    sampleRateAct->setStatusTip(tr("Changes sample frame rate (per second)"));
+    connect(sampleRateAct, SIGNAL(triggered()), this, SLOT(sampleFrameRateSlot()));
+
     /* About */
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setShortcuts(QKeySequence::SelectAll);
@@ -105,6 +113,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     fileMenu->addAction(exitAct);
 
     settingMenu->addAction(omitFramesAct);
+    settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
     settingMenu->addAction(meshAccuracyAct);
     settingMenu->addSeparator();
@@ -120,6 +129,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     setInitialButtonState();
 
     this->accuracy_control_value = 5;
+    this->samplingRate = vba::DEFAULT_FRAME_SKIP;
+    this->hasSamplingRate = false;
 
 }
 
@@ -153,6 +164,26 @@ void MainWindow::filterAccuracySlot()
 void MainWindow::meshAccuracySlot()
 {
     std::cout << "inside mesh accuracy slot\n";
+}
+
+void MainWindow::sampleFrameRateSlot()
+{
+    do {
+        hasSamplingRate = false;
+        samplingRate = QInputDialog::getInt(this,
+                                        tr("QInputDialog::getInt()"),
+                                        "label",
+                                        samplingRate,
+                                        vba::DEFAULT_FRAME_SKIP,
+                                        vba::MAX_FRAME_SKIP,
+                                        1,
+                                        &hasSamplingRate);
+
+        if (hasSamplingRate && vba::OniToPcd::minimumSamplingRate(samplingRate))
+        {
+            return;
+        }
+    } while( hasSamplingRate && !vba::OniToPcd::minimumSamplingRate(samplingRate));
 }
 
 void MainWindow::aboutSlot()
@@ -328,7 +359,7 @@ void MainWindow::oniToPCDController()
 
     appendMessageToOutputBuffer( "Start oni data output...\n" );
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
-	unsigned frameSkipMod = 25;
+    unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
 
 	// Loop through each input file
