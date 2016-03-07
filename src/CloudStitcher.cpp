@@ -286,11 +286,23 @@ namespace vba
 		vba::voxelGridFilter( final_cloud , final_cloud , this->filter_leaf_size );
 		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 30 );
 
-		if( pcl::io::savePCDFile( this->output_path , *final_cloud , true ) == -1 )
+		std::string pcd_output_path = this->output_path;
+		pcd_output_path.append( ".pcd" );
+
+		if( pcl::io::savePCDFile( pcd_output_path , *final_cloud , true ) == -1 )
 		{
 			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
 			return -1;
 		}
+
+        std::string ply_output_path = this->output_path;
+        ply_output_path.append( ".ply" );
+
+		if( pcl::io::savePLYFileASCII( ply_output_path , *final_cloud ) == -1 )
+		{
+			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
+		}
+
 
 		float elapsed_time = float( std::clock() - begin_time ) / CLOCKS_PER_SEC;
 		output.str("");
