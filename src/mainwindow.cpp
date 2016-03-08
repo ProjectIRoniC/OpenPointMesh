@@ -78,11 +78,6 @@ MainWindow::MainWindow( QWidget *parent ) :
     filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program may effects run time"));
     connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
 
-    /* Mesh Accuracy */
-    meshAccuracyAct = new QAction(tr("&Mesh Accuracy"), this);
-    meshAccuracyAct->setShortcuts(QKeySequence::Italic);
-    meshAccuracyAct->setStatusTip(tr("Select mesh creation accuracy"));
-    connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
 
     /* Change the samplerate for an oni video*/
     sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
@@ -103,6 +98,19 @@ MainWindow::MainWindow( QWidget *parent ) :
     viewWikiAct->setStatusTip(tr("Wiki Page"));
     connect(viewWikiAct, SIGNAL(triggered()), this, SLOT(viewWikiSlot()));
 
+    meshOutputOBJAct = new QAction( tr( "&OBJ") , this );
+    meshOutputPLYAct = new QAction( tr( "&PLY") , this );
+    meshOutputVTKAct = new QAction( tr( "&VTK") , this );
+    meshOutputFiletypeAct = new QActionGroup( this );
+    meshOutputFiletypeAct->addAction( meshOutputOBJAct );
+    meshOutputFiletypeAct->addAction( meshOutputPLYAct );
+    meshOutputFiletypeAct->addAction( meshOutputVTKAct );
+
+    meshOutputOBJAct->setCheckable( true );
+    meshOutputPLYAct->setCheckable( true );
+    meshOutputVTKAct->setCheckable( true );
+    meshOutputPLYAct->setChecked( true );
+
     /* create menu */
     fileMenu = menuBar()->addMenu(tr("&File"));
     settingMenu = menuBar()->addMenu(tr("&Settings"));
@@ -116,8 +124,17 @@ MainWindow::MainWindow( QWidget *parent ) :
     settingMenu->addAction(omitFramesAct);
     settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
-    settingMenu->addAction(meshAccuracyAct);
     settingMenu->addSeparator();
+
+
+    meshOutputSubMenu = settingMenu->addMenu( "Mesh Output Filetype" );
+    //meshOutputSubMenu->addAction( meshOutputFiletypeAct );
+    meshOutputSubMenu->addAction( meshOutputOBJAct );
+    meshOutputSubMenu->addAction( meshOutputPLYAct );
+    meshOutputSubMenu->addAction( meshOutputVTKAct );
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputOBJSlot() ));
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputPLYSlot() ));
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputVTKSlot() ));
 
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(viewWikiAct);
@@ -132,6 +149,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     setInitialButtonState();
 
     this->accuracy_control_value = 5;
+    this->mesh_filetype = vba::PLY;
+
     this->samplingRate = vba::DEFAULT_FRAME_SKIP;
     this->hasSamplingRate = false;
 
@@ -164,9 +183,22 @@ void MainWindow::filterAccuracySlot()
     accuracyControlMenu->show();
 }
 
-void MainWindow::meshAccuracySlot()
+void MainWindow::meshOutputOBJSlot()
 {
-    std::cout << "inside mesh accuracy slot\n";
+    this->mesh_filetype = vba::OBJ;
+
+}
+
+void MainWindow::meshOutputPLYSlot()
+{
+    this->mesh_filetype = vba::PLY;
+
+}
+
+void MainWindow::meshOutputVTKSlot()
+{
+    this->mesh_filetype = vba::VTK;
+
 }
 
 void MainWindow::sampleFrameRateSlot()
@@ -295,7 +327,21 @@ void MainWindow::meshConstructorController()
     appendMessageToOutputBuffer( "File used for construction " + mMeshConstructor->getInputFilename()  + '\n');
     //pass in a string of the output path where the final mesh should be sent. The file does not have to exist already.
     //The second parameter lets you choose the output filetype. I would just stick with PLY for now.
-    mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.ply" , vba::PLY );
+    if( this->mesh_filetype == vba::OBJ )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.obj" , this->mesh_filetype );
+    }
+
+    if( this->mesh_filetype == vba::PLY )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.ply" , this->mesh_filetype );
+    }
+
+    if( this->mesh_filetype == vba::VTK )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.vtk" , this->mesh_filetype );
+    }
+
     appendMessageToOutputBuffer( "Output final mesh to " + mMeshConstructor->getOutputFilename() + '\n');
 
     //this does the rest

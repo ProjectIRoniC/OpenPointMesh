@@ -8,10 +8,12 @@
 #include <QPlainTextEdit>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QActionGroup>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
 #include "AccuracyControlMenu.h"
 #include "AboutDialog.h"
+#include "MeshConstructor.h"
 
 
 class QAction;
@@ -124,7 +126,11 @@ private slots:
      */
     void omitFramesSlot();
     void filterAccuracySlot();
-    void meshAccuracySlot();
+
+    void meshOutputOBJSlot();
+    void meshOutputPLYSlot();
+    void meshOutputVTKSlot();
+
     void aboutSlot();
     void viewWikiSlot();
 
@@ -214,6 +220,9 @@ private:
 
     unsigned int accuracy_control_value;
 
+    //holds the filetype that the mesh will be outputted to
+    vba::MESH_FILETYPE mesh_filetype;
+
     /*
      * Actions for menue
      */
@@ -221,10 +230,14 @@ private:
     QAction *exitAct;
     QAction *omitFramesAct;
     QAction *filterAccuracyAct;
-    QAction *meshAccuracyAct;
     QAction *sampleRateAct;
     QAction *aboutAct;
     QAction *viewWikiAct;
+
+    QActionGroup *meshOutputFiletypeAct;
+    QAction *meshOutputPLYAct;
+    QAction *meshOutputOBJAct;
+    QAction *meshOutputVTKAct;
 
     /*
      * Menu
@@ -232,6 +245,7 @@ private:
     QMenu *fileMenu;
     QMenu *settingMenu;
     QMenu *helpMenu;
+    QMenu *meshOutputSubMenu;
 
 
     /*
