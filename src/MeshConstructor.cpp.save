@@ -151,7 +151,11 @@ namespace vba
 
 		PointCloud::Ptr cloud( new PointCloud );
 		pcl::io::loadPCDFile( this->input_filename , *cloud );
+       
 
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr radius_remove_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cond_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
 
 
 		pcl::NormalEstimation< PointT , PointNormal > normal_estimator;
