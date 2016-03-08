@@ -18,6 +18,14 @@ University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Te
 ##### C++ 4.8.4
 1. Run the following command in terminal: `sudo apt-get install g++`
 
+#### Google Test 1.7.0 (GTest)
+1. At the command line type `sudo apt-get install libgtest-dev`
+2. Install cmake if you have not already: `sudo apt-get install cmake`
+3. Navigate to the directory where the source files were downloaded: `cd /usr/src/gtest`
+4. Setup the cmake project: `sudo cmake CMakeLists.txt`
+5. Compile the gtest source code: `sudo make`
+6. Copy the compiled libraries into the default destination: `sudo cp *.a /usr/lib`
+
 #### Getting and Compiling the source code (Enter all commands in terminal)
 1. `sudo apt-get install git` (follow the prompts to install git)
 2. `git clone git@github.com:ProjectIRoniC/OpenPointMesh.git`
