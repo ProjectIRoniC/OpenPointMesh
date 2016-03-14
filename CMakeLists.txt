@@ -8,6 +8,11 @@
 # recursively called, but processes the Primary Project cmake file
 # OpenPointMesh.cmake instead of SuperBuild.cmake.
 ##############################################################################
+# CMake Policy settings
+# 3.1.0 NEEDED for CMAKE_CXX_STANDARD support
+#-----------------------------------------------------------------------------
+CMAKE_MINIMUM_REQUIRED( VERSION 3.1.0 FATAL_ERROR )
+ 
 #-----------------------------------------------------------------------------
 # Add the CMake Module Path
 #-----------------------------------------------------------------------------
