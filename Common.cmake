@@ -68,6 +68,7 @@ INCLUDE( ExternalProjectDependency )
 FIND_PACKAGE( PythonLibs 3 REQUIRED )
 
 # Add paths to external project helper scripts
+SET( ADD_FILE_PERMISSION_RUNNABLE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_addfilepermissionrunnable.cmake )
 SET( UPDATE_CONFIG_GUESS_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_updateguess.cmake )
 SET( RUN_AUTORECONF_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_runautoreconf.cmake )
 
@@ -141,11 +142,11 @@ ELSE()
 	# the use of either the shared or static version, respectively. If no
 	# shared version of libgcc was built when the compiler was configured,
 	# these options have no effect.
-	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
-		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++" )
+	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
+		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++" )
 	ENDIF()
-	IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-static-libgcc" )
-		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc" )
+	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-static-libgcc" )
+		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc" )
 	ENDIF()
 ENDIF()
 
@@ -332,6 +333,7 @@ MARK_AS_SUPERBUILD(
 		EP_CMAKE_ARGS:STRING
 		NONCMAKE_EP_COMMON_C_FLAGS:STRING
 		NONCMAKE_EP_COMMON_CXX_FLAGS:STRING
+		ADD_FILE_PERMISSION_RUNNABLE_SCRIPT:FILEPATH
 		UPDATE_CONFIG_GUESS_SCRIPT:FILEPATH
 		RUN_AUTORECONF_SCRIPT:FILEPATH
 	ALL_PROJECTS

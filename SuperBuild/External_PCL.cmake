@@ -16,6 +16,7 @@ SET( ${proj}_DEPENDENCIES
 	Eigen
 	#libusb
 	FLANN
+	FreeType
 	#OpenNI2
 	qhull	
 	Qt
@@ -35,6 +36,7 @@ SET( PCL_CMAKE_PREFIX_PATH
 	${BOOST_DIR}
 	${EIGEN_DIR}
 	${FLANN_DIR}
+	${FREETYPE_DIR}
 	${JPEG_DIR}
 	${LCMS_DIR}
 	${MNG_DIR}
@@ -49,6 +51,7 @@ SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${PCL_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# PCL Build ARGS
@@ -91,6 +94,8 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARY_DIR}
 	# LIBUSB ARGS
 	#-DLIBUSB_1_INCLUDE_DIR:PATH=${LIBUSB_INCLUDE_DIR}
+	# OpenGL ARGS
+	#-DOPENGL_gl_LIBRARY:FILEPATH=GL
 	# OPENNI2 ARGS
 	#-DOPENNI2_INCLUDE_DIRS:PATH=${OPENNI2_INCLUDE_DIR}
 	# QT ARGS
@@ -102,8 +107,8 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz )
 SET( ${proj}_MD5 02c72eb6760fcb1f2e359ad8871b9968 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl.git" )
-# SET( ${proj}_GIT_TAG "pcl-1.7.2" )  # 1.7.2
+#SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl" )
+#SET( ${proj}_GIT_TAG "master" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}

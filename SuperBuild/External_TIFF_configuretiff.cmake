@@ -1,9 +1,10 @@
 
-SET( TIFF_CONFIGURE_COMMAND sh ./configure )
+SET( TIFF_CONFIGURE_COMMAND bash ./configure )
 
 SET( TIFF_OPTIONS
 	CFLAGS=${TIFF_C_FLAGS}
 	CXXFLAGS=${TIFF_CXX_FLAGS}
+	LDFLAGS=${TIFF_EXE_LINKER_FLAGS}
 	--prefix=${INSTALL_DIR}
 	--enable-dependency-tracking
 	--enable-cxx

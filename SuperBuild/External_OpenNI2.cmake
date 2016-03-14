@@ -39,8 +39,6 @@ SET( ${proj}_CONFIGURE_COMMAND
 	-P ${${proj}_CONFIGURE_SCRIPT}
 )
 
-SET( ENV{PLATFORM} "x64" )
-
 #SET( ${proj}_BUILD_COMMAND
 #	msbuild
 #	${CMAKE_CURRENT_BINARY_DIR}/${proj}/OpenNI.sln

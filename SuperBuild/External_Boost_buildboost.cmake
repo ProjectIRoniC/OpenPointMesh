@@ -8,6 +8,7 @@ SET( BOOST_OPTIONS
 	--without-test					# disable building test
 	--build-dir=${BUILD_DIR}		# location of boost build files
 	--prefix=${BOOST_INSTALL_DIR}	# location of boost installation
+	include=${BZIP2_INCLUDE_DIR}	# add bzip2 dependency include directory
 	include=${ZLIB_INCLUDE_DIR}		# add zlib dependency include directory
 	include=${PYTHON_INCLUDE_DIRS}	# add python dependency include directory
 )

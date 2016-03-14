@@ -12,6 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
+	bzip2
 	#Python
 	zlib
 )
@@ -55,11 +56,12 @@ SET( ${proj}_BUILD_COMMAND
 	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
 	# Boost ARGS
 	-DBOOST_INSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
+	# bzip2 ARGS
+	-DBZIP2_INCLUDE_DIR:PATH=${BZIP2_INCLUDE_DIR}
 	# Python ARGS
 	-DPYTHON_INCLUDE_DIRS:PATH=${PYTHON_INCLUDE_DIRS}
 	# ZLIB ARGS
 	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 	# Use the build script
 	-P ${${proj}_BUILD_SCRIPT}
 )
@@ -91,6 +93,17 @@ ExternalProject_Add( ${proj}
 	INSTALL_COMMAND		"" # Boost b2 already installs, so we skip reapeating the install
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
+
+# Add runnable file permission to boost config file bootstrap.sh
+#ExternalProject_Add_Step( ${proj} "add runnable file permission bootstrap.sh"
+#	COMMAND ${CMAKE_COMMAND}
+#		-DFILE_TO_MAKE_RUNNABLE:FILEPATH=bootstrap.sh
+#		-DDIR_CONTAINING_FILE:PATH=${${proj}_SOURCE_DIR}
+#		-P ${ADD_FILE_PERMISSION_RUNNABLE_SCRIPT}
+#	
+#	DEPENDEES download
+#	DEPENDERS configure
+#)
 
 ### --- Set binary information
 SET( BOOST_DIR ${${proj}_INSTALL_DIR} )

@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName MNG ) # The find_package known name
-SET( proj        MNG ) # The local name
+SET( extProjName FreeType ) # The find_package known name
+SET( proj        FreeType ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -12,8 +12,8 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	JPEG
-	LCMS
+	bzip2
+	PNG
 	zlib
 )
 
@@ -26,33 +26,32 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
-SET( MNG_CMAKE_PREFIX_PATH
-	${JPEG_DIR}
-	${LCMS_DIR}
+SET( FREETYPE_CMAKE_PREFIX_PATH
+	${BZIP2_DIR}
+	${PNG_DIR}
 	${ZLIB_DIR}
 )
 
 SET( ${proj}_CMAKE_OPTIONS
-	# CMake Build ARGS
+	# CMake ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
-	-DCMAKE_PREFIX_PATH:PATH=${MNG_CMAKE_PREFIX_PATH}
+	-DCMAKE_PREFIX_PATH:PATH=${FREETYPE_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	# ZLIB ARGS
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL https://github.com/LuaDist/libmng/archive/1.0.10.tar.gz )
-SET( ${proj}_MD5 e63cbc9ce44f12663e269b2268bce3bb )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libmng" )
-# SET( ${proj}_GIT_TAG "1.0.10" )
+SET( ${proj}_URL http://git.savannah.gnu.org/cgit/freetype/freetype2.git/snapshot/VER-2-6-3.tar.gz )
+SET( ${proj}_MD5 f2d699ed3fa09d12802c9b032510b54d )
+# SET( ${proj}_REPOSITORY "${git_protocol}://git.savannah.gnu.org/cgit/freetype/freetype2.git" )
+# SET( ${proj}_GIT_TAG "VER-2-6-3" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
 	URL					${${proj}_URL}
-	URL_MD5				${${proj}_MD5}
+	#URL_MD5			${${proj}_MD5}	 # For some reason the md5 changes on this webiste
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
@@ -71,23 +70,24 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( MNG_DIR ${${proj}_INSTALL_DIR} )
-SET( MNG_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( MNG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( MNG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-
+SET( FREETYPE_DIR ${${proj}_INSTALL_DIR} )
+SET( FREETYPE_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( FREETYPE_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( FREETYPE_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+	
 mark_as_superbuild(
 	VARS
-		MNG_DIR:PATH
-		MNG_BUILD_DIR:PATH
-		MNG_INCLUDE_DIR:PATH
-		MNG_LIBRARY_DIR:PATH
+		FREETYPE_DIR:PATH
+		FREETYPE_BUILD_DIR:PATH
+		FREETYPE_INCLUDE_DIR:PATH
+		FREETYPE_LIBRARY_DIR:PATH
+		FREETYPE_LIBRARY:FILEPATH
 	LABELS
 		"FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "MNG_DIR: ${MNG_DIR}" )
-ExternalProject_Message( ${proj} "MNG_BUILD_DIR: ${MNG_BUILD_DIR}" )
-ExternalProject_Message( ${proj} "MNG_INCLUDE_DIR: ${MNG_INCLUDE_DIR}" )
-ExternalProject_Message( ${proj} "MNG_LIBRARY_DIR: ${MNG_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "FREETYPE_DIR: ${FREETYPE_DIR}" )
+ExternalProject_Message( ${proj} "FREETYPE_BUILD_DIR: ${FREETYPE_BUILD_DIR}" )
+ExternalProject_Message( ${proj} "FREETYPE_INCLUDE_DIR: ${FREETYPE_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "FREETYPE_LIBRARY_DIR: ${FREETYPE_LIBRARY_DIR}" )
 ### --- End binary information

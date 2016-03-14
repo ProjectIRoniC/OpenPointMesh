@@ -1,34 +1,36 @@
-SET( ENV{MSYSTEM} "MINGW64" )
-SET( ENV{PATH} "C:/msys64/usr/bin:$ENV{PATH}" )
-SET( LIBUSB_CONFIGURE_COMMAND bash -v ./bootstrap.sh )
 
-SET( LIBUSB_OPTIONS
-	CFLAGS=${LIBUSB_C_FLAGS}
-	LDFLAGS=${LIBUSB_EXE_LINKER_FLAGS}
+SET( FONTCONFIG_CONFIGURE_COMMAND sh ./configure )
+
+SET( FONTCONFIG_OPTIONS
+	CFLAGS=${FONTCONFIG_C_FLAGS}
+	CXXFLAGS=${FONTCONFIG_CXX_FLAGS}
+	LDFLAGS=${FONTCONFIG_EXE_LINKER_FLAGS}
 	--prefix=${INSTALL_DIR}
+	--enable-dependency-tracking
+	--disable-docs
 )
 
 IF( CMAKE_POSITION_INDEPENDENT_CODE )
-	LIST( APPEND LIBUSB_OPTIONS --with-pic )	# produce position independent code
+	LIST( APPEND FONTCONFIG_OPTIONS --with-pic )	# produce position independent code
 ENDIF()
 
 IF( BUILD_SHARED_LIBS )
-	LIST( APPEND LIBUSB_OPTIONS
+	LIST( APPEND FONTCONFIG_OPTIONS
 		--enable-shared		# enable shared libraries
 		--disable-static	# disable static libraries
 	)
 ELSE()
-	LIST( APPEND LIBUSB_OPTIONS
+	LIST( APPEND FONTCONFIG_OPTIONS
 		--disable-shared	# disable shared libraries
 		--enable-static		# enable static libraries
 	)
 ENDIF()
 
-EXECUTE_PROCESS( COMMAND ${LIBUSB_CONFIGURE_COMMAND} ${LIBUSB_OPTIONS}
+EXECUTE_PROCESS( COMMAND ${FONTCONFIG_CONFIGURE_COMMAND} ${FONTCONFIG_OPTIONS} 
 			WORKING_DIRECTORY ${SOURCE_DIR} RESULT_VARIABLE configure_result )
 
 IF( NOT "${configure_result}" STREQUAL "0" )
-	MESSAGE( STATUS "libusb Configure Failed!!!" )
+	MESSAGE( STATUS "FontConfig Configure Failed!!!" )
 	MESSAGE( FATAL_ERROR "configure_result='${configure_result}'" )
 ENDIF()
 			
