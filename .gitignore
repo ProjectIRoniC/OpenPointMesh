@@ -4,6 +4,7 @@
 *.o
 *.oni
 *.pcd
+*.save
 res/*
 build/*
 
