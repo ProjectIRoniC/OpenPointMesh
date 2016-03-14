@@ -14,6 +14,7 @@ OPTION( CMAKE_POSITION_INDEPENDENT_CODE "Set to use Position Independent Code" O
 
 # Library Options
 OPTION( BUILD_SHARED_LIBS "Build Shared Libraries" OFF )
+OPTION( LINK_TIME_OPTIMIZATION "***** WARNING EXPERIMENTAL ***** Use Link Time Optimization (only affects Release and RelWithDebInfo builds)" OFF )
 
 # Output Options
 OPTION( EP_LOG_DOWNLOAD "Wrap External Projects download in script to log output" OFF )
@@ -112,7 +113,8 @@ IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL 
 		SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -fPIC" )
 	ENDIF()
 ENDIF()
-	
+
+# Set BUILD_SHARED_LIBS option settings
 IF( BUILD_SHARED_LIBS )
 	# Produce a shared object which can then be linked with other objects to
 	# form an executable. Not all systems support this option. For 
@@ -144,6 +146,46 @@ ELSE()
 	ENDIF()
 	IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-static-libgcc" )
 		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc" )
+	ENDIF()
+ENDIF()
+
+# Set LINK_TIME_OPTIMIZATION option settings
+# This doesn't quite work on MSYS2 yet, there is currently an issue where
+# the test compiler doesn't find the plugin needed to handle lto
+IF( LINK_TIME_OPTIMIZATION AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "Debug" AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" )
+	# This option runs the standard link-time optimizer. When invoked with
+	# source code, it generates GIMPLE (one of GCC's internal representations)
+	# and writes it to special ELF sections in the object file. When the
+	# object files are linked together, all the function bodies are read from
+	# these ELF sections and instantiated as if they had been part of the same
+	# translation unit.
+	IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-flto" )
+		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -flto" )
+	ENDIF()
+	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-flto" )
+		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto" )
+	ENDIF()
+	
+	# This option enables the extraction of object files with GIMPLE bytecode
+	# out of library archives. This improves the quality of optimization by
+	# exposing more code to the link-time optimizer. This information
+	# specifies what symbols can be accessed externally (by non-LTO object or
+	# during dynamic linking).
+	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-fuse-linker-plugin" )
+		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-linker-plugin" )
+	ENDIF()
+	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fuse-linker-plugin" )
+		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fuse-linker-plugin" )
+	ENDIF()
+		
+	# For the 64bit target, the assembler includes a new -Wa,-mbig-obj option
+	# to allow objects with up to 2**31 sections.
+	# NOTE: This is needed to build FLANN, possibly others
+	IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-Wa,-mbig-obj" )
+		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mbig-obj" )
+	ENDIF()
+	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-Wa,-mbig-obj" )
+		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj" )
 	ENDIF()
 ENDIF()
 
@@ -292,7 +334,6 @@ MARK_AS_SUPERBUILD(
 		NONCMAKE_EP_COMMON_CXX_FLAGS:STRING
 		UPDATE_CONFIG_GUESS_SCRIPT:FILEPATH
 		RUN_AUTORECONF_SCRIPT:FILEPATH
-		#PYTHON_INCLUDE_DIR:PATH
 	ALL_PROJECTS
 )
 

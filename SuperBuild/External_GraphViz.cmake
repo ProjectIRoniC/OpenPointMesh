@@ -12,7 +12,6 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	PNG
 	zlib
 )
 
@@ -25,19 +24,26 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
+SET( GRAPHVIZ_C_FLAGS "${NONCMAKE_EP_COMMON_C_FLAGS}" )
+SET( GRAPHVIZ_CXX_FLAGS "${NONCMAKE_EP_COMMON_CXX_FLAGS}" )
+
+# Hack to fix multiple definitions in static builds
+# Link Time Optimization might be able to fix this when we get that working
+IF( NOT BUILD_SHARED_LIBS )
+	SET( GRAPHVIZ_C_FLAGS "${GRAPHVIZ_C_FLAGS} -Wl,--allow-multiple-definition" )
+	SET( GRAPHVIZ_CXX_FLAGS "${GRAPHVIZ_CXX_FLAGS} -Wl,--allow-multiple-definition" )
+ENDIF()
+
 SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_GraphViz_configuregraphviz.cmake )
 SET( ${proj}_CONFIGURE_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
-	-DGRAPHVIZ_C_FLAGS:STRING=${NONCMAKE_EP_COMMON_C_FLAGS}
-	-DGRAPHVIZ_CXX_FLAGS:STRING=${NONCMAKE_EP_COMMON_CXX_FLAGS}
+	-DGRAPHVIZ_C_FLAGS:STRING=${GRAPHVIZ_C_FLAGS}
+	-DGRAPHVIZ_CXX_FLAGS:STRING=${GRAPHVIZ_CXX_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
 	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
 	-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=${CMAKE_POSITION_INDEPENDENT_CODE}
-	# PNG ARGS
-	-DPNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-	-DPNG_LIBRARY_DIR:PATH=${PNG_LIBRARY_DIR}
 	# ZLIB ARGS
 	-DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
 	-DZLIB_LIBRARY_DIR:PATH=${ZLIB_LIBRARY_DIR}
@@ -46,18 +52,18 @@ SET( ${proj}_CONFIGURE_COMMAND
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL http://www.graphviz.org/pub/graphviz/stable/SOURCES/graphviz-2.38.0.tar.gz )
-SET( ${proj}_MD5 5b6a829b2ac94efcd5fa3c223ed6d3ae )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/ellson/graphviz" )
-# SET( ${proj}_GIT_TAG "master" )
+# SET( ${proj}_URL http://www.graphviz.org/pub/graphviz/stable/SOURCES/graphviz-2.38.0.tar.gz )
+# SET( ${proj}_MD5 5b6a829b2ac94efcd5fa3c223ed6d3ae )
+SET( ${proj}_REPOSITORY "${git_protocol}://github.com/ellson/graphviz" )
+SET( ${proj}_GIT_TAG "master" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL					${${proj}_URL}
-	URL_MD5				${${proj}_MD5}
-	# GIT_REPOSITORY	${${proj}_REPOSITORY}
-	# GIT_TAG 			${${proj}_GIT_TAG}
+	# URL					${${proj}_URL}
+	# URL_MD5				${${proj}_MD5}
+	GIT_REPOSITORY	${${proj}_REPOSITORY}
+	GIT_TAG 			${${proj}_GIT_TAG}
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
 	BUILD_IN_SOURCE		1
 	INSTALL_DIR			${${proj}_INSTALL_DIR}
@@ -69,6 +75,15 @@ ExternalProject_Add( ${proj}
 	LOG_INSTALL			${EP_LOG_INSTALL}
 	CONFIGURE_COMMAND	${${proj}_CONFIGURE_COMMAND}
 	DEPENDS				${${proj}_DEPENDENCIES}
+)
+
+# Since we are downloading from master we need to run autogen.sh before configure
+ExternalProject_Add_Step( ${proj} "run autogen.sh"
+	COMMAND ${CMAKE_COMMAND}
+		-DAUTOGENSH_IN_DIR:PATH=${${proj}_SOURCE_DIR}
+		-P ${RUN_AUTOGENSH_SCRIPT}
+	DEPENDEES download
+	DEPENDERS configure
 )
 
 ### --- Set binary information
@@ -91,5 +106,4 @@ ExternalProject_Message( ${proj} "GRAPHVIZ_DIR: ${GRAPHVIZ_DIR}" )
 ExternalProject_Message( ${proj} "GRAPHVIZ_BUILD_DIR: ${GRAPHVIZ_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "GRAPHVIZ_INCLUDE_DIR: ${GRAPHVIZ_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "GRAPHVIZ_LIBRARY_DIR: ${GRAPHVIZ_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "GRAPHVIZ_LIBRARY: ${GRAPHVIZ_LIBRARY}" )
 ### --- End binary information

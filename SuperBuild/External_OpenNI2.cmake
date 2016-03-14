@@ -12,7 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	libusb
+	#libusb
 	GraphViz
 )
 
@@ -25,18 +25,21 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
-SET( OPENNI2_CMAKE_PREFIX_PATH
-	${LIBUSB_DIR}
-	${GRAPHVIZ_DIR}
+SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_OpenNI2_configureopenni2.cmake )
+SET( ${proj}_CONFIGURE_COMMAND
+	# CMake ARGS
+	${CMAKE_COMMAND}
+	-DOPENNI2_C_FLAGS:STRING=${NONCMAKE_EP_COMMON_C_FLAGS}
+	-DOPENNI2_CXX_FLAGS:STRING=${NONCMAKE_EP_COMMON_CXX_FLAGS}
+	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
+	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
+	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+	-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=${CMAKE_POSITION_INDEPENDENT_CODE}
+	# Use the configure script
+	-P ${${proj}_CONFIGURE_SCRIPT}
 )
 
-SET( ${proj}_CMAKE_OPTIONS
-	# CMake Build ARGS
-	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_PREFIX_PATH:PATH=${OPENNI2_CMAKE_PREFIX_PATH}
-	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-)
+SET( ENV{PLATFORM} "x64" )
 
 #SET( ${proj}_BUILD_COMMAND
 #	msbuild
@@ -64,7 +67,7 @@ ExternalProject_Add( ${proj}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
-	BINARY_DIR			${${proj}_BUILD_DIR}
+	BUILD_IN_SOURCE		1
 	INSTALL_DIR			${${proj}_INSTALL_DIR}
 	LOG_DOWNLOAD		${EP_LOG_DOWNLOAD}
 	LOG_UPDATE			${EP_LOG_UPDATE}
@@ -72,10 +75,9 @@ ExternalProject_Add( ${proj}
 	LOG_BUILD			${EP_LOG_BUILD}
 	LOG_TEST			${EP_LOG_TEST}
 	LOG_INSTALL			${EP_LOG_INSTALL}
-	CMAKE_GENERATOR		${gen}
-	CMAKE_ARGS			${EP_CMAKE_ARGS}
-	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
-	DEPENDS				${${proj}_DEPENDENCIES}
+	CONFIGURE_COMMAND	"" # ${${proj}_CONFIGURE_COMMAND}
+	BUILD_COMMAND		
+	DEPENDS 			${${proj}_DEPENDENCIES}
 )
 
 ### --- Set binary information
@@ -83,7 +85,6 @@ SET( OPENNI2_DIR ${${proj}_INSTALL_DIR} )
 SET( OPENNI2_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( OPENNI2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( OPENNI2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-### --- End binary information
 
 mark_as_superbuild(
   VARS
@@ -99,3 +100,4 @@ ExternalProject_Message( ${proj} "OPENNI2_DIR: ${OPENNI2_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_BUILD_DIR: ${OPENNI2_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_INCLUDE_DIR: ${OPENNI2_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_LIBRARY_DIR: ${OPENNI2_LIBRARY_DIR}" )
+### --- End binary information

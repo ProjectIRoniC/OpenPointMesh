@@ -9,28 +9,6 @@
 # OpenPointMesh.cmake instead of SuperBuild.cmake.
 ##############################################################################
 #-----------------------------------------------------------------------------
-# CMake Policy settings
-# 3.1.0 NEEDED for CMAKE_CXX_STANDARD support
-#-----------------------------------------------------------------------------
-CMAKE_MINIMUM_REQUIRED( VERSION 3.1.0 FATAL_ERROR )
-
-CMAKE_POLICY( VERSION 3.1.0 )
-IF( POLICY CMP0048 )
-	CMAKE_POLICY( SET CMP0048 OLD )
-ENDIF()
-IF( POLICY CMP0017 )
-	CMAKE_POLICY( SET CMP0017 OLD )
-ENDIF()
-FOREACH( p
-	CMP0054 # CMake 3.1
-	)
-	IF( POLICY ${p} )
-		CMAKE_POLICY( SET ${p} NEW )
-	ENDIF()
-ENDFOREACH()
-
-
-#-----------------------------------------------------------------------------
 # Add the CMake Module Path
 #-----------------------------------------------------------------------------
 SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH} )

@@ -4,13 +4,21 @@ SET( GRAPHVIZ_CONFIGURE_COMMAND sh ./configure )
 SET( GRAPHVIZ_OPTIONS
 	CFLAGS=${GRAPHVIZ_C_FLAGS}
 	CXXFLAGS=${GRAPHVIZ_CXX_FLAGS}
-	--with-zlib
-	--with-zlib-include-dir=${ZLIB_INCLUDE_DIR}
-	--with-zlib-lib-dir=${ZLIB_LIBRARY_DIR}
-	--with-png
-	--with-png-include-dir=${PNG_INCLUDE_DIR}
-	--with-png-lib-dir=${PNG_LIBRARY_DIR}
 	--prefix=${INSTALL_DIR}
+	--enable-dependency-tracking
+	# GraphViz Options
+	--without-gdk-pixbuf
+	--with-mylibgd
+	--disable-swig
+	--without-x
+	--disable-tcl
+	--without-ipsepcola
+	--without-freetype
+	--enable-ltdl
+	--without-gtk
+	--without-gtkgl
+	--with-zincludedir=${ZLIB_INCLUDE_DIR}
+	--with-zlibdir=${ZLIB_LIBRARY_DIR}
 )
 
 IF( CMAKE_POSITION_INDEPENDENT_CODE )
