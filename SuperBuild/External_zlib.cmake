@@ -57,25 +57,6 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
-# zlib names the library file incorrectly on Windows for what dependents (Qt) expect
-# this custom step is to copy the library to the correct name after the install step
-IF( WIN32 )
-	ExternalProject_Add_Step( ${proj} "copy libraries in zlib folder"
-		COMMAND ${CMAKE_COMMAND}
-				-E copy ${ZLIB_LIBRARY_DIR}/libzlibstatic.a ${ZLIB_LIBRARY_DIR}/libz.a
-
-		DEPENDEES install
-	)
-	
-	# Also copy the ones in the main project folder
-	ExternalProject_Add_Step( ${proj} "copy libraries in primary project folder"
-		COMMAND ${CMAKE_COMMAND}
-				-E copy ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libzlibstatic.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libz.a
-
-		DEPENDEES install
-	)
-ENDIF()
-
 ### --- Set binary information
 SET( ZLIB_DIR ${${proj}_INSTALL_DIR} )
 SET( ZLIB_BUILD_DIR ${${proj}_BUILD_DIR} )
@@ -110,3 +91,23 @@ ExternalProject_Message( ${proj} "ZLIB_INCLUDE_DIR: ${ZLIB_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY_DIR: ${ZLIB_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY: ${ZLIB_LIBRARY}" )
 ### --- End binary information
+
+# zlib names the library file incorrectly on Windows for what dependents (Qt) expect
+# this custom step is to copy the library to the correct name after the install step
+IF( WIN32 )
+	ExternalProject_Add_Step( ${proj} "copy libraries in zlib folder"
+		COMMAND ${CMAKE_COMMAND}
+				-E copy ${ZLIB_LIBRARY_DIR}/libzlibstatic.a ${ZLIB_LIBRARY_DIR}/libz.a
+
+		DEPENDEES install
+	)
+	
+	# Also copy the ones in the main project folder
+	ExternalProject_Add_Step( ${proj} "copy libraries in primary project folder"
+		COMMAND ${CMAKE_COMMAND}
+				-E copy ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libzlibstatic.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libz.a
+
+		DEPENDEES install
+	)
+ENDIF()
+
