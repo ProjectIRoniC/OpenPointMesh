@@ -3,7 +3,7 @@
 # ExternalProject_Include_Dependencies
 SET( extProjName FLANN ) # The find_package known name
 SET( proj        FLANN ) # The local name
-SET( ${extProjName}_REQUIRED_VERSION "1.8.4" )  #If a required version is necessary, then set this, else leave blank
+SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
 IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
@@ -26,6 +26,7 @@ SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# FLANN ARGS
 	-DBUILD_MATLAB_BINDINGS:BOOL=OFF

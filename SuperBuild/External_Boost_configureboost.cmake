@@ -1,7 +1,11 @@
 
-# bootstrap.bat has no options, the options are given to ./b2 when BUILDING
+# bootstrap.bat/sh has no options, the options are given to ./b2 when BUILDING
 # see External_Boost_buildboost.cmake for configure options
-SET( BOOST_CONFIGURE_COMMAND bootstrap.bat )
+IF( WIN32 )
+	SET( BOOST_CONFIGURE_COMMAND ./bootstrap.bat )
+ELSE( )
+	SET( BOOST_CONFIGURE_COMMAND ./bootstrap.sh )
+ENDIF()
 
 # Set explicitly to mingw since boost will assume MSVC on WIN32
 IF( WIN32 )
