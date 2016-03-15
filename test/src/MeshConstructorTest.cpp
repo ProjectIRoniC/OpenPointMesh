@@ -63,6 +63,7 @@ TEST_F( MeshConstructorTest , SettingOutputFile )
     EXPECT_STREQ( "final_mesh.ply" , meshConstructor->getOutputFilename().c_str() );
 }
 
+//Testing an invalid output filename given to the component
 TEST_F( MeshConstructorTest , SettingInvalidOutputFile )
 {
     int return_code = meshConstructor->setOutputFilename( "final_mesh.txt" , vba::PLY );
