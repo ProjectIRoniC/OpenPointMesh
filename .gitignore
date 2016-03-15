@@ -6,6 +6,7 @@
 *.save
 res/*
 build/*
+test/build/*
 
 # CMake
 CMakeCache.txt

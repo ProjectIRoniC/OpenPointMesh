@@ -1,5 +1,10 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8 FATAL_ERROR )
-PROJECT( OpenPointMeshTest )
+
+####Executable Names
+SET( MESH_CONSTRUCTOR_TEST "MeshConstructorTest" )
+SET( CLOUD_STITCHER_TEST "CloudStitcherTest" )
+SET( ONI_TO_PCD_TEST "OniToPcdTest" )
+
 
 #### Package Dependencies
 FIND_PACKAGE( Qt4 REQUIRED )
@@ -9,8 +14,7 @@ FIND_PACKAGE( GTest REQUIRED )
 
 #### Variables
 FILE( GLOB OPENPOINTMESH_HEADERS "../include/*.h" )
-SET( OPENPOINTMESH_SOURCES  "src/main.cpp"
-                            "../src/AboutDialog.cpp"
+SET( OPENPOINTMESH_SOURCES  "../src/AboutDialog.cpp"
                             "../src/AccuracyControlMenu.cpp"
                             "../src/CloudRegistrationFunctions.cpp"
                             "../src/CloudStitcher.cpp"
@@ -23,7 +27,6 @@ SET( OPENPOINTMESH_SOURCES  "src/main.cpp"
                             "../src/viewer.cpp" )
 FILE( GLOB OPENPOINTMESH_FORMS "../src/*.ui" )
 SET( OPENPOINTMESH_INCLUDE_DIRS "../include" )
-#SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/build_output" )
 SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
 
 #### Qt4 Settings
@@ -41,8 +44,6 @@ ENDIF()
 MESSAGE( STATUS "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}" )
 
 #### Build Settings
-#SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
-#SET( CMAKE_LIBRARIES_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
 
 INCLUDE_DIRECTORIES(	${PCL_INCLUDE_DIRS}
 						${OPENPOINTMESH_INCLUDE_DIRS}
@@ -53,12 +54,40 @@ LINK_DIRECTORIES( ${PCL_LIBRARY_DIRS} )
 ADD_DEFINITIONS(	${PCL_DEFINITIONS}
 					${QT_DEFINITIONS} )
 
-ADD_EXECUTABLE(	${PROJECT_NAME}
+ADD_EXECUTABLE(	${MESH_CONSTRUCTOR_TEST}
+                "src/MeshConstructorTest.cpp"
 				${OPENPOINTMESH_SOURCES}
 				${OPENPOINTMESH_FORMS_HEADERS}
 				${OPENPOINTMESH_HEADERS_MOC} )
 
-target_link_libraries(	${PROJECT_NAME}
+
+target_link_libraries(	${MESH_CONSTRUCTOR_TEST}
+						${PCL_LIBRARIES}
+						${QT_LIBRARIES}
+						${VTK_LIBRARIES}
+						${GTEST_LIBRARIES}
+						pthread )
+
+ADD_EXECUTABLE(	${CLOUD_STITCHER_TEST}
+                "src/CloudStitcherTest.cpp"
+				${OPENPOINTMESH_SOURCES}
+				${OPENPOINTMESH_FORMS_HEADERS}
+				${OPENPOINTMESH_HEADERS_MOC} )
+
+target_link_libraries(	${CLOUD_STITCHER_TEST}
+						${PCL_LIBRARIES}
+						${QT_LIBRARIES}
+						${VTK_LIBRARIES}
+						${GTEST_LIBRARIES}
+						pthread )
+
+ADD_EXECUTABLE(	${ONI_TO_PCD_TEST}
+                "src/OniToPcdTest.cpp"
+				${OPENPOINTMESH_SOURCES}
+				${OPENPOINTMESH_FORMS_HEADERS}
+				${OPENPOINTMESH_HEADERS_MOC} )
+
+target_link_libraries(	${ONI_TO_PCD_TEST}
 						${PCL_LIBRARIES}
 						${QT_LIBRARIES}
 						${VTK_LIBRARIES}
