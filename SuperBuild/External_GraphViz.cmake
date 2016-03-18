@@ -12,7 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any
@@ -61,10 +61,11 @@ SET( ${proj}_GIT_TAG "master" )
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	# URL					${${proj}_URL}
-	# URL_MD5				${${proj}_MD5}
-	GIT_REPOSITORY	${${proj}_REPOSITORY}
+	# URL				${${proj}_URL}
+	# URL_MD5			${${proj}_MD5}
+	GIT_REPOSITORY		${${proj}_REPOSITORY}
 	GIT_TAG 			${${proj}_GIT_TAG}
+	UPDATE_COMMAND		""	# we are skipping update so we don't have to build every time
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
 	BUILD_IN_SOURCE		1
 	INSTALL_DIR			${${proj}_INSTALL_DIR}

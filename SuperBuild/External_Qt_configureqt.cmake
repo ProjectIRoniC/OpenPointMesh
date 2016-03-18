@@ -46,10 +46,14 @@ SET( QT_OPTIONS
 	-L ${PNG_LIBRARY_DIR}
 	-L ${TIFF_LIBRARY_DIR}
 	-L ${ZLIB_LIBRARY_DIR}
-	
-	# Explicit libraries to include
-	-l${LCMS_LIBRARY_NAME}
 )
+
+# Explicit libraries to include
+IF( WIN32 )
+	LIST( APPEND QT_OPTIONS -l ${LCMS_LIBRARY_NAME} )
+ELSE()
+	LIST( APPEND QT_OPTIONS -l${LCMS_LIBRARY_NAME} )
+ENDIF()
 
 IF( "${CMAKE_BUILD_TYPE}" MATCHES "Release" OR "${CMAKE_BUILD_TYPE}" MATCHES "MinSizeRel" )
 	LIST( APPEND QT_OPTIONS -release )	# build type release

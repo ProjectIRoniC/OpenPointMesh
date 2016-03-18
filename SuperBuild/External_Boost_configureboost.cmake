@@ -2,7 +2,7 @@
 # bootstrap.bat/sh has no options, the options are given to ./b2 when BUILDING
 # see External_Boost_buildboost.cmake for configure options
 IF( WIN32 )
-	SET( BOOST_CONFIGURE_COMMAND ./bootstrap.bat )
+	SET( BOOST_CONFIGURE_COMMAND bootstrap.bat )
 ELSE( )
 	SET( BOOST_CONFIGURE_COMMAND ./bootstrap.sh )
 ENDIF()

@@ -12,7 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any
@@ -31,7 +31,6 @@ SET( PNG_CMAKE_PREFIX_PATH
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${PNG_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# PNG ARGS
@@ -74,6 +73,7 @@ SET( PNG_DIR ${${proj}_INSTALL_DIR} )
 SET( PNG_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( PNG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( PNG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( PNG_LIBRARY_NAME png )
 
 mark_as_superbuild(
 	VARS
@@ -81,6 +81,7 @@ mark_as_superbuild(
 		PNG_BUILD_DIR:PATH
 		PNG_INCLUDE_DIR:PATH
 		PNG_LIBRARY_DIR:PATH
+		PNG_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -89,4 +90,5 @@ ExternalProject_Message( ${proj} "PNG_DIR: ${PNG_DIR}" )
 ExternalProject_Message( ${proj} "PNG_BUILD_DIR: ${PNG_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "PNG_INCLUDE_DIR: ${PNG_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "PNG_LIBRARY_DIR: ${PNG_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "PNG_LIBRARY_NAME: ${PNG_LIBRARY_NAME}" )
 ### --- End binary information

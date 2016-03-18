@@ -12,9 +12,9 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	bzip2
+	BZip2
 	#Python
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any

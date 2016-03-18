@@ -12,7 +12,7 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any

@@ -12,13 +12,13 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	FreeType
+	Freetype
 	FontConfig
 	JPEG
 	MNG
 	PNG
 	TIFF
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any
