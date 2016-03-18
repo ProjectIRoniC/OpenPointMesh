@@ -25,7 +25,6 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 )
 
@@ -62,11 +61,12 @@ SET( ZLIB_DIR ${${proj}_INSTALL_DIR} )
 SET( ZLIB_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( ZLIB_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( ZLIB_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-
+SET( ZLIB_LIBRARY_NAME z )
 
 IF( BUILD_SHARED_LIBS )
 	IF( WIN32 )
 		SET( ZLIB_LIBRARY ${${proj}_INSTALL_DIR}/lib/libzlib.dll.a )
+		SET( ZLIB_LIBRARY_NAME zlib )
 	ELSE()
 		SET( ZLIB_LIBRARY ${${proj}_INSTALL_DIR}/lib/libz.so )
 	ENDIF()
@@ -81,6 +81,7 @@ mark_as_superbuild(
 		ZLIB_INCLUDE_DIR:PATH
 		ZLIB_LIBRARY_DIR:PATH
 		ZLIB_LIBRARY:FILEPATH
+		ZLIB_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -90,6 +91,7 @@ ExternalProject_Message( ${proj} "ZLIB_BUILD_DIR: ${ZLIB_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_INCLUDE_DIR: ${ZLIB_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY_DIR: ${ZLIB_LIBRARY_DIR}" )
 ExternalProject_Message( ${proj} "ZLIB_LIBRARY: ${ZLIB_LIBRARY}" )
+ExternalProject_Message( ${proj} "ZLIB_LIBRARY_NAME: ${ZLIB_LIBRARY_NAME}" )
 ### --- End binary information
 
 # zlib names the library file incorrectly on Windows for what dependents (Qt) expect

@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName bzip2 ) # The find_package known name
-SET( proj        bzip2 ) # The local name
+SET( extProjName BZip2 ) # The find_package known name
+SET( proj        BZip2 ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -63,6 +63,7 @@ SET( BZIP2_DIR ${${proj}_INSTALL_DIR} )
 SET( BZIP2_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( BZIP2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( BZIP2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( BZIP2_LIBRARY_NAME bz2 )
 	
 mark_as_superbuild(
 	VARS
@@ -70,6 +71,7 @@ mark_as_superbuild(
 		BZIP2_BUILD_DIR:PATH
 		BZIP2_INCLUDE_DIR:PATH
 		BZIP2_LIBRARY_DIR:PATH
+		BZIP2_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -78,4 +80,5 @@ ExternalProject_Message( ${proj} "BZIP2_DIR: ${BZIP2_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_BUILD_DIR: ${BZIP2_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_INCLUDE_DIR: ${BZIP2_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_LIBRARY_DIR: ${BZIP2_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "BZIP2_LIBRARY_NAME: ${BZIP2_LIBRARY_NAME}" )
 ### --- End binary information

@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName FreeType ) # The find_package known name
-SET( proj        FreeType ) # The local name
+SET( extProjName Freetype ) # The find_package known name
+SET( proj        Freetype ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -12,9 +12,9 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
-	bzip2
+	BZip2
 	PNG
-	zlib
+	ZLIB
 )
 
 # Include dependent projects if any
@@ -36,9 +36,16 @@ SET( ${proj}_CMAKE_OPTIONS
 	# CMake ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${FREETYPE_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	# BZIP2 ARGS
+	-DFT_CONFIG_OPTION_USE_BZIP2:BOOL=ON
+	# PNG ARGS
+	-DFT_CONFIG_OPTION_USE_PNG:BOOL=ON
+	# ZLIB ARGS
+	-DFT_CONFIG_OPTION_USE_ZLIB:BOOL=ON
+	-DFT_CONFIG_OPTION_SYSTEM_ZLIB:BOOL=ON
+	
 )
 
 # Download tar source when possible to speed up build time
@@ -72,8 +79,9 @@ ExternalProject_Add( ${proj}
 ### --- Set binary information
 SET( FREETYPE_DIR ${${proj}_INSTALL_DIR} )
 SET( FREETYPE_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( FREETYPE_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( FREETYPE_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include/freetype2 )
 SET( FREETYPE_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( FREETYPE_LIBRARY_NAME freetype )
 	
 mark_as_superbuild(
 	VARS
@@ -81,7 +89,7 @@ mark_as_superbuild(
 		FREETYPE_BUILD_DIR:PATH
 		FREETYPE_INCLUDE_DIR:PATH
 		FREETYPE_LIBRARY_DIR:PATH
-		FREETYPE_LIBRARY:FILEPATH
+		FREETYPE_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )
@@ -90,4 +98,5 @@ ExternalProject_Message( ${proj} "FREETYPE_DIR: ${FREETYPE_DIR}" )
 ExternalProject_Message( ${proj} "FREETYPE_BUILD_DIR: ${FREETYPE_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "FREETYPE_INCLUDE_DIR: ${FREETYPE_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "FREETYPE_LIBRARY_DIR: ${FREETYPE_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "FREETYPE_LIBRARY_NAME: ${FREETYPE_LIBRARY_NAME}" )
 ### --- End binary information
