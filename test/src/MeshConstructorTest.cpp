@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include "MeshConstructor.h"
 
+#include <boost/filesystem.hpp>
+
 
 //This is the inherited class of gtest that allows us to automate some work before and after each test
 class MeshConstructorTest : public ::testing::Test
@@ -63,11 +65,30 @@ TEST_F( MeshConstructorTest , SettingOutputFile )
     EXPECT_STREQ( "final_mesh.ply" , meshConstructor->getOutputFilename().c_str() );
 }
 
+//Testing an invalid output filename given to the component
 TEST_F( MeshConstructorTest , SettingInvalidOutputFile )
 {
     int return_code = meshConstructor->setOutputFilename( "final_mesh.txt" , vba::PLY );
     EXPECT_EQ( -1 , return_code );
     EXPECT_STREQ( "" , meshConstructor->getOutputFilename().c_str() );
+}
+
+//Test if we can start the mesh constructing sequence without first giving a valid input and output filename
+TEST_F( MeshConstructorTest , StartMeshConstructionWithoutInput )
+{
+    int return_code = meshConstructor->constructMesh();
+    ASSERT_EQ( -1 , return_code );
+}
+
+//Now we will run the mesh construction over a valid input file and then test to make sure the output file matches the name we gave and that it exists
+TEST_F( MeshConstructorTest , CheckForFinishedOutputFile )
+{
+    meshConstructor->setInputFilename( "../res/valid_cloud.pcd" );
+    meshConstructor->setOutputFilename( "../res/finished_cloud_mesh.ply" , vba::PLY );
+    meshConstructor->constructMesh();
+
+    boost::filesystem::path path( "../res/finished_cloud_mesh.ply" );
+    ASSERT_TRUE( boost::filesystem::exists( path ) );
 }
 
 

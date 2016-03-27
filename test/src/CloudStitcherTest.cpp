@@ -1,10 +1,10 @@
 
 #include <gtest/gtest.h>
-#include "MeshConstructor.h"
+#include "CloudStitcher.h"
 
 
 //This is the inherited class of gtest that allows us to automate some work before and after each test
-class MeshConstructorTest : public ::testing::Test
+class CloudStitcherTest : public ::testing::Test
 {
 
     protected:
@@ -12,63 +12,72 @@ class MeshConstructorTest : public ::testing::Test
         //run this code before each test
         virtual void SetUp()
         {
-            this->meshConstructor = new vba::MeshConstructor;
+            this->cs = new vba::CloudStitcher;
         }
 
         //run this code after each test
         virtual void TearDown()
         {
-            delete this->meshConstructor;
+            delete this->cs;
         }
 
 
-        vba::MeshConstructor* meshConstructor;
+        vba::CloudStitcher* cs;
 
 };
 
-//make sure the data members are currently empty
-TEST_F( MeshConstructorTest , InitialState )
+//Testing the setters and getters for the output path
+TEST_F( CloudStitcherTest , SettingOutputPath )
 {
-    EXPECT_STREQ( "" , meshConstructor->getInputFilename().c_str() );
-    EXPECT_STREQ( "" , meshConstructor->getOutputFilename().c_str() );
+    cs->setOutputPath( "../res/final_cloud.pcd" );
+    EXPECT_STREQ( "../res" , cs->getOutputPath().c_str() );
 }
 
-//Test if a correct filename can be entered and retrieved
-TEST_F( MeshConstructorTest , SettingInputFile )
+//Make sure the method fails if a path that does not exist is given
+TEST_F( CloudStitcherTest , SettingInvalidOutputPath )
 {
-    meshConstructor->setInputFilename( "../res/valid_cloud.pcd" );
-    EXPECT_STREQ( "../res/valid_cloud.pcd" , meshConstructor->getInputFilename().c_str() );
-}
-
-//Test is a bad filename causes an unsucessful return
-TEST_F( MeshConstructorTest , SettingInvalidInputFile )
-{
-    int return_code = meshConstructor->setInputFilename( "myfile.txt" );
+    int return_code = cs->setOutputPath( "../res/invalid/final_cloud.txt" );
     EXPECT_EQ( -1 , return_code );
-    EXPECT_STREQ( "" , meshConstructor->getInputFilename().c_str() );
 }
 
-//Test if we can detect an empty input cloud
-TEST_F( MeshConstructorTest , SettingEmptyInputFile )
+//Make sure the component only takes a directory name and not a filename
+TEST_F( CloudStitcherTest , SettingInvalidFilenameforDirectory )
 {
-    int return_code = meshConstructor->setInputFilename( "../res/empty_cloud.pcd" );
+    int return_code = cs->setOutputPath( "../res/empy_cloud.pcd" );
     EXPECT_EQ( -1 , return_code );
-    EXPECT_STREQ( "" , meshConstructor->getInputFilename().c_str() );
 }
 
-//Test if we can successfully set an output filename
-TEST_F( MeshConstructorTest , SettingOutputFile )
+//Testing if the correct filter leaf size is created from the input value
+TEST_F( CloudStitcherTest , SettingFilterResolution )
 {
-    meshConstructor->setOutputFilename( "final_mesh.ply" , vba::PLY );
-    EXPECT_STREQ( "final_mesh.ply" , meshConstructor->getOutputFilename().c_str() );
+    ASSERT_FLOAT_EQ( 0.1 , cs->getFilterResolution() );
+
+    cs->setFilterResolution( 20 );
+    ASSERT_FLOAT_EQ( 0.2 , cs->getFilterResolution() );
+
+    cs->setFilterResolution( 0 );
+    ASSERT_FLOAT_EQ( 0.0 , cs->getFilterResolution() );
 }
 
-TEST_F( MeshConstructorTest , SettingInvalidOutputFile )
+//Testing invalide inputs as the filter resolution
+TEST_F( CloudStitcherTest , SettingInvalidFilterResolution )
 {
-    int return_code = meshConstructor->setOutputFilename( "final_mesh.txt" , vba::PLY );
-    EXPECT_EQ( -1 , return_code );
-    EXPECT_STREQ( "" , meshConstructor->getOutputFilename().c_str() );
+    int return_code = cs->setFilterResolution( 33.2 );
+    ASSERT_EQ( -1 , return_code );
+
+    return_code = cs->setFilterResolution( -1 );
+    ASSERT_EQ( -1 , return_code );
 }
+
+TEST_F( CloudStitcherTest , StitchingPCDFiles )
+{
+    int return_code = cs->setOutputPath( "../res/final_cloud.pcd" );
+    return_code = cs->stitchPCDFiles( "../res/" );
+
+    ASSERT_EQ( 0 , return_code );
+
+}
+
 
 
 

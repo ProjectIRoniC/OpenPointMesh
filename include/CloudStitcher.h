@@ -120,6 +120,7 @@ class CloudStitcher
 		 */
 		unsigned int getNumberofFilesRead();
 
+
 		/*This setter function allows the user to set the intensity of the filtering. The scale is from 0 to 10
 		 * with 0 being no filtering and 10 being maximum filtering. If the user enters a bad value, the default
 		 * set in the constructor is used.
@@ -130,6 +131,13 @@ class CloudStitcher
 		 *
 		 */
 		int setFilterResolution( unsigned int value );
+
+
+        /*Getter function to return the set filter leaf size
+        * @return: the current filter leaf size
+        */
+		inline
+		float getFilterResolution() {return this->filter_leaf_size;}
 
 	private:
 
