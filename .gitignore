@@ -51,3 +51,7 @@ Makefile*
 
 #QtCtreator CMake
 CMakeLists.txt.user
+
+#qTest
+qtest/build*
+
