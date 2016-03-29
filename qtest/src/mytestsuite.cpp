@@ -3,6 +3,9 @@
 #include "../include/mainwindow.h"
 #include <iostream>
 #include <fstream>
+#include "../include/sharedData.h"
+
+extern SharedData sharedvar;
 
 void MyTestSuite1::aTestFunction()
 {
@@ -13,8 +16,8 @@ void MyTestSuite1::aTestFunction()
 void MyTestSuite1::anotherTestFunction()
 {
 
-    //QApplication a(argc, argv);
-/*
+    QApplication a(sharedvar.argc, sharedvar.argv);
+
     MainWindow w;
     w.show();
 bool isshown = QTest::qWaitForWindowShown(&w);
@@ -33,7 +36,7 @@ myfile.close();
 
 
 return;
-*/
+
 
     QString str = "Goodbye";
     QVERIFY(str.toUpper() == "GOODBYE");

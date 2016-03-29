@@ -21,15 +21,32 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 // ###
 
 #include "qtestsuite.h"
-
+#include "sharedData.h"
 #include <QtTest/QtTest>
 #include <iostream>
 
+extern SharedData sharedvar;
+
 int main(int argc, char*argv[])
 {
+/*
+QApplication a(argc, argv);
+    MainWindow w;
 
+    w.show();
+bool isshown = QTest::qWaitForWindowShown(&w);
+if(isshown == false )
+    return 0;
+    //int rtn = a.exec();
+
+QTest::qWait(2000);
+
+return 0;
+return 0;
+*/
     int failedSuitesCount = 0;
     std::vector<QObject*>::iterator iSuite;
+    sharedvar.setArgs(argc, argv);
     for (iSuite = QTestSuite::m_suites.begin(); iSuite != QTestSuite::m_suites.end(); iSuite++)
     {
         int result = QTest::qExec(*iSuite);
