@@ -36,8 +36,6 @@ SET( ${proj}_CMAKE_OPTIONS
 	# PNG ARGS
 	-DPNG_SHARED:BOOL=OFF
 	-DPNG_TESTS:BOOL=OFF
-	# ZLIB ARGS
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
@@ -90,5 +88,4 @@ ExternalProject_Message( ${proj} "PNG_DIR: ${PNG_DIR}" )
 ExternalProject_Message( ${proj} "PNG_BUILD_DIR: ${PNG_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "PNG_INCLUDE_DIR: ${PNG_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "PNG_LIBRARY_DIR: ${PNG_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "PNG_LIBRARY_NAME: ${PNG_LIBRARY_NAME}" )
 ### --- End binary information

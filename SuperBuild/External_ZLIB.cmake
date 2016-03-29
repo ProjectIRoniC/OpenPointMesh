@@ -56,50 +56,12 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
-### --- Set binary information
-SET( ZLIB_DIR ${${proj}_INSTALL_DIR} )
-SET( ZLIB_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( ZLIB_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( ZLIB_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-SET( ZLIB_LIBRARY_NAME z )
-
-IF( BUILD_SHARED_LIBS )
-	IF( WIN32 )
-		SET( ZLIB_LIBRARY ${${proj}_INSTALL_DIR}/lib/libzlib.dll.a )
-		SET( ZLIB_LIBRARY_NAME zlib )
-	ELSE()
-		SET( ZLIB_LIBRARY ${${proj}_INSTALL_DIR}/lib/libz.so )
-	ENDIF()
-ELSE()
-	SET( ZLIB_LIBRARY ${${proj}_INSTALL_DIR}/lib/libz.a )
-ENDIF()
-	
-mark_as_superbuild(
-	VARS
-		ZLIB_DIR:PATH
-		ZLIB_BUILD_DIR:PATH
-		ZLIB_INCLUDE_DIR:PATH
-		ZLIB_LIBRARY_DIR:PATH
-		ZLIB_LIBRARY:FILEPATH
-		ZLIB_LIBRARY_NAME:STRING
-	LABELS
-		"FIND_PACKAGE"
-)
-
-ExternalProject_Message( ${proj} "ZLIB_DIR: ${ZLIB_DIR}" )
-ExternalProject_Message( ${proj} "ZLIB_BUILD_DIR: ${ZLIB_BUILD_DIR}" )
-ExternalProject_Message( ${proj} "ZLIB_INCLUDE_DIR: ${ZLIB_INCLUDE_DIR}" )
-ExternalProject_Message( ${proj} "ZLIB_LIBRARY_DIR: ${ZLIB_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "ZLIB_LIBRARY: ${ZLIB_LIBRARY}" )
-ExternalProject_Message( ${proj} "ZLIB_LIBRARY_NAME: ${ZLIB_LIBRARY_NAME}" )
-### --- End binary information
-
 # zlib names the library file incorrectly on Windows for what dependents (Qt) expect
 # this custom step is to copy the library to the correct name after the install step
 IF( WIN32 )
 	ExternalProject_Add_Step( ${proj} "copy libraries in zlib folder"
 		COMMAND ${CMAKE_COMMAND}
-				-E copy ${ZLIB_LIBRARY_DIR}/libzlibstatic.a ${ZLIB_LIBRARY_DIR}/libz.a
+				-E copy ${${proj}_INSTALL_DIR}/lib/libzlibstatic.a ${${proj}_INSTALL_DIR}/lib/libz.a
 
 		DEPENDEES install
 	)
@@ -113,3 +75,26 @@ IF( WIN32 )
 	)
 ENDIF()
 
+### --- Set binary information
+SET( ZLIB_DIR ${${proj}_INSTALL_DIR} )
+SET( ZLIB_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( ZLIB_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( ZLIB_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( ZLIB_LIBRARY_NAME z )
+	
+mark_as_superbuild(
+	VARS
+		ZLIB_DIR:PATH
+		ZLIB_BUILD_DIR:PATH
+		ZLIB_INCLUDE_DIR:PATH
+		ZLIB_LIBRARY_DIR:PATH
+		ZLIB_LIBRARY_NAME:STRING
+	LABELS
+		"FIND_PACKAGE"
+)
+
+ExternalProject_Message( ${proj} "ZLIB_DIR: ${ZLIB_DIR}" )
+ExternalProject_Message( ${proj} "ZLIB_BUILD_DIR: ${ZLIB_BUILD_DIR}" )
+ExternalProject_Message( ${proj} "ZLIB_INCLUDE_DIR: ${ZLIB_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "ZLIB_LIBRARY_DIR: ${ZLIB_LIBRARY_DIR}" )
+### --- End binary information

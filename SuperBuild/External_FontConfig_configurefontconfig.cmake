@@ -10,6 +10,9 @@ SET( FONTCONFIG_OPTIONS
 	LDFLAGS=${FONTCONFIG_EXE_LINKER_FLAGS}
 	FREETYPE_LIBS=${FONTCONFIG_FREETYPE_LIBS_ARG}
 	FREETYPE_CFLAGS=${FONTCONFIG_FREETYPE_CFLAGS_ARG}
+	--with-expat=${EXPAT_DIR}
+	--with-expat-includes=${EXPAT_INCLUDE_DIR}
+	--with-expat-lib=${EXPAT_LIBRARY_DIR}
 	--prefix=${INSTALL_DIR}
 	--enable-dependency-tracking
 	--disable-docs

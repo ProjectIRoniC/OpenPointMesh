@@ -13,13 +13,24 @@ ENDIF()
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
 	Boost
+	BZip2
 	Eigen
-	#LibUSB
+	EXPAT
 	FLANN
+	FontConfig
+	Freetype
+	#GraphViz
+	JPEG
+	LCMS
+	#LibUSB
+	MNG
 	#OpenNI2
+	PNG
 	Qhull	
 	Qt
+	TIFF
 	VTK
+	ZLIB
 )
 
 # Include dependent projects if any
@@ -35,11 +46,14 @@ SET( PCL_CMAKE_PREFIX_PATH
 	${BOOST_DIR}
 	${BZIP2_DIR}
 	${EIGEN_DIR}
+	${EXPAT_DIR}
 	${FLANN_DIR}
 	${FONTCONFIG_DIR}
 	${FREETYPE_DIR}
+	${GRAPHVIZ_DIR}
 	${JPEG_DIR}
 	${LCMS_DIR}
+	${LIBUSB_DIR}
 	${MNG_DIR}
 	${PNG_DIR}
 	${QHULL_DIR}
@@ -47,8 +61,6 @@ SET( PCL_CMAKE_PREFIX_PATH
 	${VTK_DIR}
 	${ZLIB_DIR}
 )
-
-SET( PCL_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${FREETYPE_LIBRARY_DIR} -l${FREETYPE_LIBRARY_NAME} -L${PNG_LIBRARY_DIR} -l${PNG_LIBRARY_NAME} -L${BZIP2_LIBRARY_DIR} -l${BZIP2_LIBRARY_NAME} -L${ZLIB_LIBRARY_DIR} -l${ZLIB_LIBRARY_NAME}" )
 
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
@@ -87,7 +99,7 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DBUILD_segmentation:BOOL=ON
 	-DBUILD_surface:BOOL=ON
 	-DBUILD_surface_on_nurbs:BOOL=OFF
-	-DBUILD_tools:BOOL=ON
+	-DBUILD_tools:BOOL=OFF
 	-DBUILD_tracking:BOOL=ON
 	-DBUILD_visualization:BOOL=ON
 	# BOOST ARGS
@@ -102,8 +114,6 @@ SET( ${proj}_CMAKE_OPTIONS
 	#-DOPENNI2_INCLUDE_DIRS:PATH=${OPENNI2_INCLUDE_DIR}
 	# QT ARGS
 	-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-	# ZLIB ARGS
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time

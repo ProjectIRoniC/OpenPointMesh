@@ -38,8 +38,6 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${LCMS_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
-	# ZLIB ARGS
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
@@ -70,6 +68,17 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
+# lcms config relies on config.guess, since some dependent files are out of date we are going
+# to update them to the latest version
+ExternalProject_Add_Step( ${proj} "update config.guess"
+	COMMAND ${CMAKE_COMMAND}
+		-DUPDATE_GUESS_IN_DIR:PATH=${${proj}_SOURCE_DIR}
+		-P ${UPDATE_CONFIG_GUESS_SCRIPT}
+	
+	DEPENDEES download
+	DEPENDERS configure
+)
+
 ### --- Set binary information
 SET( LCMS_DIR ${${proj}_INSTALL_DIR} )
 SET( LCMS_BUILD_DIR ${${proj}_BUILD_DIR} )
@@ -92,16 +101,5 @@ ExternalProject_Message( ${proj} "LCMS_DIR: ${LCMS_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_BUILD_DIR: ${LCMS_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_INCLUDE_DIR: ${LCMS_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "LCMS_LIBRARY_DIR: ${LCMS_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "LCMS_LIBRARY_NAME: ${LCMS_LIBRARY_NAME}" )
 ### --- End binary information
-
-# lcms config relies on config.guess, since some dependent files are out of date we are going
-# to update them to the latest version
-ExternalProject_Add_Step( ${proj} "update config.guess"
-	COMMAND ${CMAKE_COMMAND}
-		-DUPDATE_GUESS_IN_DIR:PATH=${${proj}_SOURCE_DIR}
-		-P ${UPDATE_CONFIG_GUESS_SCRIPT}
-	
-	DEPENDEES download
-	DEPENDERS configure
-)
-

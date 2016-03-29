@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName Freetype ) # The find_package known name
-SET( proj        Freetype ) # The local name
+SET( extProjName EXPAT ) # The find_package known name
+SET( proj        EXPAT ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -11,11 +11,7 @@ IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
 ENDIF()
 
 # Set dependency list
-SET( ${proj}_DEPENDENCIES
-	BZip2
-	PNG
-	ZLIB
-)
+SET( ${proj}_DEPENDENCIES "" )
 
 # Include dependent projects if any
 ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES )
@@ -26,31 +22,29 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
-SET( FREETYPE_CMAKE_PREFIX_PATH
-	${BZIP2_DIR}
-	${PNG_DIR}
-	${ZLIB_DIR}
-)
-
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
-	-DCMAKE_PREFIX_PATH:PATH=${FREETYPE_CMAKE_PREFIX_PATH}
-	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}	
+	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
+	# EXPAT ARGS
+	-DBUILD_shared:BOOL=${BUILD_SHARED_LIBS}
+	-DBUILD_examples:BOOL=OFF
+	-DBUILD_tests:BOOL=OFF
+	-DBUILD_tools:BOOL=ON
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL http://git.savannah.gnu.org/cgit/freetype/freetype2.git/snapshot/VER-2-6-3.tar.gz )
-SET( ${proj}_MD5 f2d699ed3fa09d12802c9b032510b54d )
-# SET( ${proj}_REPOSITORY "${git_protocol}://git.savannah.gnu.org/cgit/freetype/freetype2.git" )
-# SET( ${proj}_GIT_TAG "VER-2-6-3" )
+SET( ${proj}_URL https://sourceforge.net/projects/expat/files/expat/2.1.1/expat-2.1.1.tar.bz2/download )
+SET( ${proj}_MD5 7380a64a8e3a9d66a9887b01d0d7ea81 )
+# SET( ${proj}_REPOSITORY "${git_protocol}://git.code.sf.net/p/expat/code_git expat-code_git" )
+# SET( ${proj}_GIT_TAG "R_2_1_1" ) # 2.1.1
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
 	URL					${${proj}_URL}
-	#URL_MD5			${${proj}_MD5}	 # For some reason the md5 changes on this webiste
+	URL_MD5				${${proj}_MD5}
 	# GIT_REPOSITORY	${${proj}_REPOSITORY}
 	# GIT_TAG 			${${proj}_GIT_TAG}
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
@@ -69,25 +63,23 @@ ExternalProject_Add( ${proj}
 )
 
 ### --- Set binary information
-SET( FREETYPE_DIR ${${proj}_INSTALL_DIR} )
-SET( FREETYPE_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( FREETYPE_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include/freetype2 )
-SET( FREETYPE_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
-SET( FREETYPE_LIBRARY_NAME freetype )
-
+SET( EXPAT_DIR ${${proj}_INSTALL_DIR} )
+SET( EXPAT_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( EXPAT_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( EXPAT_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+	
 mark_as_superbuild(
 	VARS
-		FREETYPE_DIR:PATH
-		FREETYPE_BUILD_DIR:PATH
-		FREETYPE_INCLUDE_DIR:PATH
-		FREETYPE_LIBRARY_DIR:PATH
-		FREETYPE_LIBRARY_NAME:STRING
+		EXPAT_DIR:PATH
+		EXPAT_BUILD_DIR:PATH
+		EXPAT_INCLUDE_DIR:PATH
+		EXPAT_LIBRARY_DIR:PATH
 	LABELS
 		"FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "FREETYPE_DIR: ${FREETYPE_DIR}" )
-ExternalProject_Message( ${proj} "FREETYPE_BUILD_DIR: ${FREETYPE_BUILD_DIR}" )
-ExternalProject_Message( ${proj} "FREETYPE_INCLUDE_DIR: ${FREETYPE_INCLUDE_DIR}" )
-ExternalProject_Message( ${proj} "FREETYPE_LIBRARY_DIR: ${FREETYPE_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "EXPAT_DIR: ${EXPAT_DIR}" )
+ExternalProject_Message( ${proj} "EXPAT_BUILD_DIR: ${EXPAT_BUILD_DIR}" )
+ExternalProject_Message( ${proj} "EXPAT_INCLUDE_DIR: ${EXPAT_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "EXPAT_LIBRARY_DIR: ${EXPAT_LIBRARY_DIR}" )
 ### --- End binary information

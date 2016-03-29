@@ -94,17 +94,6 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
-# Add runnable file permission to boost config file bootstrap.sh
-#ExternalProject_Add_Step( ${proj} "add runnable file permission bootstrap.sh"
-#	COMMAND ${CMAKE_COMMAND}
-#		-DFILE_TO_MAKE_RUNNABLE:FILEPATH=bootstrap.sh
-#		-DDIR_CONTAINING_FILE:PATH=${${proj}_SOURCE_DIR}
-#		-P ${ADD_FILE_PERMISSION_RUNNABLE_SCRIPT}
-#	
-#	DEPENDEES download
-#	DEPENDERS configure
-#)
-
 ### --- Set binary information
 SET( BOOST_DIR ${${proj}_INSTALL_DIR} )
 SET( BOOST_BUILD_DIR ${${proj}_BUILD_DIR} )

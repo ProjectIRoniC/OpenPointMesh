@@ -12,9 +12,14 @@ ENDIF()
 
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
+	BZip2
+	Eigen
+	EXPAT
 	FontConfig
 	Freetype
 	JPEG
+	LCMS
+	MNG
 	PNG
 	Qt
 	TIFF
@@ -32,9 +37,12 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 ### --- Project specific additions here
 SET( VTK_CMAKE_PREFIX_PATH
 	${BZIP2_DIR}
+	${EIGEN_DIR}
+	${EXPAT_DIR}
 	${FONTCONFIG_DIR}
 	${FREETYPE_DIR}
 	${JPEG_DIR}
+	${LCMS_DIR}
 	${MNG_DIR}
 	${PNG_DIR}
 	${TIFF_DIR}
@@ -92,7 +100,6 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DVTK_USE_SYSTEM_TIFF:BOOL=ON
 	# ZLIB ARGS
 	-DVTK_USE_SYSTEM_ZLIB:BOOL=ON
-	-DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
 )
 
 # Download tar source when possible to speed up build time
@@ -123,6 +130,16 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
+# VTK's version of FindFontConfig.cmake does not link the EXPAT dependency
+# so we are going to remove/rename the file so CMake uses our version
+ExternalProject_Add_Step( ${proj} "remove VTK's FindFontConfg.cmake"
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/CMake/FindFontConfig.cmake ${${proj}_SOURCE_DIR}/CMake/RENAMED_BY_SUPERBUILD_FindFontConfig.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
+)
+
 ### --- Set binary information
 SET( VTK_DIR ${${proj}_INSTALL_DIR} )
 SET( VTK_BUILD_DIR ${${proj}_BUILD_DIR} )
@@ -144,4 +161,3 @@ ExternalProject_Message( ${proj} "VTK_BUILD_DIR: ${VTK_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "VTK_INCLUDE_DIR: ${VTK_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "VTK_LIBRARY_DIR: ${VTK_LIBRARY_DIR}" )
 ### --- End binary information
-  

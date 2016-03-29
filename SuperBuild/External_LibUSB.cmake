@@ -26,7 +26,7 @@ SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_libusb_configur
 SET( ${proj}_CONFIGURE_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
-	-DLIBUSB_C_FLAGS:STRING=${NONCMAKE_EP_COMMON_C_FLAGS}
+	-DLIBUSB_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
 	-DLIBUSB_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
@@ -63,6 +63,16 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
+# Force rerun of autoconf
+ExternalProject_Add_Step( ${proj} "run reautoconf"
+	COMMAND ${CMAKE_COMMAND}
+		-DAUTORECONF_IN_DIR:PATH=${${proj}_SOURCE_DIR}
+		-P ${RUN_AUTORECONF_SCRIPT}
+	
+	DEPENDEES download
+	DEPENDERS configure
+)
+
 ### --- Set binary information
 SET( LIBUSB_DIR ${${proj}_INSTALL_DIR} )
 SET( LIBUSB_BUILD_DIR ${${proj}_BUILD_DIR} )
@@ -84,13 +94,3 @@ ExternalProject_Message( ${proj} "LIBUSB_BUILD_DIR: ${LIBUSB_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "LIBUSB_INCLUDE_DIR: ${LIBUSB_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "LIBUSB_LIBRARY_DIR: ${LIBUSB_LIBRARY_DIR}" )
 ### --- End binary information
-
-# Force rerun of autoconf
-#ExternalProject_Add_Step( ${proj} "run reautoconf"
-#	COMMAND ${CMAKE_COMMAND}
-#		-DAUTORECONF_IN_DIR:PATH=${${proj}_SOURCE_DIR}
-#		-P ${RUN_AUTORECONF_SCRIPT}
-#	
-#	DEPENDEES download
-#	DEPENDERS configure
-#)

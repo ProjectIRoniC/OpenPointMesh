@@ -28,8 +28,8 @@ SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_TIFF_configuret
 SET( ${proj}_CONFIGURE_COMMAND
 	# CMake ARGS
 	${CMAKE_COMMAND}
-	-DTIFF_C_FLAGS:STRING=${NONCMAKE_EP_COMMON_C_FLAGS}
-	-DTIFF_CXX_FLAGS:STRING=${NONCMAKE_EP_COMMON_CXX_FLAGS}
+	-DTIFF_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
+	-DTIFF_CXX_FLAGS:STRING=${EP_NONCMAKE_COMMON_CXX_FLAGS}
 	-DTIFF_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
@@ -68,6 +68,17 @@ ExternalProject_Add( ${proj}
 	DEPENDS 			${${proj}_DEPENDENCIES}
 )
 
+# tiff config relies on config.guess, since some dependent files are out of date we are going
+# to update them to the latest version
+ExternalProject_Add_Step( ${proj} "update config.guess"
+	COMMAND ${CMAKE_COMMAND}
+		-DUPDATE_GUESS_IN_DIR:PATH=${${proj}_SOURCE_DIR}/config
+		-P ${UPDATE_CONFIG_GUESS_SCRIPT}
+	
+	DEPENDEES download
+	DEPENDERS configure
+)
+
 ### --- Set binary information
 SET( TIFF_DIR ${${proj}_INSTALL_DIR} )
 SET( TIFF_BUILD_DIR ${${proj}_BUILD_DIR} )
@@ -89,14 +100,3 @@ ExternalProject_Message( ${proj} "TIFF_BUILD_DIR: ${TIFF_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_INCLUDE_DIR: ${TIFF_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "TIFF_LIBRARY_DIR: ${TIFF_LIBRARY_DIR}" )
 ### --- End binary information
-
-# tiff config relies on config.guess, since some dependent files are out of date we are going
-# to update them to the latest version
-ExternalProject_Add_Step( ${proj} "update config.guess"
-	COMMAND ${CMAKE_COMMAND}
-		-DUPDATE_GUESS_IN_DIR:PATH=${${proj}_SOURCE_DIR}/config
-		-P ${UPDATE_CONFIG_GUESS_SCRIPT}
-	
-	DEPENDEES download
-	DEPENDERS configure
-)

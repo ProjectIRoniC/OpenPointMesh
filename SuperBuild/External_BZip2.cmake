@@ -22,10 +22,10 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
+SET( ${proj}_BUILD_COMMAND make )
+
 IF( BUILD_SHARED_LIBS )
-	SET( ${proj}_BUILD_COMMAND make -f Makefile-libbz2_so )
-ELSE()
-	SET( ${proj}_BUILD_COMMAND make )
+	LIST( APPEND ${${proj}_BUILD_COMMAND} -f Makefile-libbz2_so )
 ENDIF()
 
 SET( ${proj}_INSTALL_COMMAND make install PREFIX=${${proj}_INSTALL_DIR} )
@@ -64,7 +64,7 @@ SET( BZIP2_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( BZIP2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( BZIP2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( BZIP2_LIBRARY_NAME bz2 )
-	
+
 mark_as_superbuild(
 	VARS
 		BZIP2_DIR:PATH
@@ -80,5 +80,4 @@ ExternalProject_Message( ${proj} "BZIP2_DIR: ${BZIP2_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_BUILD_DIR: ${BZIP2_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_INCLUDE_DIR: ${BZIP2_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "BZIP2_LIBRARY_DIR: ${BZIP2_LIBRARY_DIR}" )
-ExternalProject_Message( ${proj} "BZIP2_LIBRARY_NAME: ${BZIP2_LIBRARY_NAME}" )
 ### --- End binary information
