@@ -5,14 +5,11 @@ File:			oni-to-pcd.cpp
 Description:	Reads an oni file recorded using the Openni2 or Openni library and outputs point clouds (pcd files)
 */
 
-#include <QApplication>
-#include <iostream>
 #include "../include/mainwindow.h"
 #include <QTextStream>
 
 // ### from other main
 
-#include <iostream>
 #include <fstream>
 #include <vector>
 #include <QtTest/QtTest>
@@ -22,7 +19,6 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 
 #include "qtestsuite.h"
 #include "sharedData.h"
-#include <QtTest/QtTest>
 #include <iostream>
 
 extern SharedData sharedvar;

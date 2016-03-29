@@ -10,6 +10,7 @@
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
 #include "../include/AboutDialog.h"
+#include "../include/debugger.h"
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -429,10 +430,16 @@ void MainWindow::oniToPCDController()
 
 void MainWindow::on_Browse_output_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+    QString dir;
+    if(debugger::QTESTING && !outputFolderName.isEmpty()) {
+            dir = outputFolderName;
+    }
+    else {
+        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                        "/home",
+                                                        QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
+    }
 
     if( dir.size() > 0 )
     {
@@ -462,11 +469,18 @@ void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_erro
 
 void MainWindow::on_oni_browse_button_clicked()
 {
-    QStringList files = QFileDialog::getOpenFileNames(
-                this,
-                "Select one or more files to open",
-                "/home",
-                "Text files (*.oni)");
+    QStringList files;
+    if(debugger::QTESTING && !ui->textBrowser->toPlainText().isEmpty()) {
+            files.append(ui->textBrowser->toPlainText());
+    }
+    else {
+        files = QFileDialog::getOpenFileNames(
+                    this,
+                    "Select one or more files to open",
+                    "/home",
+                    "Text files (*.oni)");
+    }
+
     if( files.size() > 0 )
     {
         oniFileNames = files;
@@ -486,3 +500,4 @@ void MainWindow::on_oni_browse_button_clicked()
         appendMessageToOutputBuffer( "No .ONI file selected\n" );
     }
 }
+

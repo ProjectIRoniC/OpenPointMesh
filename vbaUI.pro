@@ -29,7 +29,13 @@ SOURCES += src/main.cpp\
     src/PCDRegistration.cpp \
     build/CMakeFiles/3.2.2/CompilerIdC/CMakeCCompilerId.c \
     build/CMakeFiles/feature_tests.c \
-    src/MeshConstructor.cpp
+    src/MeshConstructor.cpp \
+    src/AboutDialog.cpp \
+    src/AccuracyControlMenu.cpp \
+    src/CloudRegistrationFunctions.cpp \
+    src/filesystemHelper.cpp \
+    src/PointCloudFilters.cpp \
+    src/viewer.cpp
 
 HEADERS  += include/mainwindow.h \
     build/ui_mainwindow.h \
@@ -43,7 +49,8 @@ HEADERS  += include/mainwindow.h \
     include/filesystemHelper.h \
     include/PointCloudFilters.h \
     include/viewer.h \
-    include/viewer.hxx
+    include/viewer.hxx \
+    include/debugger.h
 
 FORMS    += src/mainwindow.ui
 

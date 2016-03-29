@@ -14,7 +14,7 @@
 #include "AccuracyControlMenu.h"
 #include "AboutDialog.h"
 #include "MeshConstructor.h"
-
+#include "tst_MainWindow.h"
 
 class QAction;
 class QActionGroup;
@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+friend class tst_MainWindow;
 public:
 
     /*
@@ -284,6 +285,8 @@ private:
      */
     void clearTaskThread();
 
+public:
+    Ui::MainWindow* getUI() { return this->ui; }
 
 };
 
