@@ -11,11 +11,20 @@ enable_testing()
 
 
 #### Variables
-FILE( GLOB OPENPOINTMESH_HEADERS "include/*.h" )
+FILE( GLOB OPENPOINTMESH_HEADERS "../include/*.h" "include/*.h" )
 #SET( OPENPOINTMESH_SOURCES  "src/main.cpp" "src/mainwindow.cpp" "src/qtestsuite.cpp" "src/mytestsuite.cpp" )
-FILE( GLOB OPENPOINTMESH_SOURCES "src/*.cpp" )
-FILE( GLOB OPENPOINTMESH_FORMS ""src/*.ui"" )
-SET( OPENPOINTMESH_INCLUDE_DIRS "include" )
+FILE( GLOB OPENPOINTMESH_SOURCES "../src/*.cpp" "src/*.cpp" )
+LIST(REMOVE_ITEM OPENPOINTMESH_SOURCES "/home/paul/Documents/2016Volcanobot/OpenPointMesh/qtest/../src/main.cpp" )
+#foreach( var in ${OPENPOINTMESH_SOURCES} )
+#message("${var}")
+#endforeach(var)
+#RETURN()
+FILE( GLOB OPENPOINTMESH_FORMS "../src/*.ui" )
+SET( OPENPOINTMESH_INCLUDE_DIRS "../include" )
+SET( QTEST_INCLUDE_DIRS "include" )
+#foreach( var in ${OPENPOINTMESH_INCLUDE_DIRS} )
+#message("${var}")
+#endforeach(var)
 SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/build_output" )
 SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
 
@@ -38,7 +47,7 @@ SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
 SET( CMAKE_LIBRARIES_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
 
 INCLUDE_DIRECTORIES(	${PCL_INCLUDE_DIRS}
-						${OPENPOINTMESH_INCLUDE_DIRS}
+						${OPENPOINTMESH_INCLUDE_DIRS} ${QTEST_INCLUDE_DIRS} 
 						 )
 
 LINK_DIRECTORIES( ${PCL_LIBRARY_DIRS} )

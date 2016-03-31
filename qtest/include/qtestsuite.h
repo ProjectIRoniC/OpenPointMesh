@@ -1,8 +1,10 @@
+#include <QObject>
+#include <vector>
+
 #ifndef QTESTSUITE_H
 #define QTESTSUITE_H
 
-#include <QObject>
-#include <vector>
+
 
 class QTestSuite : public QObject
 {

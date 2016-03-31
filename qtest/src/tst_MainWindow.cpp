@@ -1,9 +1,9 @@
 
 #include "../include/tst_MainWindow.h"
-#include "../include/mainwindow.h"
 #include <iostream>
 #include <fstream>
 #include "../include/sharedData.h"
+#include "../../include/mainwindow.h"
 
 extern SharedData sharedvar;
 

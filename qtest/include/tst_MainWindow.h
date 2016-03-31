@@ -1,7 +1,8 @@
 #include "qtestsuite.h"
 
 #include <QtTest/QtTest>
-#include "mainwindow.h"
+#include "../../include/mainwindow.h"
+
 #ifndef TST_MAINWINDOW_H
 #define TST_MAINWINDOW_H
 
