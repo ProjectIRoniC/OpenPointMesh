@@ -14,7 +14,7 @@
 #include "AccuracyControlMenu.h"
 #include "AboutDialog.h"
 #include "MeshConstructor.h"
-
+#include "tst_MainWindow.h"
 
 class QAction;
 class QActionGroup;
@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+friend class tst_MainWindow;
 public:
 
     /*
@@ -257,8 +258,10 @@ private:
     /*
      * Marks the completion of the last step of controller constants
      * Used for processing outputbuffer.
+     * TODO : check where this is being monitored. May be obselete
      */
     bool done;
+
     /*
      * Pre:  outputBuffer is non-null
      * Post: outputbuffer elements are being removed and entered into display concole
@@ -283,7 +286,6 @@ private:
      * Stops and deletes task thread.
      */
     void clearTaskThread();
-
 
 };
 
