@@ -199,7 +199,6 @@ void MainWindow::meshOutputPLYSlot()
 void MainWindow::meshOutputVTKSlot()
 {
     this->mesh_filetype = vba::VTK;
-
 }
 
 void MainWindow::sampleFrameRateSlot()
@@ -259,6 +258,7 @@ void MainWindow::setButtonsAllDisabledState()
 
 MainWindow::~MainWindow()
 {
+    done = true;
     delete outputBuffer;
     delete outputMessageThread;
     delete taskThread;

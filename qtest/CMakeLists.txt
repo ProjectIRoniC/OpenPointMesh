@@ -65,7 +65,7 @@ target_link_libraries(	${PROJECT_NAME}
 						${QT_LIBRARIES} 
 						${VTK_LIBRARIES} QtTest )
 
-add_test( NAME testclass COMMAND $<TARGET_FILE:${PROJECT_NAME}> ) 
+add_test( NAME tst_MainWindow COMMAND $<TARGET_FILE:${PROJECT_NAME}> ) 
 
 
 
