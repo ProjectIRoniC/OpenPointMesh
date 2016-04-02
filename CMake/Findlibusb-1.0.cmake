@@ -1,5 +1,115 @@
-# The purpose of this Find<package>.cmake is to find and use pkg-config (.pc) files.
-# This is used when the package does not have a CMakeLists.txt.
-# By using the pkg-config files we can take advantage of IMPORT_TARGETS.
+# - Try to find LIBUSB_1
+#
+# IMPORTED Targets
+# ^^^^^^^^^^^^^^^^
+# This module defines :prop_tgt:`IMPORTED` target ``LIBUSB_1::LIBUSB_1``, if
+# LIBUSB has been found.
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+# This module defines the following variables:
+#
+#  LIBUSB_1_FOUND 			- system has LIBUSB_1
+#  LIBUSB_1_INCLUDE_DIRS	- the LIBUSB_1 include directories
+#  LIBUSB_1_LIBRARIES		- link these to use LIBUSB_1
+#  LIBUSB_1_DEFINITIONS		- compiler flags for LIBUSB_1
+#  LIBUSB_1_VERSION			- the version of LIBUSB_1 found (x.y.z)
 
-PKG_CHECK_MODULES( LibUSB REQUIRED )
+IF( LIBUSB_1_FOUND )
+	MESSAGE( STATUS "LIBUSB_1 is already in the cache." )
+	return()
+ENDIF()
+
+INCLUDE( ${CMAKE_CURRENT_LIST_DIR}/LibFindMacros.cmake )
+INCLUDE( ${CMAKE_ROOT}/Modules/SelectLibraryConfigurations.cmake )
+
+# Help CMake choose Static vs Shared Libraries
+# Since CMake search order prefers Shared Libraries we only need
+# to change the search order for Static Libraries
+IF( BUILD_SHARED_LIBS )
+	SET( LIB_TYPE SHARED )
+ELSE()
+	SET( LIB_TYPE STATIC )
+	IF( WIN32 )
+		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
+	ELSE()
+		SET( CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
+	ENDIF()
+ENDIF()
+
+# Use pkg-config to get hints about paths if it exists
+LIBFIND_PKG_CHECK_MODULES( LIBUSB_1_PKGCONF libusb-1.0 )
+SET( LIBUSB_1_DEFINITIONS ${LIBUSB_1_PKGCONF_CFLAGS_OTHER} )
+
+# Include dir
+FIND_PATH( LIBUSB_1_INCLUDE_DIR
+  NAMES libusb-1.0/libusb.h
+  HINTS ${LIBUSB_1_PKGCONF_INCLUDE_DIRS}
+)
+
+# The release library
+FIND_LIBRARY( LIBUSB_1_LIBRARY_RELEASE
+  NAMES usb-1.0
+  HINTS ${LIBUSB_1_PKGCONF_LIBRARY_DIRS}
+)
+
+# The debug library
+FIND_LIBRARY( LIBUSB_1_LIBRARY_DEBUG
+  NAMES usb-1.0d
+  HINTS ${LIBUSB_1_PKGCONF_LIBRARY_DIRS}
+)
+
+MARK_AS_ADVANCED( LIBUSB_1_LIBRARY_RELEASE LIBUSB_1_LIBRARY_DEBUG )
+
+# This macro takes a library base name as an argument, and will choose good values
+# for basename_LIBRARY, basename_LIBRARIES, basename_LIBRARY_DEBUG, and
+# basename_LIBRARY_RELEASE depending on what has been found and set.
+SELECT_LIBRARY_CONFIGURATIONS( LIBUSB_1 )
+
+# Set by SELECT_LIBRARY_CONFIGURATIONS(), but we want the ones from LIBFIND_PROCESS() below.
+UNSET( LIBUSB_1_FOUND )
+UNSET( LIBUSB_1_LIBRARIES )
+
+# The version number
+LIBFIND_VERSION_HEADER( LIBUSB_1 libusb-1.0/libusb.h LIBUSB_API_VERSION )
+
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this lib depends on.
+SET( LIBUSB_1_PROCESS_INCLUDES ${LIBUSB_1_INCLUDE_DIR} )
+SET( LIBUSB_1_PROCESS_LIBS ${LIBUSB_1_LIBRARY} )
+LIBFIND_PROCESS( LIBUSB_1 )
+
+# Set IMPORTED Targets
+IF( LIBUSB_1_FOUND )
+	IF( NOT TARGET LIBUSB_1::LIBUSB_1 )
+		ADD_LIBRARY( LIBUSB_1::LIBUSB_1 ${LIB_TYPE} IMPORTED )
+		SET_TARGET_PROPERTIES( LIBUSB_1::LIBUSB_1 PROPERTIES
+			INTERFACE_INCLUDE_DIRECTORIES "${LIBUSB_1_INCLUDE_DIRS}"
+			VERSION "${LIBUSB_1_VERSION}" )
+
+		IF( LIBUSB_1_LIBRARY_RELEASE )
+			SET_PROPERTY( TARGET LIBUSB_1::LIBUSB_1 APPEND PROPERTY
+				IMPORTED_CONFIGURATIONS RELEASE )
+			SET_TARGET_PROPERTIES( LIBUSB_1::LIBUSB_1 PROPERTIES
+				IMPORTED_LOCATION_RELEASE "${LIBUSB_1_LIBRARY_RELEASE}" )
+		ENDIF()
+
+		IF( LIBUSB_1_LIBRARY_DEBUG )
+			SET_PROPERTY( TARGET LIBUSB_1::LIBUSB_1 APPEND PROPERTY
+				IMPORTED_CONFIGURATIONS DEBUG )
+			SET_TARGET_PROPERTIES( LIBUSB_1::LIBUSB_1 PROPERTIES
+				IMPORTED_LOCATION_DEBUG "${LIBUSB_1_LIBRARY_DEBUG}" )
+		ENDIF()
+
+		IF( NOT LIBUSB_1_LIBRARY_RELEASE AND NOT LIBUSB_1_LIBRARY_DEBUG )
+			SET_PROPERTY( TARGET LIBUSB_1::LIBUSB_1 APPEND PROPERTY
+				IMPORTED_LOCATION "${LIBUSB_1_LIBRARY}" )
+		ENDIF()
+	ENDIF()
+	
+	MESSAGE( STATUS "  Include Dirs: ${LIBUSB_1_INCLUDE_DIRS}" )
+	MESSAGE( STATUS "  Libraries: ${LIBUSB_1_LIBRARIES}" )
+	IF( LIBUSB_1_DEFINITIONS )
+		MESSAGE( STATUS "  Definitions: ${LIBUSB_1_DEFINITIONS}" )
+	ENDIF()
+ENDIF()

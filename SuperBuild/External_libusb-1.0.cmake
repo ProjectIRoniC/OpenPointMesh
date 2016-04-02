@@ -1,8 +1,8 @@
 # Make sure that the ExtProjName/IntProjName variables are unique globally
 # even if other External_${ExtProjName}.cmake files are sourced by
 # ExternalProject_Include_Dependencies
-SET( extProjName LibUSB ) # The find_package known name
-SET( proj        LibUSB ) # The local name
+SET( extProjName libusb-1.0 ) # The find_package known name
+SET( proj        libusb-1.0 ) # The local name
 SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
@@ -22,12 +22,13 @@ SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
-SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_libusb_configurelibusb.cmake )
+SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_libusb-1.0_configurelibusb-1.0.cmake )
 SET( ${proj}_CONFIGURE_COMMAND
 	${CMAKE_COMMAND}
 	# CMake Build ARGS
-	-DLIBUSB_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
-	-DLIBUSB_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+	-DLIBUSB_1_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
+	-DLIBUSB_1_CXX_FLAGS:STRING=${EP_NONCMAKE_COMMON_CXX_FLAGS}
+	-DLIBUSB_1_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
 	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -74,23 +75,23 @@ ExternalProject_Add_Step( ${proj} "run reautoconf"
 )
 
 ### --- Set binary information
-SET( LIBUSB_DIR ${${proj}_INSTALL_DIR} )
-SET( LIBUSB_BUILD_DIR ${${proj}_BUILD_DIR} )
-SET( LIBUSB_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( LIBUSB_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( LIBUSB_1_DIR ${${proj}_INSTALL_DIR} )
+SET( LIBUSB_1_BUILD_DIR ${${proj}_BUILD_DIR} )
+SET( LIBUSB_1_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
+SET( LIBUSB_1_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 	
 mark_as_superbuild(
 	VARS
-		LIBUSB_DIR:PATH
-		LIBUSB_BUILD_DIR:PATH
-		LIBUSB_INCLUDE_DIR:PATH
-		LIBUSB_LIBRARY_DIR:PATH
+		LIBUSB_1_DIR:PATH
+		LIBUSB_1_BUILD_DIR:PATH
+		LIBUSB_1_INCLUDE_DIR:PATH
+		LIBUSB_1_LIBRARY_DIR:PATH
 	LABELS
 		"FIND_PACKAGE"
 )
 
-ExternalProject_Message( ${proj} "LIBUSB_DIR: ${LIBUSB_DIR}" )
-ExternalProject_Message( ${proj} "LIBUSB_BUILD_DIR: ${LIBUSB_BUILD_DIR}" )
-ExternalProject_Message( ${proj} "LIBUSB_INCLUDE_DIR: ${LIBUSB_INCLUDE_DIR}" )
-ExternalProject_Message( ${proj} "LIBUSB_LIBRARY_DIR: ${LIBUSB_LIBRARY_DIR}" )
+ExternalProject_Message( ${proj} "LIBUSB_1_DIR: ${LIBUSB_1_DIR}" )
+ExternalProject_Message( ${proj} "LIBUSB_1_BUILD_DIR: ${LIBUSB_1_BUILD_DIR}" )
+ExternalProject_Message( ${proj} "LIBUSB_1_INCLUDE_DIR: ${LIBUSB_1_INCLUDE_DIR}" )
+ExternalProject_Message( ${proj} "LIBUSB_1_LIBRARY_DIR: ${LIBUSB_1_LIBRARY_DIR}" )
 ### --- End binary information
