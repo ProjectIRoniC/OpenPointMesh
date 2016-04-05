@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8 FATAL_ERROR )
 SET( MESH_CONSTRUCTOR_TEST "MeshConstructorTest" )
 SET( CLOUD_STITCHER_TEST "CloudStitcherTest" )
 SET( ONI_TO_PCD_TEST "OniToPcdTest" )
+SET( FILESYSTEM_HELPER_TEST "FilesystemHelperTest" )
 
 
 #### Package Dependencies
@@ -13,18 +14,20 @@ FIND_PACKAGE( PCL 1.7 REQUIRED )
 FIND_PACKAGE( GTest REQUIRED )
 
 #### Variables
-FILE( GLOB OPENPOINTMESH_HEADERS "../include/*.h" )
-SET( OPENPOINTMESH_SOURCES  "../src/AboutDialog.cpp"
-                            "../src/AccuracyControlMenu.cpp"
-                            "../src/CloudRegistrationFunctions.cpp"
+FILE( GLOB OPENPOINTMESH_HEADERS "../include/CloudRegistrationFunctions.h"
+                                 "../include/CloudStitcher.h"
+                                 "../include/MeshConstructor.h"
+                                 "../include/PointCloudFilters.h"
+                                 "../include/filesystemHelper.h"
+                                 "../include/oni-to-pcd.h"
+                                 "../include/errorMsgHandler.h" )
+SET( OPENPOINTMESH_SOURCES  "../src/CloudRegistrationFunctions.cpp"
                             "../src/CloudStitcher.cpp"
                             "../src/MeshConstructor.cpp"
                             "../src/PointCloudFilters.cpp"
                             "../src/errorMsgHandler.cpp"
                             "../src/filesystemHelper.cpp"
-                            "../src/mainwindow.cpp"
-                            "../src/oni-to-pcd.cpp"
-                            "../src/viewer.cpp" )
+                            "../src/oni-to-pcd.cpp")
 FILE( GLOB OPENPOINTMESH_FORMS "../src/*.ui" )
 SET( OPENPOINTMESH_INCLUDE_DIRS "../include" )
 SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
@@ -88,6 +91,19 @@ ADD_EXECUTABLE(	${ONI_TO_PCD_TEST}
 				${OPENPOINTMESH_HEADERS_MOC} )
 
 target_link_libraries(	${ONI_TO_PCD_TEST}
+						${PCL_LIBRARIES}
+						${QT_LIBRARIES}
+						${VTK_LIBRARIES}
+						${GTEST_LIBRARIES}
+						pthread )
+
+ADD_EXECUTABLE(	${FILESYSTEM_HELPER_TEST}
+                "src/FilesystemHelperTest.cpp"
+				${OPENPOINTMESH_SOURCES}
+				${OPENPOINTMESH_FORMS_HEADERS}
+				${OPENPOINTMESH_HEADERS_MOC} )
+
+target_link_libraries(	${FILESYSTEM_HELPER_TEST}
 						${PCL_LIBRARIES}
 						${QT_LIBRARIES}
 						${VTK_LIBRARIES}

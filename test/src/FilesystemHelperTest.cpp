@@ -1,82 +1,68 @@
 
 #include <gtest/gtest.h>
-#include "CloudStitcher.h"
+#include <string>
+#include "filesystemHelper.h"
 
 
-//This is the inherited class of gtest that allows us to automate some work before and after each test
-class CloudStitcherTest : public ::testing::Test
+
+
+/// <summary>
+/// Creates a name for an output file
+/// </summary>
+///std::string getOutputFileName(const std::string outputDirectory, const std::string inputFile, const std::string fileExtension);
+
+/// <summary>
+/// Creates a directory
+/// </summary>
+///bool createDirectory(const std::string directoryPath);
+
+/// <summary>
+/// Deletes a directory and all its contents if it exists
+/// </summary>
+///bool deleteDirectory(const std::string directoryPath);
+
+
+
+//getOutputFileName Tests
+TEST( FilesystemHelperTest , getOutputFileName_HappyPath )
 {
-
-    protected:
-
-        //run this code before each test
-        virtual void SetUp()
-        {
-            this->cs = new vba::CloudStitcher;
-        }
-
-        //run this code after each test
-        virtual void TearDown()
-        {
-            delete this->cs;
-        }
-
-
-        vba::CloudStitcher* cs;
-
-};
-
-//Testing the setters and getters for the output path
-TEST_F( CloudStitcherTest , SettingOutputPath )
-{
-    cs->setOutputPath( "../res/final_cloud.pcd" );
-    EXPECT_STREQ( "../res" , cs->getOutputPath().c_str() );
+    std::string path = vba::filesystemhelper::getOutputFileName( "../res" , "test" , ".pcd" );
+    ASSERT_STREQ( "../res/test.pcd" , path.c_str() );
 }
 
-//Make sure the method fails if a path that does not exist is given
-TEST_F( CloudStitcherTest , SettingInvalidOutputPath )
+TEST( FilesystemHelperTest , getOutputFileName_PassEmptyDir )
 {
-    int return_code = cs->setOutputPath( "../res/invalid/final_cloud.txt" );
-    EXPECT_EQ( -1 , return_code );
+    std::string path = vba::filesystemhelper::getOutputFileName( "" , "test" , ".pcd" );
+    ASSERT_STREQ( "test.pcd" , path.c_str() );
 }
 
-//Make sure the component only takes a directory name and not a filename
-TEST_F( CloudStitcherTest , SettingInvalidFilenameforDirectory )
+TEST( FilesystemHelperTest , getOutputFileName_PassEmptyFilename )
 {
-    int return_code = cs->setOutputPath( "../res/empy_cloud.pcd" );
-    EXPECT_EQ( -1 , return_code );
+    std::string path = vba::filesystemhelper::getOutputFileName( "../res" , "" , ".pcd" );
+    ASSERT_STREQ( "" , path.c_str() );
 }
 
-//Testing if the correct filter leaf size is created from the input value
-TEST_F( CloudStitcherTest , SettingFilterResolution )
+TEST( FilesystemHelperTest , getOutputFileName_AddTrailingBackSlashtoDir )
 {
-    ASSERT_FLOAT_EQ( 0.1 , cs->getFilterResolution() );
-
-    cs->setFilterResolution( 20 );
-    ASSERT_FLOAT_EQ( 0.2 , cs->getFilterResolution() );
-
-    cs->setFilterResolution( 0 );
-    ASSERT_FLOAT_EQ( 0.0 , cs->getFilterResolution() );
+    std::string path = vba::filesystemhelper::getOutputFileName( "../res/" , "test" , ".pcd" );
+    ASSERT_STREQ( "../res/test.pcd" , path.c_str() );
 }
 
-//Testing invalide inputs as the filter resolution
-TEST_F( CloudStitcherTest , SettingInvalidFilterResolution )
+TEST( FilesystemHelperTest , getOutputFileName_EmptyFileExtension )
 {
-    int return_code = cs->setFilterResolution( 33.2 );
-    ASSERT_EQ( -1 , return_code );
-
-    return_code = cs->setFilterResolution( -1 );
-    ASSERT_EQ( -1 , return_code );
+    std::string path = vba::filesystemhelper::getOutputFileName( "../res" , "test" , "" );
+    ASSERT_STREQ( "../res/test" , path.c_str() );
 }
 
-TEST_F( CloudStitcherTest , StitchingPCDFiles )
-{
-    int return_code = cs->setOutputPath( "../res/final_cloud.pcd" );
-    return_code = cs->stitchPCDFiles( "../res/" );
 
-    ASSERT_EQ( 0 , return_code );
+//createDirectory() Tests
+
+TEST( FilesystemHelperTest , createDirectory_HappyPath )
+{
 
 }
+
+
 
 
 
