@@ -43,6 +43,7 @@ void vba::OniToPcd::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _
 {
 	outputBuffer = _outputBuffer;
 	redirectOutputFlag = true;
+        sendOutput( "setOutputBuffer worked" , false );
 }
 
 void vba::OniToPcd::setFrameSkip( const int framesToSkip )

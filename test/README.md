@@ -15,3 +15,5 @@
 5. This sets up the cmake project
 6. Compiles the test programs. Several executables are compiled: one for each component. When you run each executable, it will
    run the tests over that specific component. 
+
+http://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
