@@ -17,6 +17,7 @@ class OniToPcdTest : public ::testing::Test
         {
             outputBuffer = new boost::lockfree::spsc_queue<std::string>( 200 );
             this->oniToPcd = new vba::OniToPcd( "../res/res1" , 10 , outputBuffer );
+            oniToPcd->setDebugMode( true );
         }
 
         //run this code after each test
@@ -54,52 +55,54 @@ TEST_F( OniToPcdTest , OverloadedConstructor )
 TEST_F( OniToPcdTest , BufferCreator )
 {
     boost::lockfree::spsc_queue<std::string>* outputBuffer1 = new boost::lockfree::spsc_queue<std::string>( 200 );
-    std::cout << "made it here first\n";
     oniToPcd->setOutputBuffer( outputBuffer1 );
     std::string temp = "";
-    std::cout << "made it here second\n";
     if(outputBuffer1->empty() == false)
     {
-        std::cout << "made the check\n";
         outputBuffer1->pop(temp);
         EXPECT_STREQ( "setOutputBuffer worked" , temp.c_str() );
     }
+    delete outputBuffer1;
 }
 
-/*//Test setFrameSkip
+//Test setFrameSkip;
 TEST_F( OniToPcdTest , SetFrameSkip )
 {
-    unsigned frameSkip = 10;
-    EXPECT_STREQ( "" , oniToPcd->setFrameSkip( frameSkip ) );
-}*/
+    unsigned frameSkip = 15;
+    oniToPcd->setFrameSkip( frameSkip );
+    unsigned return_frameSkip = oniToPcd->getFrameSkip();
+    EXPECT_EQ( frameSkip , return_frameSkip );
+}
 
-//Test outputOniData correct argument
-TEST_F( OniToPcdTest , GoodOutputOniDataTest )
+//Test getDebugMode
+TEST_F( OniToPcdTest , GetDebugMode )
 {
-    oniToPcd->outputOniData( "../res/good1.oni" );
-    std::string temp = "";
-    std::cout << "made 2nd test\n\n";
-    if(outputBuffer->pop(temp) == true)
-    {
-        std::cout<< "made it here 2nd test\n";
-        EXPECT_STREQ( "File open success..." , temp.c_str() );
-    }
+    bool testDebugMode = false;
+    oniToPcd->setDebugMode( testDebugMode );
+    bool return_testDebugMode = oniToPcd->getDebugMode();
+    EXPECT_EQ( testDebugMode , return_testDebugMode );
 }
 
 //Test outputOniData incorrect argument
 TEST_F( OniToPcdTest , BadOutputOniDataTest )
 {
     oniToPcd->outputOniData( "../res/goodDieYoung.oni" );
-    oniToPcd->outputOniData( "../res/good1.oni" );
     std::string temp = "";
-    if( outputBuffer->pop(temp) == true) 
+    if( outputBuffer->empty() == false ) 
     {
+        outputBuffer->pop(temp);
         EXPECT_STREQ( "Couldn't open device" , temp.c_str() );
     }
 }
 
+//Test outputOniData correct argument
+TEST_F( OniToPcdTest , GoodOutputOniDataTest )
+{
+    oniToPcd->outputOniData( "../res/StillVideo.oni" );
 
-
+    boost::filesystem::path path( "../res/res1/StillVideo.oni.csv" );
+    ASSERT_TRUE( boost::filesystem::exists( path ) );
+}
 
 
 
