@@ -1,9 +1,10 @@
-/*	
-Team:			VolcanoBot A
-Project:		TBD
-File:			oni-to-pcd.cpp
-Description:	Reads an oni file recorded using the Openni2 or Openni library and outputs point clouds (pcd files)
-*/
+///////////////////////////////////////////////////////////////////////////////////////
+/// @file	oni-to-pcd.cpp
+/// @brief	Implementation of oni-to-pcd.h
+/// @bug	No known bugs
+/// @todo	Add missing \@details descriptions
+/// @todo	Add simple \@example
+///////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +15,7 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 #include "../include/errorMsgHandler.h"
 #include "../include/filesystemHelper.h"
 
+/// @brief Default constructor for this class, which initializes the members to default values
 vba::OniToPcd::OniToPcd()
 	: frameSkip( 0 )
 	, outputDirPath( "output" )
@@ -23,6 +25,13 @@ vba::OniToPcd::OniToPcd()
 	init();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Overloaded constructor
+///
+/// @param[in]	outputDirectoryPath		Path to where output files will be written
+/// @param[in]	frameSkipModulus		How many frames to skip between reading a frame
+/// @param[out]	_outputBuffer			Function Pointer to message output buffer
+///////////////////////////////////////////////////////////////////////////////////////
 vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer )
 	: frameSkip( frameSkipModulus )
 	, outputDirPath( outputDirectoryPath )
@@ -32,6 +41,7 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 	init();
 }
 
+/// @brief Default destructor that deallocates the dynamically allocated members of the class
 vba::OniToPcd::~OniToPcd()
 {
 	openni::OpenNI::shutdown();
@@ -39,12 +49,30 @@ vba::OniToPcd::~OniToPcd()
 	delete outputBuffer;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief		Function Pointer to message output buffer
+///
+///	@details	Accepts a function pointer that will be passed all the output from this 
+///				function. If no function pointer is ever given, it will default to sending
+///				all the output to standard out and standard error. The funciton pointer
+///				accepts the following signature `void functionName( std::string )`
+///
+/// @param[in]	_outputBuffer	Function Pointer to message output buffer
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _outputBuffer )
 {
 	outputBuffer = _outputBuffer;
 	redirectOutputFlag = true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief		Sets the number of frames to skip between reading a frame
+///
+///	@details	A minimum value of 10 is required, if a value less than 10 is supplied
+///				the value 10 will be set.
+///
+/// @param[in]	framesToSkip	Number of frames to skip
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 {
 	if( framesToSkip < vba::DEFAULT_FRAME_SKIP )
@@ -56,6 +84,12 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Reads an oni file and exports data as excel docs and point clouds
+///
+/// @param[in]	inputFile	Absolute path to directory with the input oni file
+/// @return		0 if the operation was successful, -1 otherwise
+///////////////////////////////////////////////////////////////////////////////////////
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
 	// Open the .oni file
@@ -214,6 +248,7 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 	return 0;
 }
 
+/// @brief	Performs class setup actions
 void vba::OniToPcd::init()
 {
 	// Check frame skip
@@ -232,6 +267,12 @@ void vba::OniToPcd::init()
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Sends output messages to the output buffer
+///
+/// @param[in]	output	Contains information to be displayed to the user
+/// @param[in]	error	True if the message is an error message, False otherwise
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::sendOutput( const std::string& output, const bool error )
 {
 	if( redirectOutputFlag == true )
@@ -252,6 +293,12 @@ void vba::OniToPcd::sendOutput( const std::string& output, const bool error )
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Exports a depth frame to comma separated value (.csv) file
+///
+/// @param[in]	outFileStream	File data stream for csv output
+/// @param[in]	frameReference	A depth frame to output
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::outputFrameToCsv( std::ofstream& outFileStream, const openni::VideoFrameRef frameReference )
 {
 	OniDepthPixel* pDepth = (OniDepthPixel*)frameReference.getData();
@@ -277,6 +324,14 @@ void vba::OniToPcd::outputFrameToCsv( std::ofstream& outFileStream, const openni
 	outFileStream << ",\n";
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	@a Template @a Function Exports a depth and RGB frame to point cloud data (.pcd) files
+///
+/// @param[in]	outputFrameDirectory	Directory to output the .pcd files
+/// @param[in]	device					Pointer to the device with the loaded oni file
+/// @param[in]	depthFrameReference		Depth frame to output
+/// @param[in]	colorFrameReference		Color frame to output
+///////////////////////////////////////////////////////////////////////////////////////
 template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
 vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference, const float fieldOfView_X, const float fieldOfView_Y )
 {
@@ -400,9 +455,17 @@ vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const o
 	return ( cloud );
 }
 
-/// <summary>
-/// Fills a RGB24 image buffer using downsampling
-/// </summary>
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Fills a RGB24 image buffer with downsampling
+///
+/// @param[in]	newWidth			Width of the new buffer image
+/// @param[in]	newHeight			Height of the new buffer image
+/// @param[out]	rgb_buffer			Buffer to fill with the new image
+/// @param[in]	oldWidth			Width of the input image
+/// @param[in]	oldHeight			Height of the input image
+/// @param[in]	colorFrameReference	Input image to copy
+/// @param[in]	rgb_line_step		Number of lines to step when downsampling
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::fillBufferRGB( const unsigned newWidth, const unsigned newHeight, unsigned char* rgb_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step )
 {
 	if( newWidth > oldWidth || newHeight > oldHeight )
@@ -467,9 +530,17 @@ void vba::OniToPcd::fillBufferRGB( const unsigned newWidth, const unsigned newHe
 	}
 }
 
-/// <summary>
-/// Fills a depth image buffer using downsampling
-/// </summary>
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Fills a depth image buffer with downsampling
+///
+/// @param[in]	newWidth			Width of the new buffer image
+/// @param[in]	newHeight			Height of the new buffer image
+/// @param[out]	depth_buffer		Buffer to fill with the new image
+/// @param[in]	oldWidth			Width of the input image
+/// @param[in]	oldHeight			Height of the input image
+/// @param[in]	depthFrameReference	Input image to copy
+/// @param[in]	line_step			Number of lines to step when downsampling
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::fillBufferDepth( const unsigned newWidth, const unsigned newHeight, unsigned short* depth_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef depthFrameReference, unsigned line_step )
 {
 	if( newWidth > oldWidth || newHeight > oldHeight )

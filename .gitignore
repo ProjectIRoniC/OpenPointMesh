@@ -6,6 +6,7 @@
 *.pcd
 res/*
 build/*
+doxygen_generated_documentation/*
 
 # CMake
 CMakeCache.txt
