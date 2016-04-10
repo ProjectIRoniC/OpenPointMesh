@@ -1,3 +1,8 @@
+///////////////////////////////////////////////////////////////////////////////////////
+/// @file	CloudRegistrationFunctions.h
+/// @brief	Functions used to find the transformation between sequential clouds to stitch them together
+/// @bug	Multiple implementations of pairAlign function. The first is the most stable and in current use. The rest are experimental
+///////////////////////////////////////////////////////////////////////////////////////
 
 
 #include <string>

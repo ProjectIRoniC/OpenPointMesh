@@ -1,9 +1,8 @@
-/*
- * PointCloudFilters.h
- *
- *  Created on: Jan 28, 2016
- *      Author: matt
- */
+///////////////////////////////////////////////////////////////////////////////////////
+/// @file	PointCloudFilters.h
+/// @brief	Wrappers of PCL's filtering functions to reduce the density of point clouds or remove outlier points
+///////////////////////////////////////////////////////////////////////////////////////
+
 
 #ifndef POINTCLOUDFILTERS_H_
 #define POINTCLOUDFILTERS_H_
