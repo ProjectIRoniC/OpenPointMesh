@@ -1,6 +1,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <boost/filesystem.hpp>
 #include "filesystemHelper.h"
 
 
@@ -59,9 +60,41 @@ TEST( FilesystemHelperTest , getOutputFileName_EmptyFileExtension )
 
 TEST( FilesystemHelperTest , createDirectory_HappyPath )
 {
+    bool done = vba::filesystemhelper::createDirectory( "../res/test_directory" );
 
+    boost::filesystem::path path( "../res/test_directory" );
+    ASSERT_TRUE( boost::filesystem::exists( path ) );
+    ASSERT_TRUE( done );
 }
 
+TEST( FilesystemHelperTest , createDirectory_TwoLevelDeepDir )
+{
+    bool done = vba::filesystemhelper::createDirectory( "../res/not_real/test_directory" );
+
+    boost::filesystem::path path( "../res/not_real/test_directory" );
+    ASSERT_TRUE( boost::filesystem::exists( path ) );
+    ASSERT_TRUE( done );
+}
+
+
+//deleteDirectory() tests
+
+TEST( FilesystemHelperTest , deleteDirectory_HappyPath )
+{
+    bool done = vba::filesystemhelper::deleteDirectory( "../res/test_directory" );
+
+    boost::filesystem::path path( "../res/test_directory" );
+    ASSERT_FALSE( boost::filesystem::exists( path ) );
+    ASSERT_TRUE( done );
+}
+
+
+TEST( FilesystemHelperTest , deleteDirectory_NonexistantPath )
+{
+    bool done = vba::filesystemhelper::deleteDirectory( "../res/not_real/test_directory" );
+
+    ASSERT_FALSE( done );
+}
 
 
 
