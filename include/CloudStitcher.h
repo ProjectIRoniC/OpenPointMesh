@@ -30,14 +30,14 @@
 namespace vba
 {
 
-//a bunch of typedefs for the point cloud data types so that I can save myself several keystrokes later
+/// @brief  a bunch of typedefs for the point cloud data types so that I can save myself several keystrokes later
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
 
 
-//This enum just defines the different number of threads that can be used in the stitching of
-//pcd files.
+/// @brief  This enum defines the different number of threads that can be used in the stitching of
+///         pcd files.
 enum THREAD_COUNT
 {
 	THREAD_1,
@@ -46,6 +46,13 @@ enum THREAD_COUNT
 	THREAD_8
 };
 
+//////////////////////////////////////////////////////////////////////////////////////
+/// @brief	This class provides the functionality for stitching together sequential point clouds gathered
+///         from a camera. The stitching is implemented parallely to speed up performance. The class will take a
+///         directory on the filesystem and stitch together all the found .pcd files. Note: because the component
+///         stitches one point cloud after another; it will follow alphabetical order of the filenames in the provided
+///         directory.
+///////////////////////////////////////////////////////////////////////////////////////
 class CloudStitcher
 {
 
@@ -58,88 +65,100 @@ class CloudStitcher
 		 * @param:
 		 * @return:
 		 */
+        //////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	default constructor
+        ///////////////////////////////////////////////////////////////////////////////////////
 		CloudStitcher();
 
-		/*Default destructor that deallocates the dynamically allocated members of the class.
-		 *
-		 * @param:
-		 * @param:
-		 * @return:
-		 */
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	default destructor
+        ///////////////////////////////////////////////////////////////////////////////////////
 		virtual ~CloudStitcher();
 
 
 
-
+        //////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	    sets the output pathname for the final stitched .pcd file
+        ///
+        /// @param[in]	output_path		Path to where output files will be written.
+        ///                             Can be an absolute or relative path with the intended filename appended.
+        ///
+        /// @return     int             0 if successful or -1 otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		int setOutputPath( const std::string output_path );
 
-		/*Public facing function that returns the set output path
-		 *
-		 *@return: output path string
-		 */
+
+
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	gets the currently set output path
+        ///
+        /// @return The output path previously set by the user or an empty string otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		inline
 		std::string getOutputPath(){ return output_path; }
 
 
-		/*Public facing function that accepts a function pointer. This function pointer will be passed all
-		 * the output from this function. If no function pointer is ever given, we will just default to sending
-		 * all the output to standard out and standard error.
-		 *
-		 * @param: Function pointer following the signature   void functionName( std::string )
-		 *
-
-		 */
-			/*Public facing function that accepts a queue where class output will be redirected. If never set
-		 * output will be sent to std::out & std::error
-		 * @param: Buf is a pointer to a buffer that will be monitored by driver class
-		 */
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	It is possible to redirect the standard output and standard error messages into a queue for further processing
+        ///         with this function
+        ///
+        /// @param[in]	buf		                A pointer to a buffer that the messages will be loaded into
+        ///////////////////////////////////////////////////////////////////////////////////////
 		void setOutputBuffer( boost::lockfree::spsc_queue<std::string>* buf);
 
 
 		//methods to toggle configuration settings
 
-		/*Public facing function that allows the user to toggle the utilization of concurrency while
-		 * stitching together clouds.
-		 *
-		 * @param: true if concurrency should be utilized, false otherwise. The default value is true.
-		 * @return:none
-		 */
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	This component automatically divides the stitching process among several threads. This function can restrict
+        ///         the process towards only using 1 worker thread.
+        ///
+        /// @param[in]	choice		            True to enable multiple threads (default) or false otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		void enableMultithreading( const bool choice );
 
-		/*This function allows the user to initiate the cloud stitching operation. This is the function
-		 * that will instantiate all threads, supply their input, and monitor the threads to completion.
-		 *
-		 * @return: 0 if operation was successful, -1 otherwise
-		 */
+
+
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	Starts the process of stitching .pcd files together.
+        ///
+        /// @param[in]	directory_path		    The absolute or relative path to the directory containing the target .pcd files
+        ///
+        /// @pre    The setOutputPath function must have already been successfully called
+        /// @return 0 if successful or -1 otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		int stitchPCDFiles( const std::string directory_path );
 
 
 		//class setters and getters
 
 
-		/*Just a getter function to return the number of read in files from the directory.
-		 *
-		 * @return: the number of pcd files that had been read in from the directory supplied to the
-		 * 			setPCDDirectory() function call.
-		 */
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	Returns the number of .pcd files that were found in the supplied directory
+        ///
+        /// @return The number of .pcd files found or 0 otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		unsigned int getNumberofFilesRead();
 
 
-		/*This setter function allows the user to set the intensity of the filtering. The scale is from 0 to 10
-		 * with 0 being no filtering and 10 being maximum filtering. If the user enters a bad value, the default
-		 * set in the constructor is used.
-		 *
-		 * @param: value can be an int between 0 and 20 inclusive.
-		 *
-		 * @return: 0 if the set was successful. -1 if the user entered a bad value.
-		 *
-		 */
+		//////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	The stitching component can use a voxel grid filter to reduce the density of the clouds
+        ///         and reduce the overall runtime of the stitching process
+        ///
+        /// @param[in]	value           		The filtering value. The higher the number: the more points that are filtered. Value must
+        ///                                     be between 0 and 20.
+        /// @return 0 if successful or -1 otherwise
+        ///////////////////////////////////////////////////////////////////////////////////////
 		int setFilterResolution( unsigned int value );
 
 
-        /*Getter function to return the set filter leaf size
-        * @return: the current filter leaf size
-        */
+        //////////////////////////////////////////////////////////////////////////////////////
+        /// @brief	Retuns the user set filter resolution or the default resolution otherwise. Note: the return value is a float
+        ///         instead of an integer, because the supplied integer in setFilterResolution is converted into a usable number.
+        ///
+        /// @return A float with the actual value used for the voxel grid filtering. It will be the user set number or the default
+        ///         number otherwise.
+        ///////////////////////////////////////////////////////////////////////////////////////
 		inline
 		float getFilterResolution() {return this->filter_leaf_size;}
 
