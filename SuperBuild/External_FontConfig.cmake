@@ -29,9 +29,8 @@ SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_FontConfig_conf
 SET( ${proj}_CONFIGURE_COMMAND
 	# CMake ARGS
 	${CMAKE_COMMAND}
-	-DFONTCONFIG_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
-	-DFONTCONFIG_CXX_FLAGS:STRING=${EP_NONCMAKE_COMMON_CXX_FLAGS}
-	-DFONTCONFIG_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+	-DEP_NONCMAKE_COMMON_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
+	-DCMAKE_EXE_LINKER_C_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
 	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -60,7 +59,7 @@ SET( ${proj}_CONFIGURE_COMMAND
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz )
 SET( ${proj}_MD5 e75e303b4f7756c2b16203a57ac87eba )
-# SET( ${proj}_REPOSITORY "${git_protocol}://cgit.freedesktop.org/fontconfig" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://cgit.freedesktop.org/fontconfig.git" )
 # SET( ${proj}_GIT_TAG "2.11.1" )
 ### --- End Project specific additions
 
@@ -88,6 +87,7 @@ SET( FONTCONFIG_DIR ${${proj}_INSTALL_DIR} )
 SET( FONTCONFIG_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( FONTCONFIG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( FONTCONFIG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( FONTCONFIG_LIBRARY_NAME fontconfig )
 	
 mark_as_superbuild(
 	VARS
@@ -95,7 +95,7 @@ mark_as_superbuild(
 		FONTCONFIG_BUILD_DIR:PATH
 		FONTCONFIG_INCLUDE_DIR:PATH
 		FONTCONFIG_LIBRARY_DIR:PATH
-		FONTCONFIG_LIBRARY:FILEPATH
+		FONTCONFIG_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )

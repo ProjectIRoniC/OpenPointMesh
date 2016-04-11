@@ -33,7 +33,7 @@ SET( ${proj}_INSTALL_COMMAND make install PREFIX=${${proj}_INSTALL_DIR} )
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz )
 SET( ${proj}_MD5 00b516f4704d4a7cb50a1d97e6e8e15b )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/enthought/bzip2" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/enthought/bzip2.git" )
 # SET( ${proj}_GIT_TAG "v1.0.6" )
 ### --- End Project specific additions
 

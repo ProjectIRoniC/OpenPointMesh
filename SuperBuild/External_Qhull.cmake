@@ -31,7 +31,7 @@ SET( ${proj}_CMAKE_OPTIONS
 
 # The commits on github look useful but they don't release versions on github
 # so we are going to use master
-SET( ${proj}_REPOSITORY "${git_protocol}://github.com/qhull/qhull" )
+SET( ${proj}_REPOSITORY "${git_protocol}://github.com/qhull/qhull.git" )
 SET( ${proj}_GIT_TAG master )
 ### --- End Project specific additions
 

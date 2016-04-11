@@ -25,13 +25,14 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 )
 
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/libjpeg/archive/8.4.0.tar.gz )
 SET( ${proj}_MD5 5785d8496af6d40df2bd1722efc69a85 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libjpeg" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libjpeg.git" )
 # SET( ${proj}_GIT_TAG "8.4.0" )
 ### --- End Project specific additions
 

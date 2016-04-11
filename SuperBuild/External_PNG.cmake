@@ -31,6 +31,7 @@ SET( PNG_CMAKE_PREFIX_PATH
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${PNG_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# PNG ARGS
@@ -41,7 +42,7 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/libpng/archive/1.5.10.tar.gz )
 SET( ${proj}_MD5 47f5f8c0488f41f4e71d1c9e922c79d4 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libpng" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libpng.git" )
 # SET( ${proj}_GIT_TAG "1.5.10" )
 ### --- End Project specific additions
 

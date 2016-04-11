@@ -28,9 +28,9 @@ SET( ${proj}_CONFIGURE_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/External_TIFF_configuret
 SET( ${proj}_CONFIGURE_COMMAND
 	# CMake ARGS
 	${CMAKE_COMMAND}
-	-DTIFF_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
-	-DTIFF_CXX_FLAGS:STRING=${EP_NONCMAKE_COMMON_CXX_FLAGS}
-	-DTIFF_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+	-DEP_NONCMAKE_COMMON_C_FLAGS:STRING=${EP_NONCMAKE_COMMON_C_FLAGS}
+	-DEP_NONCMAKE_COMMON_CXX_FLAGS:STRING=${EP_NONCMAKE_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DSOURCE_DIR:PATH=${${proj}_SOURCE_DIR}
 	-DINSTALL_DIR:PATH=${${proj}_INSTALL_DIR}
 	-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -45,7 +45,7 @@ SET( ${proj}_CONFIGURE_COMMAND
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/libtiff/archive/3.8.2.tar.gz )
 SET( ${proj}_MD5 c1d8ad4ee235bdef497a23a7d3f51a90 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libtiff" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libtiff.git" )
 # SET( ${proj}_GIT_TAG "3.8.2" )
 ### --- End Project specific additions
 

@@ -143,11 +143,11 @@ ELSE()
 	# the use of either the shared or static version, respectively. If no
 	# shared version of libgcc was built when the compiler was configured,
 	# these options have no effect.
-	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
-		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++" )
+	IF( NOT "${CMAKE_EXE_LINKER_C_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
+		SET( CMAKE_EXE_LINKER_C_FLAGS "${CMAKE_EXE_LINKER_C_FLAGS} -static-libstdc++" )
 	ENDIF()
-	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-static-libgcc" )
-		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc" )
+	IF( NOT "${CMAKE_EXE_LINKER_CXX_FLAGS}" MATCHES "-static-libgcc" )
+		SET( CMAKE_EXE_LINKER_CXX_FLAGS "${CMAKE_EXE_LINKER_CXX_FLAGS} -static-libgcc" )
 	ENDIF()
 ENDIF()
 
@@ -173,8 +173,8 @@ IF( LINK_TIME_OPTIMIZATION AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "Debug" AND NOT
 	# exposing more code to the link-time optimizer. This information
 	# specifies what symbols can be accessed externally (by non-LTO object or
 	# during dynamic linking).
-	IF( NOT "${CMAKE_EXE_LINKER_FLAGS}" MATCHES "-fuse-linker-plugin" )
-		SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-linker-plugin" )
+	IF( NOT "${CMAKE_C_FLAGS}" MATCHES "-fuse-linker-plugin" )
+		SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fuse-linker-plugin" )
 	ENDIF()
 	IF( NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fuse-linker-plugin" )
 		SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fuse-linker-plugin" )
@@ -271,6 +271,9 @@ SET( EP_COMMON_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_INIT} -Wno-unused
 SET( EP_NONCMAKE_COMMON_C_FLAGS "${EP_COMMON_C_FLAGS} ${NONCMAKE_C_FLAGS}" )
 SET( EP_NONCMAKE_COMMON_CXX_FLAGS "${EP_COMMON_CXX_FLAGS} ${NONCMAKE_CXX_FLAGS}" )
 
+# Set linker flags
+SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_C_FLAGS} ${CMAKE_EXE_LINKER_CXX_FLAGS}" )
+
 # Set external project cmake args
 SET( EP_CMAKE_ARGS "-Wno-dev --no-warn-unused-cli" )
 
@@ -334,6 +337,8 @@ MARK_AS_SUPERBUILD(
 		EP_CMAKE_ARGS:STRING
 		EP_NONCMAKE_COMMON_C_FLAGS:STRING
 		EP_NONCMAKE_COMMON_CXX_FLAGS:STRING
+		CMAKE_EXE_LINKER_C_FLAGS:STRING
+		CMAKE_EXE_LINKER_CXX_FLAGS:STRING
 		RUN_AUTOGENSH_SCRIPT:FILEPATH
 		RUN_AUTORECONF_SCRIPT:FILEPATH
 		UPDATE_CONFIG_GUESS_SCRIPT:FILEPATH

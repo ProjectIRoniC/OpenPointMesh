@@ -25,7 +25,7 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# EXPAT ARGS
 	-DBUILD_shared:BOOL=${BUILD_SHARED_LIBS}
@@ -37,7 +37,7 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://sourceforge.net/projects/expat/files/expat/2.1.1/expat-2.1.1.tar.bz2/download )
 SET( ${proj}_MD5 7380a64a8e3a9d66a9887b01d0d7ea81 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://git.code.sf.net/p/expat/code_git expat-code_git" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://git.code.sf.net/p/expat/code_git expat-code_git.git" )
 # SET( ${proj}_GIT_TAG "R_2_1_1" ) # 2.1.1
 ### --- End Project specific additions
 
@@ -67,6 +67,7 @@ SET( EXPAT_DIR ${${proj}_INSTALL_DIR} )
 SET( EXPAT_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( EXPAT_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( EXPAT_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( EXPAT_LIBRARY_NAME expat )
 	
 mark_as_superbuild(
 	VARS
@@ -74,6 +75,7 @@ mark_as_superbuild(
 		EXPAT_BUILD_DIR:PATH
 		EXPAT_INCLUDE_DIR:PATH
 		EXPAT_LIBRARY_DIR:PATH
+		EXPAT_LIBRARY_NAME:STRING
 	LABELS
 		"FIND_PACKAGE"
 )

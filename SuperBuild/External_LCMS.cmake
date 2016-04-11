@@ -35,7 +35,7 @@ SET( LCMS_CMAKE_PREFIX_PATH
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
-	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${LCMS_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 )
@@ -43,7 +43,7 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/lcms/archive/1.19.tar.gz )
 SET( ${proj}_MD5 e4232b8213974761c553a0d92acac504 )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/lcms" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/lcms.git" )
 # SET( ${proj}_GIT_TAG "1.19" )
 ### --- End Project specific additions
 

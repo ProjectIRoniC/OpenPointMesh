@@ -13,24 +13,14 @@ ENDIF()
 # Set dependency list
 SET( ${proj}_DEPENDENCIES
 	Boost
-	BZip2
 	Eigen
-	EXPAT
 	FLANN
-	FontConfig
-	Freetype
 	#GraphViz
-	JPEG
-	LCMS
-	#LibUSB
-	MNG
+	libusb-1.0
 	#OpenNI2
-	PNG
 	Qhull	
 	Qt
-	TIFF
 	VTK
-	ZLIB
 )
 
 # Include dependent projects if any
@@ -53,7 +43,7 @@ SET( PCL_CMAKE_PREFIX_PATH
 	${GRAPHVIZ_DIR}
 	${JPEG_DIR}
 	${LCMS_DIR}
-	${LIBUSB_DIR}
+	${LIBUSB_1_DIR}
 	${MNG_DIR}
 	${PNG_DIR}
 	${QHULL_DIR}
@@ -106,8 +96,6 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DBOOST_ROOT:PATH=${BOOST_DIR}
 	-DBOOST_INCLUDEDIR:PATH=${BOOST_INCLUDE_DIR}
 	-DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARY_DIR}
-	# LIBUSB ARGS
-	#-DLIBUSB_1_INCLUDE_DIR:PATH=${LIBUSB_INCLUDE_DIR}
 	# OpenGL ARGS
 	#-DOPENGL_gl_LIBRARY:FILEPATH=GL
 	# OPENNI2 ARGS
@@ -119,7 +107,7 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz )
 SET( ${proj}_MD5 02c72eb6760fcb1f2e359ad8871b9968 )
-#SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl" )
+#SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl.git" )
 #SET( ${proj}_GIT_TAG "master" )
 ### --- End Project specific additions
 

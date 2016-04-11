@@ -37,6 +37,7 @@ SET( MNG_CMAKE_PREFIX_PATH
 SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_C_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${MNG_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 )
@@ -44,7 +45,7 @@ SET( ${proj}_CMAKE_OPTIONS
 # Download tar source when possible to speed up build time
 SET( ${proj}_URL https://github.com/LuaDist/libmng/archive/1.0.10.tar.gz )
 SET( ${proj}_MD5 e63cbc9ce44f12663e269b2268bce3bb )
-# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libmng" )
+# SET( ${proj}_REPOSITORY "${git_protocol}://github.com/LuaDist/libmng.git" )
 # SET( ${proj}_GIT_TAG "1.0.10" )
 ### --- End Project specific additions
 
