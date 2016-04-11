@@ -47,11 +47,11 @@ enum THREAD_COUNT
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
-/// @brief	This class provides the functionality for stitching together sequential point clouds gathered
-///         from a camera. The stitching is implemented parallely to speed up performance. The class will take a
-///         directory on the filesystem and stitch together all the found .pcd files. Note: because the component
-///         stitches one point cloud after another; it will follow alphabetical order of the filenames in the provided
-///         directory.
+/// @details	This class provides the functionality for stitching together sequential point clouds gathered
+///             from a camera. The stitching is implemented parallely to speed up performance. The class will take a
+///             directory on the filesystem and stitch together all the found .pcd files. Note: because the component
+///             stitches one point cloud after another; it will follow alphabetical order of the filenames in the provided
+///             directory.
 ///////////////////////////////////////////////////////////////////////////////////////
 class CloudStitcher
 {
