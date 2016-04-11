@@ -10,7 +10,7 @@
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
 #include "../include/AboutDialog.h"
-#include "../include/debugger.h"
+#include "../qtest/include/debugger.h"
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -66,6 +66,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     exitAct->setShortcuts(QKeySequence::Close);
     exitAct->setStatusTip(tr("Exit the program"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(exitSlot()));
+    exitAct->setObjectName("exitAct");
 
     /* Omit Frames */
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
@@ -78,7 +79,6 @@ MainWindow::MainWindow( QWidget *parent ) :
     filterAccuracyAct->setShortcuts(QKeySequence::New);
     filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program may effects run time"));
     connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
-
 
     /* Change the samplerate for an oni video*/
     sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
@@ -121,11 +121,13 @@ MainWindow::MainWindow( QWidget *parent ) :
     fileMenu->addAction(openAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
+    fileMenu->setObjectName("fileMenu");
 
     settingMenu->addAction(omitFramesAct);
     settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
     settingMenu->addSeparator();
+
 
 
     meshOutputSubMenu = settingMenu->addMenu( "Mesh Output Filetype" );

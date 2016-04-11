@@ -25,6 +25,11 @@ private slots:
        Pre: oni_file_path contains the absolute path to the file you want to test
        Post: */
     void tst_SingleFileRunThrough();
+
+    /*
+     * Simulate a press to file menu bar
+     */
+    void tst_OpenOniFile();
     
 };
 

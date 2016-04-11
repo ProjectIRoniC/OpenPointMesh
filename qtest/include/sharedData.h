@@ -13,6 +13,7 @@ public:
 // variables
 static int argc;
 static char** argv;
+static const bool RUN_WITH_ONI_FILE = false;
 };
 
 #endif

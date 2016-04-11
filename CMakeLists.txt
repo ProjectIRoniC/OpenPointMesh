@@ -48,4 +48,4 @@ ADD_EXECUTABLE(	${PROJECT_NAME}
 target_link_libraries(	${PROJECT_NAME}
 						${PCL_LIBRARIES}
 						${QT_LIBRARIES}
-						${VTK_LIBRARIES} )
+						${VTK_LIBRARIES} QtTest )
