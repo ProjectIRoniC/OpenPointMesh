@@ -10,7 +10,7 @@
 #include "../include/MeshConstructor.h"
 #include "../include/AccuracyControlMenu.h"
 #include "../include/AboutDialog.h"
-#include "../include/debugger.h"
+#include "../qtest/include/debugger.h"
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -223,10 +223,6 @@ void MainWindow::sampleFrameRateSlot()
 
 void MainWindow::aboutSlot()
 {
-    //QMessageBox::about(this, tr("About Menu"),
-     //       tr("This <b>messagebox</b> example shows how we can create "
-     //          "an about page or instructions."));
-
     aboutDialog->show();
 }
 
