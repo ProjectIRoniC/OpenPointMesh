@@ -4,7 +4,7 @@
 
 class debugger {
 public:
-    static const bool QTESTING = true;
+    static const bool QTESTING = false;
 private:
     debugger();
 };
