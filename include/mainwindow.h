@@ -14,7 +14,7 @@
 #include "AccuracyControlMenu.h"
 #include "AboutDialog.h"
 #include "MeshConstructor.h"
-#include "../qtest/include/tst_MainWindow.h"
+#include "tst_MainWindow.h"
 
 class QAction;
 class QActionGroup;

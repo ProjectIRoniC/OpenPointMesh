@@ -6,11 +6,22 @@
 
 #include "qtestsuite.h"
 #include <QtTest/QtTest>
-#include "../../include/mainwindow.h"
+#include "mainwindow.h"
 #include <string>
+#include <QtGui>
+#include <QMainWindow>
+#include <QFileDialog>
+#include "../build/ui_mainwindow.h"
+
+
 
 #ifndef TST_MAINWINDOW_H
 #define TST_MAINWINDOW_H
+
+class MainWindow;
+namespace Ui {
+class MainWindow;
+}
 
 class tst_MainWindow: public QTestSuite
 {
@@ -18,7 +29,7 @@ class tst_MainWindow: public QTestSuite
 private:
     /* Declaration inside .cpp file. Should contain absolute path to oni file*/
     static const std::string oni_file_path;
-
+    MainWindow *w;
 
 private slots:
     /* Simulate a single run through of the program.
@@ -30,7 +41,11 @@ private slots:
      * Simulate a press to file menu bar
      */
     void tst_OpenOniFile();
-    
+
+    void initTestCase();
+
+    void cleanupTestCase();
+
 };
 
 #endif
