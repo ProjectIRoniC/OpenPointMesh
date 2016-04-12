@@ -64,7 +64,22 @@ namespace vba
 			 *
 			 * @param: number of frames to skip, if less than 10, 10 will be set by default
 			 */
-            void setFrameSkip( const int framesToSkip );
+                        void setFrameSkip( const int framesToSkip );
+                        
+                        /*Public facing function that sets debug mode to true for testing purposes.
+                         *
+                         */
+                        void setDebugMode( bool debugBool);
+                        
+                        /*Public facing function that gets the number of frames to skip between reading a frame.
+                         *
+                         */
+                        int getFrameSkip() { return frameSkip; }
+
+                        /*Public facing function that gets the debug mode bool.
+                         *
+                         */
+                        int getDebugMode() { return debugMode; }
 			
 			/*Public facing function that reads an oni file and exports data as excel docs and point clouds
 			 *
@@ -139,10 +154,11 @@ namespace vba
 			void fillBufferDepth( const unsigned newWidth, const unsigned newHeight, unsigned short* depth_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef depthFrameReference, unsigned line_step = 0 );
 			
 			// Private Data Members
-            unsigned frameSkip;
+                        unsigned frameSkip;
 			std::string outputDirPath;
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;
 			bool redirectOutputFlag;
+                        bool debugMode;
 	};
 };
 

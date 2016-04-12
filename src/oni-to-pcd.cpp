@@ -20,6 +20,7 @@ vba::OniToPcd::OniToPcd()
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
 {
+        setDebugMode( false );
 	init();
 }
 
@@ -29,20 +30,21 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 	, outputBuffer( _outputBuffer )
 	, redirectOutputFlag( true )
 {
+        setDebugMode( false );
 	init();
 }
 
 vba::OniToPcd::~OniToPcd()
 {
 	openni::OpenNI::shutdown();
-	
-	delete outputBuffer;
 }
 
 void vba::OniToPcd::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _outputBuffer )
 {
 	outputBuffer = _outputBuffer;
 	redirectOutputFlag = true;
+        if( debugMode == true )
+            sendOutput( "setOutputBuffer worked" , false );
 }
 
 void vba::OniToPcd::setFrameSkip( const int framesToSkip )
@@ -56,6 +58,11 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
+void vba::OniToPcd::setDebugMode( bool debugBool )
+{
+        this->debugMode = debugBool;
+}
+
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
 	// Open the .oni file
@@ -63,10 +70,21 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 	openni::Status rc = device.open( inputFile.c_str() );
 	if( rc != openni::STATUS_OK )
 	{
-		sendOutput( "Couldn't open device\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
-		return -1;
+                if( debugMode == true )
+                {
+                    sendOutput( "Couldn't open device" , false );
+                }
+                else
+                {
+		    sendOutput( "Couldn't open device\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
+		}
+                return -1;
 	}
-	
+	else
+        {
+                if( debugMode == true)
+                    sendOutput( "Device opened" , false );
+        }
 	// Device Check
 	if( !device.isValid() )
 	{
@@ -98,7 +116,6 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 		sendOutput( "Couldn't create depth stream\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
 		return -1;
 	}
-	sendOutput( "File open success...\n", false );
 
 	// Set playback controls
 	openni::PlaybackControl* pbc = device.getPlaybackControl();
@@ -143,7 +160,9 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 	
 	// Read all frames
 	openni::VideoFrameRef depthStreamFrame, colorStreamFrame;
-	while( true )
+        // Get the frame index number
+        long whileFrameIndex;
+	while( whileFrameIndex <= totalFrames )
 	{
 		// Read a depth frame
 		rc = depthStream.readFrame( &depthStreamFrame );
@@ -177,10 +196,11 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 
 		// Get the frame index number
 		const long frameIndex = depthStreamFrame.getFrameIndex();
-
+                whileFrameIndex = frameIndex;
 		// Skip unneeded frames
 		if( frameIndex % frameSkip == 0 )
 		{
+                        std::cout<<"Frame Number: " << frameIndex << '\n';
 			// Get the video stream field of view
 			const float fov_x = depthStream.getHorizontalFieldOfView();
 			const float fov_y = depthStream.getVerticalFieldOfView();
@@ -201,6 +221,7 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 			break;
 		}
 	}
+        
 
 	// Cleanup
 	out.clear();
