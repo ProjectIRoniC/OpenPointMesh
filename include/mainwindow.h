@@ -32,11 +32,11 @@ class QMenu;
 namespace Ui {
 class MainWindow;
 }
-//class MainWindow;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
 
     /*
@@ -64,6 +64,7 @@ public:
 
 private:
 
+private:
     /*
      * @brief       Adds a message to be displayed as output on the details panel
      * @details     Adds msg to outputBuffer
@@ -240,6 +241,8 @@ private:
     static const int MESHCONSTRUCTOR = 2;
     static const int FINISHED = 3;
 
+
+
     /*
      * if the user has changed the sampleing rate
      */
@@ -313,6 +316,10 @@ private:
      * TODO : check where this is being monitored. May be obselete
      */
     bool done;
+
+    /* True when the start button has been pressed and through all processes until final
+     * output file is created */
+    bool workingOnFile;
 
     /*
      * @Pre:        outputBuffer is non-null

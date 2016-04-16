@@ -355,7 +355,9 @@ namespace vba
 			this->filter_leaf_size = float( 0.01 * value );
 		}
 
-		std::cout << "filter size set to: " << this->filter_leaf_size << "\n";
+        std::stringstream output;
+        output << "filter size set to: " << this->filter_leaf_size << "\n";
+        this->sendOutput(output.str(), false);
 
 		return 0;
 	}
