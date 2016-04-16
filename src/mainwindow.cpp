@@ -275,7 +275,8 @@ MainWindow::~MainWindow()
     delete taskThread;
     delete ui;
 
-    QTimer::singleShot(0, this, SLOT(q()));
+    delete accuracyControlMenu;
+    delete aboutDialog;
     // TODO add cleanup for threads
 }
 
