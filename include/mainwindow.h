@@ -14,7 +14,6 @@
 #include "AccuracyControlMenu.h"
 #include "AboutDialog.h"
 #include "MeshConstructor.h"
-#include "tst_MainWindow.h"
 
 class QAction;
 class QActionGroup;
@@ -24,13 +23,11 @@ class QMenu;
 namespace Ui {
 class MainWindow;
 }
-//class MainWindow;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-friend class tst_MainWindow;
 public:
 
     /*
@@ -44,6 +41,16 @@ public:
      * Destructor
      */
     ~MainWindow();
+
+
+    /* Getters and Setters */
+    void setTextBrowser(QString);
+    QString getTextBrowser();
+
+    void setOutputFolderName(QString);
+    QString getOutputFolderName();
+
+    bool hasStartedWorkingOnFile();
 
 
 private:
@@ -188,6 +195,8 @@ private:
     static const int MESHCONSTRUCTOR = 2;
     static const int FINISHED = 3;
 
+
+
     /*
      * if the user has changed the sampleing rate
      */
@@ -261,6 +270,10 @@ private:
      * TODO : check where this is being monitored. May be obselete
      */
     bool done;
+
+    /* True when the start button has been pressed and through all processes until final
+     * output file is created */
+    bool workingOnFile;
 
     /*
      * Pre:  outputBuffer is non-null

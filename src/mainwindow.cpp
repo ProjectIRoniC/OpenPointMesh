@@ -60,6 +60,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open a .ONI file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(openSlot()));
+    openAct->setObjectName("openAct");
 
     /* Exit */
     exitAct = new QAction(tr("&Exit"), this);
@@ -73,18 +74,21 @@ MainWindow::MainWindow( QWidget *parent ) :
     omitFramesAct->setShortcuts(QKeySequence::Find);
     omitFramesAct->setStatusTip(tr("Select frames to omit"));
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
+    omitFramesAct->setObjectName("omitFramesAct");
 
     /* Filter Accuracy */
     filterAccuracyAct = new QAction(tr("&Filter Accuracy"), this);
     filterAccuracyAct->setShortcuts(QKeySequence::New);
     filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program may effects run time"));
     connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
+    filterAccuracyAct->setObjectName("filterAccuracyAct");
 
     /* Change the samplerate for an oni video*/
     sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
     sampleRateAct->setShortcuts(QKeySequence::Save);
     sampleRateAct->setStatusTip(tr("Changes sample frame rate (per second)"));
     connect(sampleRateAct, SIGNAL(triggered()), this, SLOT(sampleFrameRateSlot()));
+    sampleRateAct->setObjectName("sampleRateAct");
 
     /* About */
     aboutAct = new QAction(tr("&About"), this);
@@ -92,17 +96,24 @@ MainWindow::MainWindow( QWidget *parent ) :
     aboutAct->setStatusTip(tr("About"));
     // connect(aboutAct, SIGNAL(triggered()), qApp, SLOT(aboutSlot()));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutSlot()));
+    aboutAct->setObjectName("aboutAct");
 
     /* View Wiki Page */
     viewWikiAct = new QAction(tr("&Wiki"), this);
     viewWikiAct->setShortcuts(QKeySequence::Underline);
     viewWikiAct->setStatusTip(tr("Wiki Page"));
     connect(viewWikiAct, SIGNAL(triggered()), this, SLOT(viewWikiSlot()));
+    viewWikiAct->setObjectName("viewWikiAct");
 
     meshOutputOBJAct = new QAction( tr( "&OBJ") , this );
     meshOutputPLYAct = new QAction( tr( "&PLY") , this );
     meshOutputVTKAct = new QAction( tr( "&VTK") , this );
     meshOutputFiletypeAct = new QActionGroup( this );
+
+    meshOutputOBJAct->setObjectName("meshOutputOBJAct");
+    meshOutputPLYAct->setObjectName("meshOutputPLYAct");
+    meshOutputVTKAct->setObjectName("meshOutputVTKAct");
+
     meshOutputFiletypeAct->addAction( meshOutputOBJAct );
     meshOutputFiletypeAct->addAction( meshOutputPLYAct );
     meshOutputFiletypeAct->addAction( meshOutputVTKAct );
@@ -127,8 +138,6 @@ MainWindow::MainWindow( QWidget *parent ) :
     settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
     settingMenu->addSeparator();
-
-
 
     meshOutputSubMenu = settingMenu->addMenu( "Mesh Output Filetype" );
     //meshOutputSubMenu->addAction( meshOutputFiletypeAct );
@@ -265,8 +274,8 @@ MainWindow::~MainWindow()
     delete outputMessageThread;
     delete taskThread;
     delete ui;
-    delete accuracyControlMenu;
-    delete aboutDialog;
+
+    QTimer::singleShot(0, this, SLOT(q()));
     // TODO add cleanup for threads
 }
 
@@ -280,23 +289,28 @@ void MainWindow::nextStep( const int& step )
     switch( step ) {
 
     case ONITOPCD:
+        workingOnFile = true;
         setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::oniToPCDController, this );
         break;
     case CLOUDSTITCHER :
+        workingOnFile = true;
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::cloudStitcherController, this );
         break;
     case MESHCONSTRUCTOR:
+        workingOnFile = true;
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::meshConstructorController, this );
         break;
     case FINISHED:
+        workingOnFile = false;
         clearTaskThread();
         setInitialButtonState();
         break;
     default :
+        workingOnFile = false;
         setInitialButtonState();
         QString errmsg = "MESSAGE: Well this is embarassing, there seems to be an ";
         errmsg += "error with my instruction set and I not quiet sure how to fix it. ";
@@ -473,7 +487,7 @@ void MainWindow::on_oni_browse_button_clicked()
 {
     QStringList files;
     if(debugger::QTESTING && !ui->textBrowser->toPlainText().isEmpty()) {
-            files.append(ui->textBrowser->toPlainText());
+            files << ui->textBrowser->toPlainText().split(";", QString::SkipEmptyParts);
     }
     else {
         files = QFileDialog::getOpenFileNames(
@@ -503,3 +517,27 @@ void MainWindow::on_oni_browse_button_clicked()
     }
 }
 
+/* Setters and Getters */
+
+void MainWindow::setTextBrowser(QString txt)
+{
+    ui->textBrowser->setText(txt);
+}
+QString MainWindow::getTextBrowser()
+{
+    return ui->textBrowser->toPlainText();
+}
+
+void MainWindow::setOutputFolderName(QString txt)
+{
+    outputFolderName = txt;
+}
+
+QString MainWindow::getOutputFolderName() {
+    return outputFolderName;
+}
+
+bool MainWindow::hasStartedWorkingOnFile()
+{
+    return workingOnFile;
+}
