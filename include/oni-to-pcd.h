@@ -9,6 +9,7 @@ Description:	Reads an oni file recorded using the Openni2 library and outputs po
 #include <pcl/io/openni2/openni.h>
 #include <pcl/point_cloud.h>
 #include <boost/lockfree/spsc_queue.hpp>
+#include <set>
 
 #ifndef _ONI_TO_PCD
 #define _ONI_TO_PCD
@@ -45,6 +46,14 @@ namespace vba
 			 * @param: frameSkipModulus - how many frames to skip between reading a frame
 			 */
 			OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer );
+
+			/*Overloaded constructor
+			 *
+			 * @param: outputDirectoryPath - path to where output files will be written
+			 * @param: frameSkipModulus - how many frames to skip between reading a frame
+			 * @param: omitFrames - frames to be excluded from sampling
+			 */
+			OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& omitFrames );
 
 			/*Default destructor that deallocates the dynamically allocated members of the class.
 			 *
@@ -98,6 +107,7 @@ namespace vba
 			 */
             static bool minimumSamplingRate (int sampleRate);
 
+			void setOmmittedFrames( const std::set<int>& of );
 			
 		private:
 			/*Performs class setup actions
@@ -158,6 +168,7 @@ namespace vba
 			std::string outputDirPath;
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;
 			bool redirectOutputFlag;
+			std::set<int> ommittedFrames;
                         bool debugMode;
 	};
 };

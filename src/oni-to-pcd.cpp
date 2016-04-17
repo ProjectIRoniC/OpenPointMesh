@@ -19,6 +19,7 @@ vba::OniToPcd::OniToPcd()
 	, outputDirPath( "output" )
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
+	, ommittedFrames()
 {
         setDebugMode( false );
 	init();
@@ -31,6 +32,17 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 	, redirectOutputFlag( true )
 {
         setDebugMode( false );
+	init();
+}
+
+vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& _ommittedFrames )
+	: frameSkip( frameSkipModulus )
+	, outputDirPath( outputDirectoryPath )
+	, outputBuffer( _outputBuffer )
+	, redirectOutputFlag( true )
+	, ommittedFrames(_ommittedFrames)
+{
+				setDebugMode( false );
 	init();
 }
 
@@ -58,6 +70,11 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
+void vba::OniToPcd::setOmmittedFrames( const std::set<int>& of ) 
+{
+	this->ommittedFrames = of;  
+}
+
 void vba::OniToPcd::setDebugMode( bool debugBool )
 {
         this->debugMode = debugBool;
@@ -65,6 +82,12 @@ void vba::OniToPcd::setDebugMode( bool debugBool )
 
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
+
+	    for (std::set<int>::iterator it=this->ommittedFrames.begin(); it != this->ommittedFrames.end(); ++it) {
+        std::cout << '\n' << *it << '\n';
+    }
+
+
 	// Open the .oni file
 	openni::Device device;
 	openni::Status rc = device.open( inputFile.c_str() );

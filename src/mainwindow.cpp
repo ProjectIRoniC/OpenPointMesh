@@ -11,6 +11,7 @@
 #include "../include/AccuracyControlMenu.h"
 #include "../include/AboutDialog.h"
 #include "../qtest/include/debugger.h"
+#include "../include/OPM_NiViewer.h"
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -45,6 +46,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     connect( this, SIGNAL(appendToConsole(QString)), this, SLOT(ensureCursorVisible(QString)) );
     connect( this, SIGNAL(cloudStitcherFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(meshConstructorFinished(int)), this, SLOT(nextStep(int)) );
+    connect( this, SIGNAL(omitFramesFinished(int)), this , SLOT(nextStep(int)) );
 
     // set initial values for varibles
     outputFolderName = QString( "" );
@@ -73,6 +75,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
     omitFramesAct->setShortcuts(QKeySequence::Find);
     omitFramesAct->setStatusTip(tr("Select frames to omit"));
+    omitFramesAct->setCheckable(true);
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
     omitFramesAct->setObjectName("omitFramesAct");
 
@@ -186,7 +189,14 @@ void MainWindow::exitSlot()
 
 void MainWindow::omitFramesSlot()
 {
-    std::cout << "inside omitframesslot\n";
+    /* omitFrameAct retains the check status */
+    /* send message to output */
+    if(omitFramesAct->isChecked()) {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " enabled\n");
+    }
+    else {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " disabled\n");
+    }
 }
 
 void MainWindow::filterAccuracySlot()
@@ -284,7 +294,11 @@ void MainWindow::ensureCursorVisible( QString s )
 void MainWindow::nextStep( const int& step )
 {
     switch( step ) {
-
+    case OMITFRAMES:
+        setButtonsAllDisabledState();
+        clearTaskThread();
+        taskThread = new boost::thread( &MainWindow::omitFramesController, this );
+        break;
     case ONITOPCD:
         workingOnFile = true;
         setButtonsAllDisabledState();
@@ -428,11 +442,12 @@ void MainWindow::oniToPCDController()
     unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
 
-	// Loop through each input file
+	// Loop through each input file and its associated set of omitted frames, which may be an empty set
 	for( int i = 0; i < oniFileNames.size(); ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
+        oniReader->setOmmittedFrames( this->ommittedFrames[i] );
 	}
 
     emit oniToPCDFinished( CLOUDSTITCHER );
@@ -469,7 +484,7 @@ void MainWindow::on_Browse_output_clicked()
 
 void MainWindow::on_Start_clicked()
 {
-    emit start( ONITOPCD );
+    emit start( OMITFRAMES );
 }
 
 // ** Helper Functions ** //
@@ -512,6 +527,14 @@ void MainWindow::on_oni_browse_button_clicked()
     {
         appendMessageToOutputBuffer( "No .ONI file selected\n" );
     }
+}
+
+void MainWindow::omitFramesController()
+{
+    int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
+    this->ommittedFrames.push_back(std::set<int> (of, of+22));
+
+    emit omitFramesFinished( ONITOPCD );
 }
 
 /* Setters and Getters */
