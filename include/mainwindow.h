@@ -62,6 +62,17 @@ public:
     */
     ~MainWindow();
 
+    void setTextBrowser(QString txt);
+
+    QString getTextBrowser ();
+
+    void setOutputFolderName(QString txt);
+
+    QString getOutputFolderName();
+
+    bool hasStartedWorkingOnFile();
+
+
 private:
 
 private:
