@@ -1,14 +1,3 @@
-// #include "../build/OpenNI2/Source/Tools/NiViewer/Device.h"
-// #include "OpenNI.h"
-// #include "../build/OpenNI2/ThirdParty/PSCommon/XnLib/Include/XnLib.h"
-// #include <../build/OpenNI2/ThirdParty/GL/glh/glh_obs.h>
-// // #include <../build/OpenNI2/ThirdParty/GL/glh/glh_glut2.h>
-// #include <../build/OpenNI2/ThirdParty/PSCommon/XnLib/Include/XnLog.h>
-// #include "../build/OpenNI2/Source/Tools/NiViewer/Capture.h"
-// #include "../build/OpenNI2/Source/Tools/NiViewer/Draw.h"
-// #include "../build/OpenNI2/Source/Tools/NiViewer/Keyboard.h"
-// #include "../build/OpenNI2/Source/Tools/NiViewer/Menu.h"
-// #include "../build/OpenNI2/Source/Tools/NiViewer/MouseInput.h"
 #include <set>
 
 #ifndef _OPM_NIVIEWER
@@ -21,21 +10,11 @@
 extern std::set<int> viewerOmittedFrames;
 extern int currentFrame;
 
-// using namespace glh;
-
-// #if (ONI_PLATFORM == ONI_PLATFORM_WIN32)
-// 	#include <conio.h>
-// 	#include <direct.h>	
-// #elif (ONI_PLATFORM == ONI_PLATFORM_LINUX_X86 || ONI_PLATFORM == ONI_PLATFORM_LINUX_ARM || ONI_PLATFORM == ONI_PLATFORM_MACOSX)
-// 	#define _getch() getchar()
-// #endif
-
 // --------------------------------
 // Defines
 // --------------------------------
-#ifndef SAMPLE_XML_PATH
 #define SAMPLE_XML_PATH "../../../../Data/SamplesConfig.xml"
-#endif
+
 // --------------------------------
 // Types
 // --------------------------------
