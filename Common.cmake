@@ -67,6 +67,7 @@ INCLUDE( CMakeDependentOption )
 INCLUDE( ExternalProject )
 INCLUDE( ExternalProjectDependency )
 FIND_PACKAGE( PythonLibs 3 REQUIRED )
+FIND_PACKAGE( OpenGL REQUIRED )
 
 # Add paths to external project helper scripts
 SET( RUN_AUTOGENSH_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_runautogensh.cmake )
