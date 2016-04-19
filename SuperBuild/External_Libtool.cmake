@@ -3,7 +3,8 @@
 # ExternalProject_Include_Dependencies
 SET( extProjName Libtool ) # The find_package known name
 SET( proj        Libtool ) # The local name
-SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
+# GraphViz has not been updated to support libtool 2.4 which had major changes
+SET( ${extProjName}_REQUIRED_VERSION "2.2.10" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
 IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )

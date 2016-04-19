@@ -15,8 +15,7 @@ SET( ${proj}_DEPENDENCIES
 	Boost
 	Eigen
 	FLANN
-	#GraphViz
-	libusb-1.0
+	GraphViz
 	#OpenNI2
 	Qhull	
 	Qt
