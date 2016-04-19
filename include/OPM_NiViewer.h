@@ -78,6 +78,6 @@ int changeDirectory(char* arg0);
 
 void recordFrameNumber (std::set<int>& frames);
 
-void initLaunchViewer (char** );
+void initLaunchViewer (char* );
 
 #endif

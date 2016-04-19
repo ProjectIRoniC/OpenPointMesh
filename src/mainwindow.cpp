@@ -531,8 +531,14 @@ void MainWindow::on_oni_browse_button_clicked()
 
 void MainWindow::omitFramesController()
 {
-    int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
-    this->ommittedFrames.push_back(std::set<int> (of, of+22));
+    char oniFileName [oniFileNames[0].length()];
+
+    strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
+
+    initLaunchViewer (oniFileName);
+    this->ommittedFrames.push_back(viewerOmittedFrames);
+    // int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
+    // this->ommittedFrames.push_back(std::set<int> (of, of+22));
 
     emit omitFramesFinished( ONITOPCD );
 }

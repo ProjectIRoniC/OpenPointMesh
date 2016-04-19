@@ -479,19 +479,6 @@ void createMenu()
  					}
  					endSubMenu();
 				}
-// 				startSubMenu("Audio");
-// 				{
-// 					createMenuEntry("On/Off", toggleAudioState, 0);
-// 				}
-// 				endSubMenu();
-// 				startSubMenu("Primary Stream");
-// 				{
-// 					for (int i = 0; i < g_PrimaryStream.nValuesCount; ++i)
-// 					{
-// 						createMenuEntry(g_PrimaryStream.pValues[i], changePrimaryStream, i);
-// 					}
-// 				}
-// 				endSubMenu();
 			}
 			endSubMenu();
 			startSubMenu("Registration");
@@ -653,15 +640,15 @@ void initLaunchViewer(char* oniFile) {
 	createKeyboardMap();
 	createMenu();
 
-	atexit(onExit);
+	// atexit(onExit);
 	
 	// Per frame code is in drawFrame()
 	glutMainLoop();
 
 //	audioShutdown();
 
-	closeSample(ERR_OK);
-//	return (ERR_OK);
+	// closeSample(ERR_OK);
+	return ;
 }
 
 // int main(int argc, char **argv)
