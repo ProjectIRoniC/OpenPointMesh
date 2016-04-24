@@ -14,6 +14,11 @@ OPTION( CMAKE_POSITION_INDEPENDENT_CODE "Set to use Position Independent Code" O
 
 # Library Options
 OPTION( BUILD_SHARED_LIBS "Build Shared Libraries" OFF )
+IF( APPLE )
+	# OS X does not support static os libraries so we must use a shared library build
+	SET( BUILD_SHARED_LIBS ON FORCE )
+ENDIF()
+
 OPTION( LINK_TIME_OPTIMIZATION "***** WARNING EXPERIMENTAL ***** Use Link Time Optimization (only affects Release and RelWithDebInfo builds)" OFF )
 
 # Output Options
@@ -120,16 +125,18 @@ ENDIF()
 
 # Set BUILD_SHARED_LIBS option settings
 IF( BUILD_SHARED_LIBS )
-	# Produce a shared object which can then be linked with other objects to
-	# form an executable. Not all systems support this option. For 
-	# predictable results, you must also specify the same set of options used
-	# for compilation (-fpic, -fPIC, or model suboptions) when you specify
-	# this linker option.
-	IF( NOT "${NONCMAKE_CXX_FLAGS}" MATCHES "-shared" )
-		SET( NONCMAKE_CXX_FLAGS "${NONCMAKE_CXX_FLAGS} -shared" )
-	ENDIF()
-	IF( NOT "${NONCMAKE_C_FLAGS}" MATCHES "-shared" )
-		SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -shared" )
+	IF( NOT APPLE ) # OS X does not support this flag
+		# Produce a shared object which can then be linked with other objects to
+		# form an executable. Not all systems support this option. For 
+		# predictable results, you must also specify the same set of options used
+		# for compilation (-fpic, -fPIC, or model suboptions) when you specify
+		# this linker option.
+		IF( NOT "${NONCMAKE_CXX_FLAGS}" MATCHES "-shared" )
+			SET( NONCMAKE_CXX_FLAGS "${NONCMAKE_CXX_FLAGS} -shared" )
+		ENDIF()
+		IF( NOT "${NONCMAKE_C_FLAGS}" MATCHES "-shared" )
+			SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -shared" )
+		ENDIF()
 	ENDIF()
 ELSE()
 	# On systems that support dynamic linking, this prevents linking with the
