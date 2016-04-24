@@ -99,6 +99,28 @@ SET( CMAKE_BUNDLE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/install/bin )
 
 
 #-----------------------------------------------------------------------------
+# Setup RPATH
+#-----------------------------------------------------------------------------
+# use, i.e. don't skip the full RPATH for the build tree
+SET( CMAKE_SKIP_BUILD_RPATH OFF )
+
+# when building, don't use the install RPATH already (but later on when installing)
+SET( CMAKE_BUILD_WITH_INSTALL_RPATH OFF ) 
+
+SET( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET( CMAKE_INSTALL_RPATH_USE_LINK_PATH ON )
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST( FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir )
+IF( "${isSystemDir}" STREQUAL "-1" )
+   SET( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
+ENDIF()
+
+
+#-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 IF( NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES )
@@ -338,6 +360,10 @@ MARK_AS_SUPERBUILD(
 		CMAKE_INSTALL_ARCHIVE_DIRECTORY:PATH
 		CMAKE_INSTALL_RUNTIME_DIRECTORY:PATH
 		CMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH
+		CMAKE_SKIP_BUILD_RPATH:BOOL
+		CMAKE_BUILD_WITH_INSTALL_RPATH:BOOL
+		CMAKE_INSTALL_RPATH:PATH
+		CMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL
 		CTEST_NEW_FORMAT:BOOL
 		MEMORYCHECK_COMMAND_OPTIONS:STRING
 		MEMORYCHECK_COMMAND:PATH
