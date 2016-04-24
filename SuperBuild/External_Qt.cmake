@@ -66,6 +66,13 @@ SET( ${proj}_CONFIGURE_COMMAND
 		-P ${${proj}_CONFIGURE_SCRIPT}
 )
 
+# On OS X we need to apply a patch file to qpaintengine
+IF( APPLE )
+	SET( ${proj}_PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/External_Qt_qpaintengine_mac.diff )
+ELSE()
+	SET( ${proj}_PATCH_COMMAND "" )
+ENDIF()
+
 SET( ${proj}_URL https://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
 SET( ${proj}_MD5 2edbe4d6c2eff33ef91732602f3518eb )
 ### --- End Project specific additions
@@ -83,6 +90,7 @@ ExternalProject_Add( ${proj}
 	LOG_BUILD			${EP_LOG_BUILD}
 	LOG_TEST			${EP_LOG_TEST}
 	LOG_INSTALL			${EP_LOG_INSTALL}
+	PATCH_COMMAND		${${proj}_PATCH_COMMAND}
 	CONFIGURE_COMMAND	${${proj}_CONFIGURE_COMMAND}
 	INSTALL_COMMAND		""
 	DEPENDS 			${${proj}_DEPENDENCIES}
