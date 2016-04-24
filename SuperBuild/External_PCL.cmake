@@ -15,8 +15,7 @@ SET( ${proj}_DEPENDENCIES
 	Boost
 	Eigen
 	FLANN
-	GraphViz
-	#OpenNI2
+	OpenNI2
 	Qhull	
 	Qt
 	VTK
@@ -39,11 +38,11 @@ SET( PCL_CMAKE_PREFIX_PATH
 	${FLANN_DIR}
 	${FONTCONFIG_DIR}
 	${FREETYPE_DIR}
-	${GRAPHVIZ_DIR}
 	${JPEG_DIR}
 	${LCMS_DIR}
 	${LIBUSB_1_DIR}
 	${MNG_DIR}
+	${OPENNI2_DIR}
 	${PNG_DIR}
 	${QHULL_DIR}
 	${TIFF_DIR}
@@ -55,20 +54,19 @@ SET( ${proj}_CMAKE_OPTIONS
 	# CMake Build ARGS
 	-DCMAKE_C_FLAGS:STRING=${EP_COMMON_C_FLAGS}
 	-DCMAKE_CXX_FLAGS:STRING=${EP_COMMON_CXX_FLAGS}
+	-DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
 	-DCMAKE_PREFIX_PATH:PATH=${PCL_CMAKE_PREFIX_PATH}
 	-DCMAKE_INSTALL_PREFIX:PATH=${${proj}_INSTALL_DIR}
 	# PCL Build ARGS
 	-DPCL_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
 	-DWITH_DOCS:BOOL=OFF
 	-DWITH_OPENNI:BOOL=OFF
-	-DBUILD_OPENNI:BOOL=OFF
-	-DWITH_OPENNI2:BOOL=OFF
-	-DBUILD_OPENNI2:BOOL=OFF
+	-DWITH_OPENNI2:BOOL=ON
 	-DBUILD_all_in_one_installer:BOOL=OFF
 	-DBUILD_apps:BOOL=OFF
-	-DBUILD_apps_cloud_composer:BOOL=OFF
-	-DBUILD_apps_modeler:BOOL=OFF
-	-DBUILD_apps_point_cloud_editor:BOOL=OFF
+	#-DBUILD_apps_cloud_composer:BOOL=OFF
+	#-DBUILD_apps_modeler:BOOL=OFF
+	#-DBUILD_apps_point_cloud_editor:BOOL=OFF
 	-DBUILD_common:BOOL=ON
 	-DBUILD_examples:BOOL=OFF
 	-DBUILD_features:BOOL=ON
@@ -97,8 +95,10 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARY_DIR}
 	# OpenGL ARGS
 	-DOPENGL_gl_LIBRARY:FILEPATH=${OPENGL_gl_LIBRARY}
-	# OPENNI2 ARGS
-	#-DOPENNI2_INCLUDE_DIRS:PATH=${OPENNI2_INCLUDE_DIR}
+	# GLUT ARGS
+	#-DGLUT_glut_LIBRARY:FILEPATH=${GLUT_glut_LIBRARY}
+	#-DGLUT_Xi_LIBRARY:FILEPATH=${GLUT_Xi_LIBRARY}
+	#-DGLUT_Xmu_LIBRARY:FILEPATH=${GLUT_Xmu_LIBRARY}
 	# QT ARGS
 	-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 )
@@ -129,6 +129,48 @@ ExternalProject_Add( ${proj}
 	CMAKE_ARGS			${EP_CMAKE_ARGS}
 	CMAKE_CACHE_ARGS	${${proj}_CMAKE_OPTIONS}
 	DEPENDS				${${proj}_DEPENDENCIES}
+)
+
+# Our project has better find package modules than PCL
+# so we are going to remove/rename the files so CMake uses our versions
+ExternalProject_Add_Step( ${proj} remove_PCL_FindEigen.cmake
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/cmake/Modules/FindEigen.cmake ${${proj}_SOURCE_DIR}/cmake/Modules/RENAMED_BY_SUPERBUILD_FindEigen.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
+)
+
+ExternalProject_Add_Step( ${proj} remove_PCL_FindFLANN.cmake
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/cmake/Modules/FindFLANN.cmake ${${proj}_SOURCE_DIR}/cmake/Modules/RENAMED_BY_SUPERBUILD_FindFLANN.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
+)
+
+ExternalProject_Add_Step( ${proj} remove_PCL_Findlibusb-1.0.cmake
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/cmake/Modules/Findlibusb-1.0.cmake ${${proj}_SOURCE_DIR}/cmake/Modules/RENAMED_BY_SUPERBUILD_Findlibusb-1.0.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
+)
+
+ExternalProject_Add_Step( ${proj} remove_PCL_FindOpenNI2.cmake
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/cmake/Modules/FindOpenNI2.cmake ${${proj}_SOURCE_DIR}/cmake/Modules/RENAMED_BY_SUPERBUILD_FindOpenNI2.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
+)
+
+ExternalProject_Add_Step( ${proj} remove_PCL_FindQhull.cmake
+	COMMAND ${CMAKE_COMMAND}
+			-E rename ${${proj}_SOURCE_DIR}/cmake/Modules/FindQhull.cmake ${${proj}_SOURCE_DIR}/cmake/Modules/RENAMED_BY_SUPERBUILD_FindQhull.cmake
+
+	DEPENDEES download
+	DEPENDERS configure
 )
 
 ### --- Set binary information

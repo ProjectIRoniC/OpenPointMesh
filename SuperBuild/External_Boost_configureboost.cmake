@@ -17,7 +17,7 @@ IF( WIN32 )
 ENDIF()
 
 EXECUTE_PROCESS( COMMAND ${BOOST_CONFIGURE_COMMAND}
-			WORKING_DIRECTORY ${SOURCE_DIR} RESULT_VARIABLE bootstrap_result )
+					WORKING_DIRECTORY ${SOURCE_DIR} RESULT_VARIABLE bootstrap_result )
 
 IF( NOT "${bootstrap_result}" STREQUAL "0" )
 	MESSAGE( STATUS "Boost bootstrap.bat Failed!!!" )

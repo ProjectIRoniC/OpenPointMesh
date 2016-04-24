@@ -25,7 +25,7 @@ SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 SET( ${proj}_BUILD_COMMAND make )
 
 IF( BUILD_SHARED_LIBS )
-	LIST( APPEND ${${proj}_BUILD_COMMAND} -f Makefile-libbz2_so )
+	SET( ${proj}_BUILD_COMMAND make -f Makefile-libbz2_so )
 ENDIF()
 
 SET( ${proj}_INSTALL_COMMAND make install PREFIX=${${proj}_INSTALL_DIR} )

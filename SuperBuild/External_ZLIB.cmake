@@ -60,7 +60,7 @@ ExternalProject_Add( ${proj}
 # zlib names the library file incorrectly on Windows for what dependents (Qt) expect
 # this custom step is to copy the library to the correct name after the install step
 IF( WIN32 )
-	ExternalProject_Add_Step( ${proj} "copy libraries in zlib folder"
+	ExternalProject_Add_Step( ${proj} copy_libraries_in_zlib_folder
 		COMMAND ${CMAKE_COMMAND}
 				-E copy ${${proj}_INSTALL_DIR}/lib/libzlibstatic.a ${${proj}_INSTALL_DIR}/lib/libz.a
 
@@ -68,7 +68,7 @@ IF( WIN32 )
 	)
 	
 	# Also copy the ones in the main project folder
-	ExternalProject_Add_Step( ${proj} "copy libraries in primary project folder"
+	ExternalProject_Add_Step( ${proj} copy_libraries_in_primary_project_folder
 		COMMAND ${CMAKE_COMMAND}
 				-E copy ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libzlibstatic.a ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libz.a
 

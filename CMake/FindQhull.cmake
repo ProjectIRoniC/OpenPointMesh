@@ -13,7 +13,6 @@
 #  Qhull_INCLUDE_DIRS	- the Qhull include directories
 #  Qhull_LIBRARIES		- link these to use Qhull
 #  Qhull_DEFINITIONS	- compiler flags for Qhull
-#  Qhull_VERSION		- the version of Qhull found (x.y.z)
 
 IF( Qhull_FOUND )
 	MESSAGE( STATUS "Qhull is already in the cache." )
@@ -84,9 +83,6 @@ SELECT_LIBRARY_CONFIGURATIONS( Qhull )
 # Set by SELECT_LIBRARY_CONFIGURATIONS(), but we want the ones from LIBFIND_PROCESS() below.
 UNSET( Qhull_FOUND )
 UNSET( Qhull_LIBRARIES )
-
-# The version number
-LIBFIND_VERSION_HEADER( Qhull zlib.h Qhull_VERSION )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this lib depends on.

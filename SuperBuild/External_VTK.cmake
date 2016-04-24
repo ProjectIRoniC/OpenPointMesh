@@ -132,7 +132,7 @@ ExternalProject_Add( ${proj}
 
 # VTK's version of FindFontConfig.cmake does not link the EXPAT dependency
 # so we are going to remove/rename the file so CMake uses our version
-ExternalProject_Add_Step( ${proj} "remove VTK's FindFontConfg.cmake"
+ExternalProject_Add_Step( ${proj} remove_VTK_FindFontConfg.cmake
 	COMMAND ${CMAKE_COMMAND}
 			-E rename ${${proj}_SOURCE_DIR}/CMake/FindFontConfig.cmake ${${proj}_SOURCE_DIR}/CMake/RENAMED_BY_SUPERBUILD_FindFontConfig.cmake
 
