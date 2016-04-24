@@ -30,10 +30,7 @@ LIBFIND_PACKAGE( OpenNI2 libusb-1.0 )
 # Help CMake choose Static vs Shared Libraries
 # Since CMake search order prefers Shared Libraries we only need
 # to change the search order for Static Libraries
-IF( BUILD_SHARED_LIBS )
-	SET( LIB_TYPE SHARED )
-ELSE()
-	SET( LIB_TYPE STATIC )
+IF( NOT BUILD_SHARED_LIBS )
 	IF( WIN32 )
 		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
 	ELSE()
@@ -108,6 +105,13 @@ LIBFIND_PROCESS( OpenNI2 )
 # Set IMPORTED Targets
 IF( OpenNI2_FOUND )
 	IF( NOT TARGET OpenNI2::OpenNI2 )
+		GET_FILENAME_COMPONENT( LIB_EXT ${OpenNI2_LIBRARY} EXT )
+		IF( "${LIB_EXT}" MATCHES "a" OR "${LIB_EXT}" MATCHES "lib" )
+			SET( LIB_TYPE STATIC )
+		ELSE()
+			SET( LIB_TYPE SHARED )
+		ENDIF()
+		
 		ADD_LIBRARY( OpenNI2::OpenNI2 ${LIB_TYPE} IMPORTED )
 		SET_TARGET_PROPERTIES( OpenNI2::OpenNI2 PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${OpenNI2_INCLUDE_DIRS}"

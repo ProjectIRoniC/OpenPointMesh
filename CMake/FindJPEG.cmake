@@ -26,10 +26,7 @@ INCLUDE( ${CMAKE_ROOT}/Modules/SelectLibraryConfigurations.cmake )
 # Help CMake choose Static vs Shared Libraries
 # Since CMake search order prefers Shared Libraries we only need
 # to change the search order for Static Libraries
-IF( BUILD_SHARED_LIBS )
-	SET( LIB_TYPE SHARED )
-ELSE()
-	SET( LIB_TYPE STATIC )
+IF( NOT BUILD_SHARED_LIBS )
 	IF( WIN32 )
 		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
 	ELSE()
@@ -104,6 +101,13 @@ LIBFIND_PROCESS( JPEG )
 # Set IMPORTED Targets
 IF( JPEG_FOUND )
 	IF( NOT TARGET JPEG::JPEG )
+		GET_FILENAME_COMPONENT( LIB_EXT ${JPEG_LIBRARY} EXT )
+		IF( "${LIB_EXT}" MATCHES "a" OR "${LIB_EXT}" MATCHES "lib" )
+			SET( LIB_TYPE STATIC )
+		ELSE()
+			SET( LIB_TYPE SHARED )
+		ENDIF()
+		
 		ADD_LIBRARY( JPEG::JPEG ${LIB_TYPE} IMPORTED )
 		SET_TARGET_PROPERTIES( JPEG::JPEG PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${JPEG_INCLUDE_DIRS}"

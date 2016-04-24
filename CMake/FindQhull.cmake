@@ -26,8 +26,6 @@ INCLUDE( ${CMAKE_ROOT}/Modules/SelectLibraryConfigurations.cmake )
 # Since CMake search order prefers Shared Libraries we only need
 # to change the search order for Static Libraries
 IF( BUILD_SHARED_LIBS )
-	SET( LIB_TYPE SHARED )
-	
 	# Qhull Shared Library Names
 	SET( Qhull_RELEASE_NAME qhull_p )
 	SET( Qhull_DEBUG_NAME qhull_pd )
@@ -35,7 +33,6 @@ IF( BUILD_SHARED_LIBS )
 	# If using shared, be sure to use libqhullcpp
 	SET( Qhull_H Qhull.h )
 ELSE()
-	SET( LIB_TYPE STATIC )
 	IF( WIN32 )
 		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
 	ELSE()
@@ -93,6 +90,13 @@ LIBFIND_PROCESS( Qhull )
 # Set IMPORTED Targets
 IF( Qhull_FOUND )
 	IF( NOT TARGET Qhull::Qhull )
+		GET_FILENAME_COMPONENT( LIB_EXT ${Qhull_LIBRARY} EXT )
+		IF( "${LIB_EXT}" MATCHES "a" OR "${LIB_EXT}" MATCHES "lib" )
+			SET( LIB_TYPE STATIC )
+		ELSE()
+			SET( LIB_TYPE SHARED )
+		ENDIF()
+		
 		ADD_LIBRARY( Qhull::Qhull ${LIB_TYPE} IMPORTED )
 		SET_TARGET_PROPERTIES( Qhull::Qhull PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${Qhull_INCLUDE_DIRS}"

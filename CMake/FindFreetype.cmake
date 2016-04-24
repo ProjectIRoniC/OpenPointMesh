@@ -31,10 +31,7 @@ LIBFIND_PACKAGE( Freetype PNG )
 # Help CMake choose Static vs Shared Libraries
 # Since CMake search order prefers Shared Libraries we only need
 # to change the search order for Static Libraries
-IF( BUILD_SHARED_LIBS )
-	SET( LIB_TYPE SHARED )
-ELSE()
-	SET( LIB_TYPE STATIC )
+IF( NOT BUILD_SHARED_LIBS )
 	IF( WIN32 )
 		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
 	ELSE()
@@ -116,6 +113,13 @@ LIBFIND_PROCESS( Freetype )
 # Set IMPORTED Targets
 IF( Freetype_FOUND )
 	IF( NOT TARGET Freetype::Freetype )
+		GET_FILENAME_COMPONENT( LIB_EXT ${Freetype_LIBRARY} EXT )
+		IF( "${LIB_EXT}" MATCHES "a" OR "${LIB_EXT}" MATCHES "lib" )
+			SET( LIB_TYPE STATIC )
+		ELSE()
+			SET( LIB_TYPE SHARED )
+		ENDIF()
+		
 		ADD_LIBRARY( Freetype::Freetype ${LIB_TYPE} IMPORTED )
 		SET_TARGET_PROPERTIES( Freetype::Freetype PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${Freetype_INCLUDE_DIRS}"
