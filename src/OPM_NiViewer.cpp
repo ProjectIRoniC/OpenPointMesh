@@ -112,7 +112,7 @@ IntPair mouseLocation;
 IntPair windowSize;
 
 int currentFrame = 0;
-std::set<int> viewerOmittedFrames;
+std::set<int> *viewerOmittedFrames;
 
 // --------------------------------
 // Utilities
@@ -165,7 +165,7 @@ void reshapeCallback(int width, int height)
 void idleCallback()
 {
 	if (isCapturing()) {
-		viewerOmittedFrames.insert(currentFrame);
+		viewerOmittedFrames->insert(currentFrame);
 	}
 
 	if (g_bShutdown)
@@ -553,11 +553,6 @@ void createMenu()
 
 void onExit()
 {
-	std::cout << "\nEXITING " << viewerOmittedFrames.size() << '\n';
-	std::set<int>::iterator it;
-	for(it = viewerOmittedFrames.begin(); it != viewerOmittedFrames.end(); ++it) {
-		std::cout << *it << '\n';
-	}
 	closeDevice();
 	captureStop(0);
 }
@@ -576,7 +571,21 @@ int changeDirectory(char* arg0)
 	return 0;
 }
 
+void initOmittedFrameSet () {
+		viewerOmittedFrames = new std::set<int> ();
+}
+
+std::set<int> getOmittedFrameSet () {
+	return *viewerOmittedFrames;
+}
+
+void destroyOmittedFrameSet () {
+	delete viewerOmittedFrames;
+}
+
 void initLaunchViewer(char* oniFile) {
+	initOmittedFrameSet();
+
 	XnBool bChooseDevice = FALSE;
 	const char* uri = NULL;
 
@@ -607,7 +616,6 @@ void initLaunchViewer(char* oniFile) {
 		closeSample(ERR_DEVICE);
 	}
 
-// 	audioInit();
  	captureInit();
 
 	reshaper.zNear = 1;
@@ -647,17 +655,6 @@ void initLaunchViewer(char* oniFile) {
 
 //	audioShutdown();
 
-	// closeSample(ERR_OK);
+	closeSample(ERR_OK);
 	return ;
 }
-
-// int main(int argc, char **argv)
-// {
-// 	if (argv[1] != NULL) {
-// 		initLaunchViewer(argv[1]);
-// 	} else {
-// 		std::cerr << "\nPlease provide a filename!\n";
-// 		return -1;
-// 	}
-
-// }

@@ -168,7 +168,6 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     this->samplingRate = vba::DEFAULT_FRAME_SKIP;
     this->hasSamplingRate = false;
-
 }
 
 
@@ -295,6 +294,7 @@ void MainWindow::nextStep( const int& step )
 {
     switch( step ) {
     case OMITFRAMES:
+        workingOnFile = true;
         setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::omitFramesController, this );
@@ -338,7 +338,10 @@ void MainWindow::clearTaskThread()
     if( taskThread == NULL )
         return;
 
-    taskThread->join(); // this should return immeditly as the thread should already have finished if this function is called.
+    if ( !(taskThread->try_join_for(boost::chrono::milliseconds(1000))) ) { // this should return immeditly as the thread should already have finished if this function is called.
+       taskThread->detach(); 
+    }
+
     delete taskThread;
     taskThread = NULL;
 }
@@ -536,11 +539,10 @@ void MainWindow::omitFramesController()
     strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
 
     initLaunchViewer (oniFileName);
-    this->ommittedFrames.push_back(viewerOmittedFrames);
-    // int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
-    // this->ommittedFrames.push_back(std::set<int> (of, of+22));
+    this->ommittedFrames.push_back( getOmittedFrameSet() );
+    destroyOmittedFrameSet();
 
-    emit omitFramesFinished( ONITOPCD );
+    emit omitFramesFinished( FINISHED );
 }
 
 /* Setters and Getters */

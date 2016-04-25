@@ -7,7 +7,7 @@
  * @author - nicole cranon
  * used for blurry frame omission
  */
-extern std::set<int> viewerOmittedFrames;
+extern std::set<int> *viewerOmittedFrames;
 extern int currentFrame;
 
 // --------------------------------
@@ -77,6 +77,12 @@ void onExit();
 int changeDirectory(char* arg0);
 
 void recordFrameNumber (std::set<int>& frames);
+
+void initOmittedFrameSet ();
+
+std::set<int> getOmittedFrameSet ();
+
+void destroyOmittedFrameSet ();
 
 void initLaunchViewer (char* );
 
