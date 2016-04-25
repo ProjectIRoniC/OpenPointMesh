@@ -22,7 +22,7 @@ vba::OniToPcd::OniToPcd()
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
 	, ommittedFrames()
-	, setDebugMode( false )
+	, debugMode( false )
 {
 	init();
 }
@@ -39,7 +39,7 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 	, outputDirPath( outputDirectoryPath )
 	, outputBuffer( _outputBuffer )
 	, redirectOutputFlag( true )
-	, setDebugMode( false )
+	, debugMode( false )
 {
 	init();
 }
@@ -397,10 +397,10 @@ template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
 vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference, const float fieldOfView_X, const float fieldOfView_Y )
 {
 	// Set cloud meta data
-	const unsigned depthWidth = depthFrameReference.getWidth();
-	const unsigned depthHeight = depthFrameReference.getHeight();
-	const unsigned colorWidth = colorFrameReference.getWidth();
-	const unsigned colorHeight = colorFrameReference.getHeight();
+	const int depthWidth = depthFrameReference.getWidth();
+	const int depthHeight = depthFrameReference.getHeight();
+	const int colorWidth = colorFrameReference.getWidth();
+	const int colorHeight = colorFrameReference.getHeight();
 	boost::shared_ptr<pcl::PointCloud<PointT> > cloud( new pcl::PointCloud<PointT> );
 	cloud->header.seq = depthFrameReference.getFrameIndex();
 	cloud->header.frame_id = depthFrameReference.getFrameIndex();
@@ -490,9 +490,9 @@ vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const o
 	point_idx = 0;
 	RGBValue color;
 	color.Alpha = 0;
-	for( unsigned yIdx = 0; yIdx < colorHeight; ++yIdx, point_idx += skip )
+	for( int yIdx = 0; yIdx < colorHeight; ++yIdx, point_idx += skip )
 	{
-		for( unsigned xIdx = 0; xIdx < colorWidth; ++xIdx, point_idx += step, value_idx += 3 )
+		for( int xIdx = 0; xIdx < colorWidth; ++xIdx, point_idx += step, value_idx += 3 )
 		{
 			PointT& pt = cloud->points[point_idx];
 

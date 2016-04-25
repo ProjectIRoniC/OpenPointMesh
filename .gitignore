@@ -6,6 +6,7 @@
 *.save
 res/*
 build/*
+build_output/*
 doxygen_generated_documentation/*
 test/build/*
 test/reports*

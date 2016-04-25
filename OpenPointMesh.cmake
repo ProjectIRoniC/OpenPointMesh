@@ -29,6 +29,7 @@ SET( CMAKE_PREFIX_PATH
 #### Package Dependencies ####
 FIND_PACKAGE( Qt4 REQUIRED )
 FIND_PACKAGE( VTK REQUIRED )
+FIND_PACKAGE( OpenNI2 REQUIRED )
 FIND_PACKAGE( PCL 1.7 REQUIRED )
 FIND_PACKAGE( GLUT REQUIRED )
 FIND_PACKAGE( OpenGL REQUIRED )
@@ -39,25 +40,13 @@ FILE( GLOB OPENPOINTMESH_HEADERS "include/*.h" )
 FILE( GLOB OPENPOINTMESH_SOURCES "src/*.cpp" )
 FILE( GLOB OPENPOINTMESH_FORMS "src/*.ui" )
 SET( OPENPOINTMESH_INCLUDE_DIRS "include" )
-SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/build_output" )
-SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
+SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_output" )
+#SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
 
-#### Download OpenNI2 source, we use it for the viewer ####
-# Download the OpenNI2 Source Code
-SET( OPENNI2_SOURCE_ZIP ${CMAKE_CURRENT_BINARY_DIR}/v2.2.0-debian.tar.gz )
-SET( OPENNI2_SOURCE_URL https://github.com/occipital/OpenNI2/archive/v2.2.0-debian.tar.gz )
-SET( OPENNI2_SOURCE_MD5 bdb95be379150c6bd0433f8a6862ee7f )
+#### VTK Settings ####
+INCLUDE( ${VTK_USE_FILE} )
 
-FILE( DOWNLOAD ${OPENNI2_SOURCE_URL} ${OPENNI2_SOURCE_ZIP}
-		EXPECTED_MD5 ${OPENNI2_SOURCE_MD5}
-		SHOW_PROGRESS )
-
-# Unzip the sources
-SET( OPENNI2_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/OpenNI2-2.2.0-debian )
-FILE( MAKE_DIRECTORY ${OPENNI2_SOURCE_DIR} )
-EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E tar xzf ${OPENNI2_SOURCE_ZIP} )
-
-# Viewer Sources
+#### Viewer Sources, uses OpenNI2 source ####
 SET( NIVIEWER_INCLUDE_DIRS 	${OPENNI2_SOURCE_DIR}/Source/Tools/NiViewer
 							${OPENNI2_SOURCE_DIR}/Include
 							${OPENNI2_SOURCE_DIR}/ThirdParty/PSCommon/XnLib/Include
@@ -106,7 +95,8 @@ ADD_EXECUTABLE(	${PROJECT_NAME}
 
 target_link_libraries(	${PROJECT_NAME}
 						${PCL_LIBRARIES}
-						${QT_LIBRARIES}
 						${VTK_LIBRARIES}
+						${QT_LIBRARIES}
+						${OpenNI2_LIBRARIES}
 						${OPENGL_LIBRARIES}
-						${GLUT_glut_LIBRARY} )
+						${GLUT_LIBRARIES} )

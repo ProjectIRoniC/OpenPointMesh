@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <fstream>
-#include <pcl/io/openni2/openni.h>
+#include <OpenNI.h>
 #include <pcl/point_cloud.h>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <set>

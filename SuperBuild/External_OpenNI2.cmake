@@ -299,6 +299,7 @@ ExternalProject_Add_Step( ${proj} build_OniFile
 
 ### --- Set binary information
 SET( OPENNI2_DIR ${${proj}_INSTALL_DIR} )
+SET( OPENNI2_SOURCE_DIR ${${proj}_SOURCE_DIR} )
 SET( OPENNI2_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( OPENNI2_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
 SET( OPENNI2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
@@ -306,6 +307,7 @@ SET( OPENNI2_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
 mark_as_superbuild(
   VARS
     OPENNI2_DIR:PATH
+    OPENNI2_SOURCE_DIR:PATH
 	OPENNI2_BUILD_DIR:PATH
 	OPENNI2_INCLUDE_DIR:PATH
 	OPENNI2_LIBRARY_DIR:PATH
@@ -314,6 +316,7 @@ mark_as_superbuild(
 )
 
 ExternalProject_Message( ${proj} "OPENNI2_DIR: ${OPENNI2_DIR}" )
+ExternalProject_Message( ${proj} "OPENNI2_SOURCE_DIR: ${OPENNI2_SOURCE_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_BUILD_DIR: ${OPENNI2_BUILD_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_INCLUDE_DIR: ${OPENNI2_INCLUDE_DIR}" )
 ExternalProject_Message( ${proj} "OPENNI2_LIBRARY_DIR: ${OPENNI2_LIBRARY_DIR}" )
