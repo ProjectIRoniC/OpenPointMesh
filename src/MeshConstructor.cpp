@@ -211,7 +211,7 @@ namespace vba
 		{
 		case OBJ:
 			pcl::io::saveOBJFile( this->output_filename , mesh_poisson );
-            ss << "\nSaved new polygon mesh to: " << this->output_filename;
+            ss << "\nSaved new polygon mesh to: " << this->output_filename << '\n';
             this->sendOutput(ss.str(), false);
 			break;
 

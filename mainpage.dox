@@ -1,0 +1,22 @@
+///////////////////////////////////////////////////////////////////////////////////////
+/// @mainpage Welcome to the OpenPointMesh API Documentation
+///
+/// @section intro_sec Introduction
+///
+/// OpenPointMesh is an application that turns .oni video files that contain depth
+/// data into point clouds and static meshes. The application is cross platform and
+/// includes a Graphical User Interface for selecting input data and setting various
+/// configuration options.
+///
+/// @section superbuild SuperBuild
+///
+/// OpenPointMesh is built using CMake and supports a SuperBuild option. In addition to
+/// building the application, SuperBuild will also build the application dependencies
+/// making it easy for anyone to compile with as few setup instructions as possible.
+/// More information can be found on the
+/// <a href="https://github.com/ProjectIRoniC/OpenPointMesh/wiki/SuperBuild-FAQ">SuperBuild FAQ</a>.
+///
+/// @section links_sec Useful Links
+/// 
+/// <a href="https://github.com/ProjectIRoniC/OpenPointMesh/wiki">OpenPointMesh Wiki</a>
+///////////////////////////////////////////////////////////////////////////////////////

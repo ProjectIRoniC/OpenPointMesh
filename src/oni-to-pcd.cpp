@@ -1,9 +1,10 @@
-/*	
-Team:			VolcanoBot A
-Project:		TBD
-File:			oni-to-pcd.cpp
-Description:	Reads an oni file recorded using the Openni2 or Openni library and outputs point clouds (pcd files)
-*/
+///////////////////////////////////////////////////////////////////////////////////////
+/// @file	oni-to-pcd.cpp
+/// @brief	Implementation of oni-to-pcd.h
+/// @bug	No known bugs
+/// @todo	Add missing \@details descriptions
+/// @todo	Add simple \@example
+///////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 #include <fstream>
@@ -12,27 +13,35 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 #include <pcl/io/pcd_io.h>
 #include "../include/oni-to-pcd.h"
 #include "../include/errorMsgHandler.h"
-#include "../include/OniProperties.h"
 #include "../include/filesystemHelper.h"
 
+/// @brief Default constructor for this class, which initializes the members to default values
 vba::OniToPcd::OniToPcd()
-	: outputDirPath( "output" )
-	, frameSkip( 0 )
+	: frameSkip( 0 )
+	, outputDirPath( "output" )
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
 {
 	init();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Overloaded constructor
+///
+/// @param[in]	outputDirectoryPath		Path to where output files will be written
+/// @param[in]	frameSkipModulus		How many frames to skip between reading a frame
+/// @param[out]	_outputBuffer			Function Pointer to message output buffer
+///////////////////////////////////////////////////////////////////////////////////////
 vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer )
-	: outputDirPath( outputDirectoryPath )
-	, frameSkip( frameSkipModulus )
+	: frameSkip( frameSkipModulus )
+	, outputDirPath( outputDirectoryPath )
 	, outputBuffer( _outputBuffer )
 	, redirectOutputFlag( true )
 {
 	init();
 }
 
+/// @brief Default destructor that deallocates the dynamically allocated members of the class
 vba::OniToPcd::~OniToPcd()
 {
 	openni::OpenNI::shutdown();
@@ -40,12 +49,30 @@ vba::OniToPcd::~OniToPcd()
 	delete outputBuffer;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief		Function Pointer to message output buffer
+///
+///	@details	Accepts a function pointer that will be passed all the output from this 
+///				function. If no function pointer is ever given, it will default to sending
+///				all the output to standard out and standard error. The funciton pointer
+///				accepts the following signature `void functionName( std::string )`
+///
+/// @param[in]	_outputBuffer	Function Pointer to message output buffer
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _outputBuffer )
 {
 	outputBuffer = _outputBuffer;
 	redirectOutputFlag = true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief		Sets the number of frames to skip between reading a frame
+///
+///	@details	A minimum value of 10 is required, if a value less than 10 is supplied
+///				the value 10 will be set.
+///
+/// @param[in]	framesToSkip	Number of frames to skip
+///////////////////////////////////////////////////////////////////////////////////////
 void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 {
 	if( framesToSkip < vba::DEFAULT_FRAME_SKIP )
@@ -57,7 +84,13 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
-int vba::OniToPcd::outputOniData( std::string inputFile )
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Reads an oni file and exports data as excel docs and point clouds
+///
+/// @param[in]	inputFile	Absolute path to directory with the input oni file
+/// @return		0 if the operation was successful, -1 otherwise
+///////////////////////////////////////////////////////////////////////////////////////
+int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
 	// Open the .oni file
 	openni::Device device;
@@ -116,7 +149,7 @@ int vba::OniToPcd::outputOniData( std::string inputFile )
 		return -1;
 
 	// Start reading the frame data
-	unsigned totalFrames = pbc->getNumberOfFrames( depthStream );
+	const unsigned totalFrames = pbc->getNumberOfFrames( depthStream );
 	std::stringstream framesToProcessSS;
 	framesToProcessSS << "Frames to read " << totalFrames / frameSkip << "...\n";
 	sendOutput( framesToProcessSS.str(), false );
@@ -177,14 +210,18 @@ int vba::OniToPcd::outputOniData( std::string inputFile )
 		}
 
 		// Get the frame index number
-		long frameIndex = depthStreamFrame.getFrameIndex();
+		const long frameIndex = depthStreamFrame.getFrameIndex();
 
 		// Skip unneeded frames
 		if( frameIndex % frameSkip == 0 )
 		{
+			// Get the video stream field of view
+			const float fov_x = depthStream.getHorizontalFieldOfView();
+			const float fov_y = depthStream.getVerticalFieldOfView();
+			
 			// Output needed frame data
 			outputFrameToCsv( out, depthStreamFrame );
-			outputFrameToPcd<pcl::PointXYZRGBA>( pointCloudOutputDirectory + '/', &device, depthStreamFrame, colorStreamFrame );
+			outputFrameToPcd<pcl::PointXYZRGBA>( pointCloudOutputDirectory + '/', &device, depthStreamFrame, colorStreamFrame, fov_x, fov_y );
 		}
 		else
 		{
@@ -211,6 +248,7 @@ int vba::OniToPcd::outputOniData( std::string inputFile )
 	return 0;
 }
 
+/// @brief	Performs class setup actions
 void vba::OniToPcd::init()
 {
 	// Check frame skip
@@ -229,7 +267,13 @@ void vba::OniToPcd::init()
 	}
 }
 
-void vba::OniToPcd::sendOutput( const std::string& output, bool error )
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Sends output messages to the output buffer
+///
+/// @param[in]	output	Contains information to be displayed to the user
+/// @param[in]	error	True if the message is an error message, False otherwise
+///////////////////////////////////////////////////////////////////////////////////////
+void vba::OniToPcd::sendOutput( const std::string& output, const bool error )
 {
 	if( redirectOutputFlag == true )
 	{
@@ -249,23 +293,29 @@ void vba::OniToPcd::sendOutput( const std::string& output, bool error )
 	}
 }
 
-void vba::OniToPcd::outputFrameToCsv(std::ofstream& outFileStream, const openni::VideoFrameRef frameReference)
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Exports a depth frame to comma separated value (.csv) file
+///
+/// @param[in]	outFileStream	File data stream for csv output
+/// @param[in]	frameReference	A depth frame to output
+///////////////////////////////////////////////////////////////////////////////////////
+void vba::OniToPcd::outputFrameToCsv( std::ofstream& outFileStream, const openni::VideoFrameRef frameReference )
 {
 	OniDepthPixel* pDepth = (OniDepthPixel*)frameReference.getData();
-	int frameHeight = frameReference.getHeight();
-	int frameWidth = frameReference.getWidth();
+	const int frameHeight = frameReference.getHeight();
+	const int frameWidth = frameReference.getWidth();
 
 	// Output the frame header
 	std::stringstream frameHeaderSS;
 	frameHeaderSS << "Processing " << frameWidth << 'x' << frameHeight << " frame number " << frameReference.getFrameIndex() << "...\n";
-	sendOutput(frameHeaderSS.str(), false);
+	sendOutput( frameHeaderSS.str(), false );
 	outFileStream << "FrameNumber=" << frameReference.getFrameIndex() << ",FrameWidth=" << frameWidth << ",FrameHeight=" << frameHeight << ",\n";
 
 	// All heights of the frame
-	for (int y = 0; y < frameHeight; ++y)
+	for( int y = 0; y < frameHeight; ++y )
 	{
 		// All widths of the frame
-		for (int x = 0; x < frameWidth; ++x, ++pDepth)
+		for( int x = 0; x < frameWidth; ++x, ++pDepth )
 		{
 			outFileStream << *pDepth << ",";
 		}
@@ -274,73 +324,76 @@ void vba::OniToPcd::outputFrameToCsv(std::ofstream& outFileStream, const openni:
 	outFileStream << ",\n";
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	@a Template @a Function Exports a depth and RGB frame to point cloud data (.pcd) files
+///
+/// @param[in]	outputFrameDirectory	Directory to output the .pcd files
+/// @param[in]	device					Pointer to the device with the loaded oni file
+/// @param[in]	depthFrameReference		Depth frame to output
+/// @param[in]	colorFrameReference		Color frame to output
+///////////////////////////////////////////////////////////////////////////////////////
 template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
-vba::OniToPcd::outputFrameToPcd(const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference)
+vba::OniToPcd::outputFrameToPcd( const std::string outputFrameDirectory, const openni::Device* device, const openni::VideoFrameRef depthFrameReference, const openni::VideoFrameRef colorFrameReference, const float fieldOfView_X, const float fieldOfView_Y )
 {
 	// Set cloud meta data
-	unsigned depthWidth = depthFrameReference.getWidth();
-	unsigned depthHeight = depthFrameReference.getHeight();
-	unsigned colorWidth = colorFrameReference.getWidth();
-	unsigned colorHeight = colorFrameReference.getHeight();
-	boost::shared_ptr<pcl::PointCloud<PointT> > cloud (new pcl::PointCloud<PointT>);
+	const unsigned depthWidth = depthFrameReference.getWidth();
+	const unsigned depthHeight = depthFrameReference.getHeight();
+	const unsigned colorWidth = colorFrameReference.getWidth();
+	const unsigned colorHeight = colorFrameReference.getHeight();
+	boost::shared_ptr<pcl::PointCloud<PointT> > cloud( new pcl::PointCloud<PointT> );
 	cloud->header.seq = depthFrameReference.getFrameIndex();
 	cloud->header.frame_id = depthFrameReference.getFrameIndex();
 	cloud->header.stamp = depthFrameReference.getTimestamp();
-	cloud->height = std::max(depthHeight, colorHeight);
-	cloud->width = std::max(depthWidth, colorWidth);
+	cloud->height = std::max( depthHeight, colorHeight );
+	cloud->width = std::max( depthWidth, colorWidth );
 	cloud->is_dense = false;
-	cloud->points.resize(cloud->height * cloud->width);
+	cloud->points.resize( cloud->height * cloud->width );
 
 	// Calculate the center of height and width
-	float centerX = ((float)depthWidth - 1.f) / 2.f;
-	float centerY = ((float)depthHeight - 1.f) / 2.f;
-	
-	// Get the device field of view
-	int xFov = 0, yFov = 0;
-	device->getProperty(openni::STREAM_PROPERTY_HORIZONTAL_FOV, &xFov);
-	device->getProperty(openni::STREAM_PROPERTY_VERTICAL_FOV, &yFov);
+	const float centerX = ((float)depthWidth - 1.f) / 2.f;
+	const float centerY = ((float)depthHeight - 1.f) / 2.f;
 
 	// Use field of view to calculate focal length
-	float focalLength_x = ((float)depthWidth / 2) / tan(xFov);
-	float focalLength_y = ((float)depthHeight / 2) / tan(yFov);
+	const float focalLength_x = ((float)depthWidth / 2) / tan( (float)fieldOfView_X / 2 );
+	const float focalLength_y = ((float)depthHeight / 2) / tan( (float)fieldOfView_Y / 2 );
 	
 	// Get inverse focal length for calculations below
-	float inverseFocalLength_x = 1.0f / focalLength_x;
-	float inverseFocalLength_y = 1.0f / focalLength_y;
-
+	const float inverseFocalLength_x = 1.0f / focalLength_x;
+	const float inverseFocalLength_y = 1.0f / focalLength_y;
+	
 	// Get the depth frame data
 	const uint16_t* depth_map = (const uint16_t*)depthFrameReference.getData();
-	if (depthFrameReference.getWidth() != depthWidth || depthFrameReference.getHeight() != depthHeight)
+	if( depthFrameReference.getWidth() != depthWidth || depthFrameReference.getHeight() != depthHeight )
 	{
 		// Resize the depth image if nessacery
 		std::vector<uint16_t> pointsBuffer;
-		pointsBuffer.resize(depthWidth * depthHeight);
+		pointsBuffer.resize( depthWidth * depthHeight );
 		depth_map = pointsBuffer.data();
-		fillBufferDepth(depthWidth, depthHeight, (unsigned short*)depth_map, depthFrameReference.getWidth(), depthFrameReference.getHeight(), depthFrameReference);
+		fillBufferDepth( depthWidth, depthHeight, (unsigned short*)depth_map, depthFrameReference.getWidth(), depthFrameReference.getHeight(), depthFrameReference );
 	}
 	
 	// Get the color frame data
 	const uint8_t* rgb_buffer = (const uint8_t*)colorFrameReference.getData();
-	if (colorFrameReference.getWidth() != colorWidth || colorFrameReference.getHeight() != colorHeight)
+	if( colorFrameReference.getWidth() != colorWidth || colorFrameReference.getHeight() != colorHeight )
 	{
 		// Resize the color image if nessacery
 		std::vector<uint8_t> pointsBuffer;
 		pointsBuffer.resize(colorWidth * colorHeight * 3);
 		rgb_buffer = pointsBuffer.data();
-		fillBufferRGB(colorWidth, colorHeight, (unsigned char*)rgb_buffer, colorFrameReference.getWidth(), colorFrameReference.getHeight(), colorFrameReference, colorWidth * 3);
+		fillBufferRGB( colorWidth, colorHeight, (unsigned char*)rgb_buffer, colorFrameReference.getWidth(), colorFrameReference.getHeight(), colorFrameReference, colorWidth * 3 );
 	}
 	
 	// Set bad point value
-	float bad_point = std::numeric_limits<float>::quiet_NaN();
+	const float bad_point = std::numeric_limits<float>::quiet_NaN();
 
 	// Set xyz to Nan and rgb to 0 (black)  
-	if (colorWidth != depthWidth)
+	if( colorWidth != depthWidth )
 	{
 		PointT pt;
 		pt.x = pt.y = pt.z = bad_point;
 		pt.b = pt.g = pt.r = 0;
 		pt.a = 255; // point has no color info -> alpha = max => transparent 
-		cloud->points.assign(cloud->points.size(), pt);
+		cloud->points.assign( cloud->points.size(), pt );
 	}
 	
 	// Fill in the XYZ values
@@ -348,15 +401,15 @@ vba::OniToPcd::outputFrameToPcd(const std::string outputFrameDirectory, const op
 	unsigned skip = cloud->width * step - cloud->width;
 	int value_idx = 0;
 	int point_idx = 0;
-	for (int v = 0; v < depthHeight; ++v, point_idx += skip)
+	for( int v = 0; v < depthHeight; ++v, point_idx += skip )
 	{
-		for (int u = 0; u < depthWidth; ++u, ++value_idx, point_idx += step)
+		for( int u = 0; u < depthWidth; ++u, ++value_idx, point_idx += step )
 		{
 			PointT& pt = cloud->points[point_idx];
 			
 			// Check for invalid measurements
 			OniDepthPixel pixel = depth_map[value_idx];
-			if (pixel != 0)
+			if( pixel != 0 )
 			{
 				pt.z = depth_map[value_idx] * 0.001f;  // millimeters to meters
 				pt.x = (static_cast<float> (u) - centerX) * pt.z * inverseFocalLength_x;
@@ -376,9 +429,9 @@ vba::OniToPcd::outputFrameToPcd(const std::string outputFrameDirectory, const op
 	point_idx = 0;
 	RGBValue color;
 	color.Alpha = 0;
-	for (unsigned yIdx = 0; yIdx < colorHeight; ++yIdx, point_idx += skip)
+	for( unsigned yIdx = 0; yIdx < colorHeight; ++yIdx, point_idx += skip )
 	{
-		for (unsigned xIdx = 0; xIdx < colorWidth; ++xIdx, point_idx += step, value_idx += 3)
+		for( unsigned xIdx = 0; xIdx < colorWidth; ++xIdx, point_idx += step, value_idx += 3 )
 		{
 			PointT& pt = cloud->points[point_idx];
 
@@ -396,47 +449,56 @@ vba::OniToPcd::outputFrameToPcd(const std::string outputFrameDirectory, const op
 
 	// Output the point cloud to a pcd frame file
 	std::stringstream outputFrameFile;
-	outputFrameFile << outputFrameDirectory << "frame_" << std::setw(10) << std::setfill('0') << depthFrameReference.getFrameIndex() << ".pcd";
+	outputFrameFile << outputFrameDirectory << "frame_" << std::setw( 10 ) << std::setfill( '0' ) << depthFrameReference.getFrameIndex() << ".pcd";
 	pcl::PCDWriter w;
-	w.writeBinaryCompressed(outputFrameFile.str(), *cloud);
+	w.writeBinaryCompressed( outputFrameFile.str(), *cloud );
+	return ( cloud );
 }
 
-/// <summary>
-/// Fills a RGB24 image buffer using downsampling
-/// </summary>
-void vba::OniToPcd::fillBufferRGB(unsigned newWidth, unsigned newHeight, unsigned char* rgb_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step)
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Fills a RGB24 image buffer with downsampling
+///
+/// @param[in]	newWidth			Width of the new buffer image
+/// @param[in]	newHeight			Height of the new buffer image
+/// @param[out]	rgb_buffer			Buffer to fill with the new image
+/// @param[in]	oldWidth			Width of the input image
+/// @param[in]	oldHeight			Height of the input image
+/// @param[in]	colorFrameReference	Input image to copy
+/// @param[in]	rgb_line_step		Number of lines to step when downsampling
+///////////////////////////////////////////////////////////////////////////////////////
+void vba::OniToPcd::fillBufferRGB( const unsigned newWidth, const unsigned newHeight, unsigned char* rgb_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef colorFrameReference, unsigned rgb_line_step )
 {
-	if (newWidth > oldWidth || newHeight > oldHeight)
+	if( newWidth > oldWidth || newHeight > oldHeight )
 	{
 		std::stringstream notSupportedMessage;
 		notSupportedMessage << "Up-sampling not supported. Request was " << oldWidth << 'x' << oldHeight << " -> " << newWidth << 'x' << newHeight << ".\n";
-		sendOutput(notSupportedMessage.str(), false);
-		exit(13);
+		sendOutput( notSupportedMessage.str(), false );
+		exit( 13 );
 	}
 
-	if (newWidth == oldWidth && newHeight == oldHeight)
+	if( newWidth == oldWidth && newHeight == oldHeight )
 	{
-		unsigned line_size = newWidth * 3;
-		if (rgb_line_step == 0 || rgb_line_step == line_size)
+		const unsigned line_size = newWidth * 3;
+		if( rgb_line_step == 0 || rgb_line_step == line_size )
 		{
-			memcpy(rgb_buffer, colorFrameReference.getData(), colorFrameReference.getDataSize());
+			memcpy( rgb_buffer, colorFrameReference.getData(), colorFrameReference.getDataSize() );
 		}
 		else // line by line
 		{
 			unsigned char* rgb_line = rgb_buffer;
 			const unsigned char* src_line = static_cast<const unsigned char*>(colorFrameReference.getData());
-			for (unsigned yIdx = 0; yIdx < newHeight; ++yIdx, rgb_line += rgb_line_step, src_line += line_size)
+			for( unsigned yIdx = 0; yIdx < newHeight; ++yIdx, rgb_line += rgb_line_step, src_line += line_size )
 			{
-				memcpy (rgb_line, src_line, line_size);
+				memcpy( rgb_line, src_line, line_size );
 			}
 		}
 	}
-	else if (oldWidth % newWidth == 0 && oldHeight % newHeight == 0) // downsamplig
+	else if( oldWidth % newWidth == 0 && oldHeight % newHeight == 0 ) // downsamplig
 	{
 		unsigned src_step = oldWidth / newWidth;
 		unsigned src_skip = (oldHeight / newHeight - 1) * oldWidth;
 
-		if (rgb_line_step == 0)
+		if( rgb_line_step == 0 )
 			rgb_line_step = newWidth * 3;
 
 		unsigned dst_skip = rgb_line_step - newWidth * 3; // skip of padding values in bytes
@@ -444,14 +506,14 @@ void vba::OniToPcd::fillBufferRGB(unsigned newWidth, unsigned newHeight, unsigne
 		openni::RGB888Pixel* dst_line = reinterpret_cast<openni::RGB888Pixel*> (rgb_buffer);
 		const openni::RGB888Pixel* src_line = (openni::RGB888Pixel*)colorFrameReference.getData();
 
-		for (unsigned yIdx = 0; yIdx < newHeight; ++yIdx, src_line += src_skip)
+		for( unsigned yIdx = 0; yIdx < newHeight; ++yIdx, src_line += src_skip )
 		{
-			for (unsigned xIdx = 0; xIdx < newWidth; ++xIdx, src_line += src_step, dst_line ++)
+			for( unsigned xIdx = 0; xIdx < newWidth; ++xIdx, src_line += src_step, dst_line++ )
 			{
 				*dst_line = *src_line;
 			}
 
-			if (dst_skip != 0)
+			if( dst_skip != 0 )
 			{
 				// use bytes to skip rather than XnRGB24Pixel's, since line_step does not need to be multiple of 3
 				unsigned char* temp = reinterpret_cast <unsigned char*> (dst_line);
@@ -463,39 +525,47 @@ void vba::OniToPcd::fillBufferRGB(unsigned newWidth, unsigned newHeight, unsigne
 	{
 		std::stringstream notSupportedMessage;
 		notSupportedMessage << "Down-sampling only possible for integer scale. Request was " << oldWidth << 'x' << oldHeight << " -> " << newWidth << 'x' << newHeight << ".\n";
-		sendOutput(notSupportedMessage.str(), false);
-		exit(14);
+		sendOutput( notSupportedMessage.str(), false );
+		exit( 14 );
 	}
 }
 
-/// <summary>
-/// Fills a depth image buffer using downsampling
-/// </summary>
-void vba::OniToPcd::fillBufferDepth(unsigned newWidth, unsigned newHeight, unsigned short* depth_buffer, unsigned oldWidth, unsigned oldHeight, openni::VideoFrameRef depthFrameReference, unsigned line_step)
+///////////////////////////////////////////////////////////////////////////////////////
+/// @brief	Fills a depth image buffer with downsampling
+///
+/// @param[in]	newWidth			Width of the new buffer image
+/// @param[in]	newHeight			Height of the new buffer image
+/// @param[out]	depth_buffer		Buffer to fill with the new image
+/// @param[in]	oldWidth			Width of the input image
+/// @param[in]	oldHeight			Height of the input image
+/// @param[in]	depthFrameReference	Input image to copy
+/// @param[in]	line_step			Number of lines to step when downsampling
+///////////////////////////////////////////////////////////////////////////////////////
+void vba::OniToPcd::fillBufferDepth( const unsigned newWidth, const unsigned newHeight, unsigned short* depth_buffer, const unsigned oldWidth, const unsigned oldHeight, const openni::VideoFrameRef depthFrameReference, unsigned line_step )
 {
-	if (newWidth > oldWidth || newHeight > oldHeight)
+	if( newWidth > oldWidth || newHeight > oldHeight )
 	{
 		std::stringstream notSupportedMessage;
 		notSupportedMessage << "Up-sampling not supported. Request was " << oldWidth << 'x' << oldHeight << " -> " << newWidth << 'x' << newHeight << ".\n";
-		sendOutput(notSupportedMessage.str(), false);
-		exit(15);
+		sendOutput( notSupportedMessage.str(), false );
+		exit( 15 );
 	}
 
-	if (oldWidth % newWidth != 0 || oldHeight % newHeight != 0)
+	if( oldWidth % newWidth != 0 || oldHeight % newHeight != 0 )
 	{
 		std::stringstream notSupportedMessage;
 		notSupportedMessage << "Down-sampling only possible for integer scale. Request was " << oldWidth << 'x' << oldHeight << " -> " << newWidth << 'x' << newHeight << ".\n";
-		sendOutput(notSupportedMessage.str(), false);
-		exit(16);
+		sendOutput( notSupportedMessage.str(), false );
+		exit( 16 );
 	}
 
-	if (line_step == 0)
+	if( line_step == 0 )
 		line_step = newWidth * static_cast<unsigned> (sizeof (unsigned short));
 
 	// special case no sclaing, no padding => memcopy!
-	if (newWidth == oldWidth && newHeight == oldHeight && (line_step == newWidth * sizeof (unsigned short)))
+	if( newWidth == oldWidth && newHeight == oldHeight && (line_step == newWidth * sizeof (unsigned short)) )
 	{
-		memcpy (depth_buffer, depthFrameReference.getData(), depthFrameReference.getDataSize());
+		memcpy( depth_buffer, depthFrameReference.getData(), depthFrameReference.getDataSize() );
 		return;
 	}
 
@@ -507,18 +577,18 @@ void vba::OniToPcd::fillBufferDepth(unsigned newWidth, unsigned newHeight, unsig
 	unsigned ySkip = (oldHeight / newHeight - 1) * oldWidth;
 
 	// Fill in the depth image data, converting mm to m
-	short bad_point = std::numeric_limits<short>::quiet_NaN ();
+	const short bad_point = std::numeric_limits<short>::quiet_NaN ();
 	unsigned depthIdx = 0;
 
 	const unsigned short* inputBuffer = static_cast<const unsigned short*> (depthFrameReference.getData());
 
-	for (unsigned yIdx = 0; yIdx < newHeight; ++yIdx, depthIdx += ySkip)
+	for( unsigned yIdx = 0; yIdx < newHeight; ++yIdx, depthIdx += ySkip )
 	{
-		for (unsigned xIdx = 0; xIdx < newWidth; ++xIdx, depthIdx += xStep, ++depth_buffer)
+		for( unsigned xIdx = 0; xIdx < newWidth; ++xIdx, depthIdx += xStep, ++depth_buffer )
 		{
 			/// @todo Different values for these cases
 			unsigned short pixel = inputBuffer[depthIdx];
-			if (pixel == 0)
+			if( pixel == 0 )
 				*depth_buffer = bad_point;
 			else
 			{
@@ -526,7 +596,7 @@ void vba::OniToPcd::fillBufferDepth(unsigned newWidth, unsigned newHeight, unsig
 			}
 		}
 		// if we have padding
-		if (bufferSkip > 0)
+		if( bufferSkip > 0 )
 		{
 			char* cBuffer = reinterpret_cast<char*> (depth_buffer);
 			depth_buffer = reinterpret_cast<unsigned short*> (cBuffer + bufferSkip);
