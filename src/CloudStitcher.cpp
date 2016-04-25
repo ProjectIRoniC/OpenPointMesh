@@ -283,14 +283,26 @@ namespace vba
 		}
 
 		PointCloud::Ptr final_cloud( new PointCloud( global_cloud ));
-		vba::voxelGridFilter( final_cloud , final_cloud , 0.05 );
-		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 20 );
+		vba::voxelGridFilter( final_cloud , final_cloud , this->filter_leaf_size );
+		vba::statisticalOutlierFilter( final_cloud , final_cloud , 1.0 , 30 );
 
-		if( pcl::io::savePCDFile( this->output_path , *final_cloud , true ) == -1 )
+		std::string pcd_output_path = this->output_path;
+		pcd_output_path.append( ".pcd" );
+
+		if( pcl::io::savePCDFile( pcd_output_path , *final_cloud , true ) == -1 )
 		{
 			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
 			return -1;
 		}
+
+        std::string ply_output_path = this->output_path;
+        ply_output_path.append( ".ply" );
+
+		if( pcl::io::savePLYFileASCII( ply_output_path , *final_cloud ) == -1 )
+		{
+			this->sendOutput( "Error: Could not save final stitched cloud to specified output path.\n" , true );
+		}
+
 
 		float elapsed_time = float( std::clock() - begin_time ) / CLOCKS_PER_SEC;
 		output.str("");
@@ -322,7 +334,7 @@ namespace vba
 	}
 
 
-	int CloudStitcher::setFilterIntensity( unsigned int value )
+	int CloudStitcher::setFilterResolution( unsigned int value )
 	{
 		//make sure value is between 0 and 20
 		if( value < 0 || value > 20 )
@@ -343,6 +355,10 @@ namespace vba
 			this->filter_leaf_size = float( 0.01 * value );
 		}
 
+        std::stringstream output;
+        output << "filter size set to: " << this->filter_leaf_size << "\n";
+        this->sendOutput(output.str(), false);
+
 		return 0;
 	}
 
@@ -361,7 +377,7 @@ namespace vba
 		if( thread_count == 1 )
 		{
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 		}
 
 		//otherwise we are going to divide up the filename array as evenly as possible among all the threads
@@ -371,13 +387,13 @@ namespace vba
 			{
 				std::vector< std::string >::iterator last = ( current_offset + offset );
 				std::vector< std::string > param_vec( current_offset , last );
-				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+				this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 				current_offset = last - 1;
 			}
 
 			//to prevent a seg-fault we just copy whatever is left of the filename array into the last thread
 			std::vector< std::string > param_vec( current_offset , this->pcd_filenames->end() );
-			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished ));
+			this->worker_threads->push_back( new CloudStitcher::CloudStitchingThread( param_vec , this->output_buffer , &this->files_finished , this->filter_leaf_size ));
 
 		}
 	}
@@ -407,12 +423,13 @@ namespace vba
 	}
 
 
-	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished )
+	CloudStitcher::CloudStitchingThread::CloudStitchingThread( const std::vector< std::string >& files , boost::lockfree::spsc_queue<std::string>* buf , unsigned int* files_finished , float filter_res )
 	{
 		//we will make a copy of the list of target filenames for this instance of the class
 		this->file_list = new std::vector< std::string >( files );
 		this->worker_thread_is_finished = false;
 		this->files_finished = files_finished;
+		this->filter_leaf_size = filter_res;
 
 		this->output_buffer = buf;
 
@@ -483,13 +500,30 @@ namespace vba
             pcl::removeNaNFromPointCloud( *target , *target , indices );
 
             //original is 0.05
-            vba::statisticalOutlierFilter( source , source , 1.0 , 5 );
-            vba::statisticalOutlierFilter( target , target , 1.0 , 5 );
-            vba::voxelGridFilter( source , source , 0.05 );
-            vba::voxelGridFilter( target , target , 0.05 );
+            vba::voxelGridFilter( source , source , this->filter_leaf_size );
+            vba::voxelGridFilter( target , target , this->filter_leaf_size );
+            vba::statisticalOutlierFilter( source , source , 1.0 , 30 );
+            vba::statisticalOutlierFilter( target , target , 1.0 , 30 );
 
             //we input the two clouds to compare and the resulting transformation that lines them up is returned in pairTransform
             vba::pairAlign( source, target, pairTransform );
+
+
+            //We are making some changes to the resulting Transformation matrix to try and refine the accuracy of the model.
+            //Mostly getting rid of x and y translations as well as all rotations.
+            pairTransform( 0 , 0 ) = 1.0f;
+            pairTransform( 0 , 1 ) = 0.0f;
+            pairTransform( 0 , 2 ) = 0.0f;
+            pairTransform( 0 , 3 ) = 0.0f;
+            pairTransform( 1 , 0 ) = 0.0f;
+            pairTransform( 1 , 1 ) = 1.0f;
+            pairTransform( 1 , 2 ) = 0.0f;
+            pairTransform( 1 , 3 ) = 0.0f;
+            pairTransform( 2 , 0 ) = 0.0f;
+            pairTransform( 2 , 1 ) = 0.0f;
+            pairTransform( 2 , 2 ) = 1.0f;
+            //std::cout << "Z-transform: " << pairTransform( 2 , 3 ) << "\n";
+
 
             //update the global transform with the pairTransform returned from aligning the two clouds
             GlobalTransform = GlobalTransform * pairTransform;
@@ -505,6 +539,7 @@ namespace vba
             output_stream.str( "" );
             output_stream << "Registered Cloud " << ++*this->files_finished << "\n";
             output_buffer->push( output_stream.str() );
+            //std::cout << output_stream.str();
 
         }
 

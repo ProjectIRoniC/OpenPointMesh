@@ -8,6 +8,12 @@
 #include "../include/CloudStitcher.h"
 #include "../include/filesystemHelper.h"
 #include "../include/MeshConstructor.h"
+#include "../include/AccuracyControlMenu.h"
+#include "../include/AboutDialog.h"
+#include "../qtest/include/debugger.h"
+#include "../include/OPM_NiViewer.h"
+#include <QMessageBox>
+#include <QInputDialog>
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -40,6 +46,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     connect( this, SIGNAL(appendToConsole(QString)), this, SLOT(ensureCursorVisible(QString)) );
     connect( this, SIGNAL(cloudStitcherFinished(int)), this, SLOT(nextStep(int)) );
     connect( this, SIGNAL(meshConstructorFinished(int)), this, SLOT(nextStep(int)) );
+    connect( this, SIGNAL(omitFramesFinished(int)), this , SLOT(nextStep(int)) );
 
     // set initial values for varibles
     outputFolderName = QString( "" );
@@ -55,30 +62,36 @@ MainWindow::MainWindow( QWidget *parent ) :
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open a .ONI file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(openSlot()));
+    openAct->setObjectName("openAct");
 
     /* Exit */
     exitAct = new QAction(tr("&Exit"), this);
     exitAct->setShortcuts(QKeySequence::Close);
     exitAct->setStatusTip(tr("Exit the program"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(exitSlot()));
+    exitAct->setObjectName("exitAct");
 
     /* Omit Frames */
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
     omitFramesAct->setShortcuts(QKeySequence::Find);
     omitFramesAct->setStatusTip(tr("Select frames to omit"));
+    omitFramesAct->setCheckable(true);
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
+    omitFramesAct->setObjectName("omitFramesAct");
 
     /* Filter Accuracy */
     filterAccuracyAct = new QAction(tr("&Filter Accuracy"), this);
     filterAccuracyAct->setShortcuts(QKeySequence::New);
     filterAccuracyAct->setStatusTip(tr("Selecting accuracy of the program may effects run time"));
     connect(filterAccuracyAct, SIGNAL(triggered()), this, SLOT(filterAccuracySlot()));
+    filterAccuracyAct->setObjectName("filterAccuracyAct");
 
-    /* Mesh Accuracy */
-    meshAccuracyAct = new QAction(tr("&Mesh Accuracy"), this);
-    meshAccuracyAct->setShortcuts(QKeySequence::Italic);
-    meshAccuracyAct->setStatusTip(tr("Select mesh creation accuracy"));
-    connect(meshAccuracyAct, SIGNAL(triggered()), this, SLOT(meshAccuracySlot()));
+    /* Change the samplerate for an oni video*/
+    sampleRateAct = new QAction(tr("&Oni Sample Rate"), this);
+    sampleRateAct->setShortcuts(QKeySequence::Save);
+    sampleRateAct->setStatusTip(tr("Changes sample frame rate (per second)"));
+    connect(sampleRateAct, SIGNAL(triggered()), this, SLOT(sampleFrameRateSlot()));
+    sampleRateAct->setObjectName("sampleRateAct");
 
     /* About */
     aboutAct = new QAction(tr("&About"), this);
@@ -86,12 +99,32 @@ MainWindow::MainWindow( QWidget *parent ) :
     aboutAct->setStatusTip(tr("About"));
     // connect(aboutAct, SIGNAL(triggered()), qApp, SLOT(aboutSlot()));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(aboutSlot()));
+    aboutAct->setObjectName("aboutAct");
 
     /* View Wiki Page */
     viewWikiAct = new QAction(tr("&Wiki"), this);
     viewWikiAct->setShortcuts(QKeySequence::Underline);
     viewWikiAct->setStatusTip(tr("Wiki Page"));
     connect(viewWikiAct, SIGNAL(triggered()), this, SLOT(viewWikiSlot()));
+    viewWikiAct->setObjectName("viewWikiAct");
+
+    meshOutputOBJAct = new QAction( tr( "&OBJ") , this );
+    meshOutputPLYAct = new QAction( tr( "&PLY") , this );
+    meshOutputVTKAct = new QAction( tr( "&VTK") , this );
+    meshOutputFiletypeAct = new QActionGroup( this );
+
+    meshOutputOBJAct->setObjectName("meshOutputOBJAct");
+    meshOutputPLYAct->setObjectName("meshOutputPLYAct");
+    meshOutputVTKAct->setObjectName("meshOutputVTKAct");
+
+    meshOutputFiletypeAct->addAction( meshOutputOBJAct );
+    meshOutputFiletypeAct->addAction( meshOutputPLYAct );
+    meshOutputFiletypeAct->addAction( meshOutputVTKAct );
+
+    meshOutputOBJAct->setCheckable( true );
+    meshOutputPLYAct->setCheckable( true );
+    meshOutputVTKAct->setCheckable( true );
+    meshOutputPLYAct->setChecked( true );
 
     /* create menu */
     fileMenu = menuBar()->addMenu(tr("&File"));
@@ -102,20 +135,43 @@ MainWindow::MainWindow( QWidget *parent ) :
     fileMenu->addAction(openAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
+    fileMenu->setObjectName("fileMenu");
 
     settingMenu->addAction(omitFramesAct);
+    settingMenu->addAction(sampleRateAct);
     settingMenu->addAction(filterAccuracyAct);
-    settingMenu->addAction(meshAccuracyAct);
     settingMenu->addSeparator();
+
+    meshOutputSubMenu = settingMenu->addMenu( "Mesh Output Filetype" );
+    //meshOutputSubMenu->addAction( meshOutputFiletypeAct );
+    meshOutputSubMenu->addAction( meshOutputOBJAct );
+    meshOutputSubMenu->addAction( meshOutputPLYAct );
+    meshOutputSubMenu->addAction( meshOutputVTKAct );
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputOBJSlot() ));
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputPLYSlot() ));
+    connect( meshOutputOBJAct , SIGNAL( triggered() ) , this , SLOT( meshOutputVTKSlot() ));
 
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(viewWikiAct);
     helpMenu->addSeparator();
 
+    accuracyControlMenu = new AccuracyControlMenu( this );
+    connect( accuracyControlMenu , SIGNAL( accepted() ) , this , SLOT( onAccuracyControlDialogClose() ));
+
+    aboutDialog = new AboutDialog( this );
+
     // Set initial button state
     setInitialButtonState();
 
+    this->accuracy_control_value = 5;
+    this->mesh_filetype = vba::PLY;
+
+    this->samplingRate = vba::DEFAULT_FRAME_SKIP;
+    this->hasSamplingRate = false;
+
 }
+
+
 
 /*
  * ***************************Action button Controls***************************
@@ -133,29 +189,72 @@ void MainWindow::exitSlot()
 
 void MainWindow::omitFramesSlot()
 {
-    std::cout << "inside omitframesslot\n";
+    /* omitFrameAct retains the check status */
+    /* send message to output */
+    if(omitFramesAct->isChecked()) {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " enabled\n");
+    }
+    else {
+        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " disabled\n");
+    }
 }
 
 void MainWindow::filterAccuracySlot()
 {
-    std::cout << "inside filteraccuracyslot\n";
+    accuracyControlMenu->setAccuracyValue( this->accuracy_control_value );
+    accuracyControlMenu->show();
 }
 
-void MainWindow::meshAccuracySlot()
+void MainWindow::meshOutputOBJSlot()
 {
-    std::cout << "inside mesh accuracy slot\n";
+    this->mesh_filetype = vba::OBJ;
+
+}
+
+void MainWindow::meshOutputPLYSlot()
+{
+    this->mesh_filetype = vba::PLY;
+
+}
+
+void MainWindow::meshOutputVTKSlot()
+{
+    this->mesh_filetype = vba::VTK;
+}
+
+void MainWindow::sampleFrameRateSlot()
+{
+    do {
+        hasSamplingRate = false;
+        samplingRate = QInputDialog::getInt(this,
+                                        tr("QInputDialog::getInt()"),
+                                        "label",
+                                        samplingRate,
+                                        vba::DEFAULT_FRAME_SKIP,
+                                        vba::MAX_FRAME_SKIP,
+                                        1,
+                                        &hasSamplingRate);
+
+        if (hasSamplingRate && vba::OniToPcd::minimumSamplingRate(samplingRate))
+        {
+            return;
+        }
+    } while( hasSamplingRate && !vba::OniToPcd::minimumSamplingRate(samplingRate));
 }
 
 void MainWindow::aboutSlot()
 {
-    QMessageBox::about(this, tr("About Menu"),
-            tr("This <b>messagebox</b> example shows how we can create "
-               "an about page or instructions."));
+    aboutDialog->show();
 }
 
 void MainWindow::viewWikiSlot()
 {
-    std::cout << "inside view wiki slot\n";
+    QDesktopServices::openUrl( QUrl( "https://github.com/ProjectIRoniC/OpenPointMesh/wiki" ));
+}
+
+void MainWindow::onAccuracyControlDialogClose()
+{
+    this->accuracy_control_value = this->accuracyControlMenu->getAccuracyValue();
 }
 
 /*
@@ -176,10 +275,14 @@ void MainWindow::setButtonsAllDisabledState()
 
 MainWindow::~MainWindow()
 {
+    done = true;
     delete outputBuffer;
     delete outputMessageThread;
     delete taskThread;
     delete ui;
+
+    delete accuracyControlMenu;
+    delete aboutDialog;
     // TODO add cleanup for threads
 }
 
@@ -191,25 +294,34 @@ void MainWindow::ensureCursorVisible( QString s )
 void MainWindow::nextStep( const int& step )
 {
     switch( step ) {
-
+    case OMITFRAMES:
+        setButtonsAllDisabledState();
+        clearTaskThread();
+        taskThread = new boost::thread( &MainWindow::omitFramesController, this );
+        break;
     case ONITOPCD:
+        workingOnFile = true;
         setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::oniToPCDController, this );
         break;
     case CLOUDSTITCHER :
+        workingOnFile = true;
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::cloudStitcherController, this );
         break;
     case MESHCONSTRUCTOR:
+        workingOnFile = true;
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::meshConstructorController, this );
         break;
     case FINISHED:
+        workingOnFile = false;
         clearTaskThread();
         setInitialButtonState();
         break;
     default :
+        workingOnFile = false;
         setInitialButtonState();
         QString errmsg = "MESSAGE: Well this is embarassing, there seems to be an ";
         errmsg += "error with my instruction set and I not quiet sure how to fix it. ";
@@ -243,7 +355,21 @@ void MainWindow::meshConstructorController()
     appendMessageToOutputBuffer( "File used for construction " + mMeshConstructor->getInputFilename()  + '\n');
     //pass in a string of the output path where the final mesh should be sent. The file does not have to exist already.
     //The second parameter lets you choose the output filetype. I would just stick with PLY for now.
-    mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.ply" , vba::PLY );
+    if( this->mesh_filetype == vba::OBJ )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.obj" , this->mesh_filetype );
+    }
+
+    if( this->mesh_filetype == vba::PLY )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.ply" , this->mesh_filetype );
+    }
+
+    if( this->mesh_filetype == vba::VTK )
+    {
+        mMeshConstructor->setOutputFilename( this->outputFolderName.toStdString() + "/finished_mesh.vtk" , this->mesh_filetype );
+    }
+
     appendMessageToOutputBuffer( "Output final mesh to " + mMeshConstructor->getOutputFilename() + '\n');
 
     //this does the rest
@@ -259,16 +385,17 @@ void MainWindow::cloudStitcherController()
     appendMessageToOutputBuffer( "Start point cloud stitching...\n" );
     vba::CloudStitcher* mCloudStitcher = new vba::CloudStitcher;
 	mCloudStitcher->setOutputBuffer( this->outputBuffer );
-    
+	mCloudStitcher->setFilterResolution( this->accuracy_control_value );
+
 	// Loop through each input file
 	for( int h = 0; h < oniFileNames.size(); ++h )
 	{
         appendMessageToOutputBuffer( "Working on stitching " + oniFileNames[h].toStdString() + "...\n" );
-		mCloudStitcher->setOutputPath( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "_finalPointCloud.pcd") );
+		mCloudStitcher->setOutputPath( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "_finalPointCloud") );
         appendMessageToOutputBuffer( "Output final point cloud to " + mCloudStitcher->getOutputPath() + '\n');
 		mCloudStitcher->stitchPCDFiles( vba::filesystemhelper::getOutputFileName(this->outputFolderName.toStdString(), oniFileNames[h].toStdString(), "") );
 	}
-    
+
     delete mCloudStitcher;
     emit cloudStitcherFinished( MESHCONSTRUCTOR );
 }
@@ -309,19 +436,20 @@ void MainWindow::oniToPCDController()
         appendMessageToOutputBuffer( "ERROR: Please browse for an .ONI file before clicking start.\n" );
         return;
     }
-	
+
     appendMessageToOutputBuffer( "Start oni data output...\n" );
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
-	unsigned frameSkipMod = 25;
+    unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
-	
-	// Loop through each input file
+
+	// Loop through each input file and its associated set of omitted frames, which may be an empty set
 	for( int i = 0; i < oniFileNames.size(); ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
+        oniReader->setOmmittedFrames( this->ommittedFrames[i] );
 	}
-	
+
     emit oniToPCDFinished( CLOUDSTITCHER );
 
 }
@@ -330,10 +458,16 @@ void MainWindow::oniToPCDController()
 
 void MainWindow::on_Browse_output_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+    QString dir;
+    if(debugger::QTESTING && !outputFolderName.isEmpty()) {
+            dir = outputFolderName;
+    }
+    else {
+        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                        "/home",
+                                                        QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
+    }
 
     if( dir.size() > 0 )
     {
@@ -350,7 +484,7 @@ void MainWindow::on_Browse_output_clicked()
 
 void MainWindow::on_Start_clicked()
 {
-    emit start( ONITOPCD );
+    emit start( OMITFRAMES );
 }
 
 // ** Helper Functions ** //
@@ -363,11 +497,18 @@ void MainWindow::appendMessageToOutputBuffer( std::string msg,const bool is_erro
 
 void MainWindow::on_oni_browse_button_clicked()
 {
-    QStringList files = QFileDialog::getOpenFileNames(
-                this,
-                "Select one or more files to open",
-                "/home",
-                "Text files (*.oni)");
+    QStringList files;
+    if(debugger::QTESTING && !ui->textBrowser->toPlainText().isEmpty()) {
+            files << ui->textBrowser->toPlainText().split(";", QString::SkipEmptyParts);
+    }
+    else {
+        files = QFileDialog::getOpenFileNames(
+                    this,
+                    "Select one or more files to open",
+                    "/home",
+                    "Text files (*.oni)");
+    }
+
     if( files.size() > 0 )
     {
         oniFileNames = files;
@@ -386,4 +527,37 @@ void MainWindow::on_oni_browse_button_clicked()
     {
         appendMessageToOutputBuffer( "No .ONI file selected\n" );
     }
+}
+
+void MainWindow::omitFramesController()
+{
+    int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
+    this->ommittedFrames.push_back(std::set<int> (of, of+22));
+
+    emit omitFramesFinished( ONITOPCD );
+}
+
+/* Setters and Getters */
+
+void MainWindow::setTextBrowser(QString txt)
+{
+    ui->textBrowser->setText(txt);
+}
+QString MainWindow::getTextBrowser()
+{
+    return ui->textBrowser->toPlainText();
+}
+
+void MainWindow::setOutputFolderName(QString txt)
+{
+    outputFolderName = txt;
+}
+
+QString MainWindow::getOutputFolderName() {
+    return outputFolderName;
+}
+
+bool MainWindow::hasStartedWorkingOnFile()
+{
+    return workingOnFile;
 }

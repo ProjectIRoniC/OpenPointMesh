@@ -21,6 +21,8 @@ vba::OniToPcd::OniToPcd()
 	, outputDirPath( "output" )
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
+	, ommittedFrames()
+	, setDebugMode( false )
 {
 	init();
 }
@@ -37,7 +39,25 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 	, outputDirPath( outputDirectoryPath )
 	, outputBuffer( _outputBuffer )
 	, redirectOutputFlag( true )
+	, setDebugMode( false )
 {
+	init();
+}
+
+/*Overloaded constructor
+*
+* @param: outputDirectoryPath - path to where output files will be written
+* @param: frameSkipModulus - how many frames to skip between reading a frame
+* @param: omitFrames - frames to be excluded from sampling
+*/
+vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& _ommittedFrames )
+	: frameSkip( frameSkipModulus )
+	, outputDirPath( outputDirectoryPath )
+	, outputBuffer( _outputBuffer )
+	, redirectOutputFlag( true )
+	, ommittedFrames(_ommittedFrames)
+{
+	setDebugMode( false );
 	init();
 }
 
@@ -45,8 +65,6 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 vba::OniToPcd::~OniToPcd()
 {
 	openni::OpenNI::shutdown();
-	
-	delete outputBuffer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +81,8 @@ void vba::OniToPcd::setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _
 {
 	outputBuffer = _outputBuffer;
 	redirectOutputFlag = true;
+        if( debugMode == true )
+            sendOutput( "setOutputBuffer worked" , false );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +104,31 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
+void vba::OniToPcd::setOmmittedFrames( const std::set<int>& of ) 
+{
+	this->ommittedFrames = of;  
+}
+
+/*Public facing function that sets debug mode to true for testing purposes.
+*
+*/
+void vba::OniToPcd::setDebugMode( bool debugBool )
+{
+        this->debugMode = debugBool;
+}
+
+/*Public facing function that checks if a value meets the minimum frame sampling rate
+*
+* @param: The positive integer frame sampling rate to check
+*
+* @return: returns true if the value provided meets or is greater than the minimum value
+*			returns false if the value provided is less than the minimum value
+*/
+bool vba::OniToPcd::minimumSamplingRate (int sampleRate) 
+{
+	return sampleRate >= vba::DEFAULT_FRAME_SKIP;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 /// @brief	Reads an oni file and exports data as excel docs and point clouds
 ///
@@ -92,13 +137,30 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 ///////////////////////////////////////////////////////////////////////////////////////
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
+	for (std::set<int>::iterator it=this->ommittedFrames.begin(); it != this->ommittedFrames.end(); ++it)
+	{
+		std::cout << '\n' << *it << '\n';
+	}
+    
 	// Open the .oni file
 	openni::Device device;
 	openni::Status rc = device.open( inputFile.c_str() );
 	if( rc != openni::STATUS_OK )
 	{
-		sendOutput( "Couldn't open device\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
+		if( debugMode == true )
+		{
+			sendOutput( "Couldn't open device" , false );
+		}
+		else
+		{
+			sendOutput( "Couldn't open device\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
+		}
 		return -1;
+	}
+	else
+	{
+		if( debugMode == true)
+			sendOutput( "Device opened" , false );
 	}
 	
 	// Device Check
@@ -132,7 +194,6 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 		sendOutput( "Couldn't create depth stream\n" + std::string(openni::OpenNI::getExtendedError()) + '\n', true );
 		return -1;
 	}
-	sendOutput( "File open success...\n", false );
 
 	// Set playback controls
 	openni::PlaybackControl* pbc = device.getPlaybackControl();
@@ -603,4 +664,3 @@ void vba::OniToPcd::fillBufferDepth( const unsigned newWidth, const unsigned new
 		}
 	}
 }
-

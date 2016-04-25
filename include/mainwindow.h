@@ -1,3 +1,12 @@
+/*
+ * @file    mainwindow.h
+ * @brief   This is the main gui window for Mesh Generation. At least (1) .oni file is required to run
+ *          through the program.
+ * @bug     Opening multiple windows has not been fully test.
+ * @bug     Closing the window after mesh construction has already begun but has not be finished may create zombie process.
+ *
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -6,9 +15,16 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPlainTextEdit>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QActionGroup>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
-
+#include "AccuracyControlMenu.h"
+#include "AboutDialog.h"
+#include "MeshConstructor.h"
+#include <set>
+#include <vector>
 
 class QAction;
 class QActionGroup;
@@ -18,7 +34,6 @@ class QMenu;
 namespace Ui {
 class MainWindow;
 }
-//class MainWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -27,22 +42,48 @@ class MainWindow : public QMainWindow
 public:
 
     /*
-     * Constructor
-     */
+    @brief a brief description
+    @details a more detailed description
+    @pre any preconditions if they exist
+    @param any parameters used if they exist
+    @return expected return values
+    */
 
-    /* Post: Initialize GUI object */
+    /*
+    @brief      Constructor for mainwindow class
+    @details    Initializes signals and slots for gui.
+    @pre        None
+    @return     GUI has been initialized
+    */
     explicit MainWindow( QWidget *parent = 0 );
 
     /*
-     * Destructor
-     */
+        @brief      Destructor mainwindow object
+        @details    QT library will delete its own dynamic objects. Use this to remove non QT objects that you create.
+        @return     mainwindow object has been destoryed
+    */
     ~MainWindow();
+
+    void setTextBrowser(QString txt);
+
+    QString getTextBrowser ();
+
+    void setOutputFolderName(QString txt);
+
+    QString getOutputFolderName();
+
+    bool hasStartedWorkingOnFile();
+
 
 private:
     /*
-     * Pre:  Msg contains a non null string to be output to GUI display
-     * Post: Msg has been added to GUI display.
-     * Note: Currently does not support is_error effect
+     * @brief       Adds a message to be displayed as output on the details panel
+     * @details     Adds msg to outputBuffer
+     * @pre         outputBuffer has been initialized
+     * @param:      msg contains the the string that will be added to outputBuffer
+     * @param:      is_error - flag that indicates if the message should be treated normally or like an error
+     * @bug         currently does not support is_error
+     * @return      Msg has been added to GUI outputBuffer
      */
     void appendMessageToOutputBuffer( std::string msg, const bool is_error = false );
 
@@ -50,20 +91,30 @@ private:
      * Pre:  outputBuffer has been initialized to a non-null object.
      * Post: If outputBuffer is non-empty then element is send to appenedMessage
      */
+    /*
+     * @brief       Adds msg to outputBuffer
+     * @details     Polls the outputbuffer to see if there is something to be added to details panel
+     * @pre         outputBuffer has been initialized to a non-null object.
+     * @return      If outputBuffer is non-empty then element is send to appenedMessage
+     */
     void processOutputQueue();
 
-    /* Pre:  All buttons are either enabled(true) or enabled(false).
-     * Post: Browse_oni    = enabled
-     *       Browse_output = disabled
-     *       Start         = disabled
-     *       Close         = enabled
+    /*
+     * @brief       Sets initial button state
+     * @pre         All buttons in GUI have been initliazed
+     * @return      Browse_oni    = enabled
+     *              Browse_output = disabled
+     *              Start         = disabled
+     *              Close         = enabled
      */
     void setInitialButtonState() ;
 
     /*
-     * Post: Browse_oni    = disabled
-     *       Browse_output = disabled
-     *       Start         = disabled
+     * @brief       Sets initial button state
+     * @pre         All buttons in GUI have been initliazed
+     * @return      Browse_oni    = disabled
+     *              Browse_output = disabled
+     *              Start         = disabled
      */
     void setButtonsAllDisabledState();
 
@@ -73,23 +124,26 @@ private:
 private slots:
 
     /*
-     * Pre:  oniFileName points to an oni file. outpuFolderName points to dir where output will be placed
-     * Post: Begins oni to mesh transformation
+     * @pre         oniFileName points to an oni file. outpuFolderName points to dir where output will be placed
+     * @return      Begins oni to mesh transformation
      */
     void on_Start_clicked();
+
     /*
-     * Pre:  constrollerConstant must from the controller constants set
-     * Post: nextstep for given constant is executed.
-     * Note: This is where software flow is defined. Connect signal to a slot and call nextStep at the end of
-     *       every subtask passing the controller constant for the next action to be performed
+     * @pre:        constrollerConstant must from the controller constants set
+     * @return:     nextstep for given constant is executed.
+     * @brief:      This is where software flow is defined. Connect signal to a slot and call nextStep at the end of
+     *              every subtask passing the controller constant for the next action to be performed
      */
     void nextStep( const int& controllerConstant );
     /*
-     * Post: Opens files explorer so that the user can select an output folder. outputFolderName stores absolute path
+     * @return: Opens files explorer so that the user can select an output folder. outputFolderName stores absolute path
      */
     void on_Browse_output_clicked();
     /*
-     * Post: Display concole is moved to the cursor position
+     * @brief       Slot that controls where the cursor is on the display panel
+     * @param       QString is a placerholder object. Connected signals and slots require the same parameters. Currently depends on appendToConsole signal
+     * @return      Display concole is moved to the cursor position
      * Note: Not sure if this is needed.
      */
     void ensureCursorVisible( QString );
@@ -97,59 +151,95 @@ private slots:
     /*
      * Menu functions
      */
+
     /*
-     * Post: Opens file explorer to choose .oni file.
-     *       Path is stored in onifileName
+     * @brief       Slot needs to be connected to a signal to use
+     * @return:     Opens file explorer to choose .oni file. Path is stored in onifileName
      */
     void openSlot();
+
     /*
-     * Post: Closes application. Destroys GUI
+     * @brief       Slot needs to be connected to a signal to use
+     * @return: Closes application. Destroys GUI
      */
     void exitSlot();
+
+    /*
+     * @brief       Slot needs to be connected to a signal to use
+     * @pre         Must be a number. Rules for this number are defined within
+     *              oni-to-pcd class.
+     * @return      Opens a new window for the user to input a sample rate.
+     *
+     */
+    void sampleFrameRateSlot();
+
+    /*
+     * @brief       Slot needs to be connected to a signal to use
+     * @pre         aboutDialog class contains information to be presented to user when selected
+     * @return      Opens aboutdialog class.
+     *
+     */
+    void aboutSlot();
+    /*
+     * @brief       Slot needs to be connected to a signal to use
+     * @pre         URL for wiki page online must exist. URL defined within function
+     * @return      Opens default browser to specified url.
+     *
+     */
+    void viewWikiSlot();
+
 
     /*
      * Not Implemented
      */
     void omitFramesSlot();
     void filterAccuracySlot();
-    void meshAccuracySlot();
-    void aboutSlot();
-    void viewWikiSlot();
 
+    void meshOutputOBJSlot();
+    void meshOutputPLYSlot();
+    void meshOutputVTKSlot();
 
 
     void on_oni_browse_button_clicked();
 
+    void onAccuracyControlDialogClose();
+
 signals:
     /*
-     * Pre:  msg is non-nul / non-empty.
-     * Post: AppendMessage has been called with msg. EnsureCursorvisibile has also been called.
+     * @brief       Signals are emitted
+     * @pre:        msg is non-nul / non-empty.
+     * @return:     AppendMessage has been called with msg. EnsureCursorvisibile has also been called.
      */
     void appendToConsole( QString msg );
-
 
     /*
      * Program Flow
      */
+
     /*
-     * Start is not really needed. Start is for readability. Start signal is attached to nextstep.
-     * Post: nextStep has been called
+     * @details     Start is not really needed. Start is for readability. Start signal is attached to nextstep.
+     * @return      nextStep has been called
      */
     void start( int );
     /*
-     * Signal that marks the end of onitToPcd conversion.
-     * Post: nextStep is called
+     * Sginal that marks the end of the omit frames component
+     * Post: nextstep is called with passed int
+     */
+    void omitFramesFinished(int);
+    /*
+     * @brief     Signal that marks the end of onitToPcd conversion.
+     * @return    nextStep is called
      */
     void oniToPCDFinished( int );
     /*
-     * Signal that marks the end of cloudstiching.
-     * Post: nextstep is called
+     * @brief       Signal that marks the end of cloudstiching.
+     * @return      nextstep is called
      */
     void cloudStitcherFinished( int );
 
     /*
-     * Sginal that marks the end of the mesh construction
-     * Post: nextstep is called with passed int
+     * @brief       Sginal that marks the end of the mesh construction
+     * @return      nextstep is called with passed int
      */
     void meshConstructorFinished( int );
 
@@ -165,8 +255,16 @@ private:
     static const int ONITOPCD = 0;
     static const int CLOUDSTITCHER = 1;
     static const int MESHCONSTRUCTOR = 2;
-    static const int FINISHED = 3;
+    static const int OMITFRAMES = 3;
+    static const int FINISHED = 4;
 
+    std::vector<std::set<int> > ommittedFrames;
+
+    /*
+     * if the user has changed the sampleing rate
+     */
+    bool hasSamplingRate;
+    int samplingRate;
     /*
      * Main ui
      */
@@ -192,6 +290,12 @@ private:
      */
     boost::thread* taskThread;
 
+
+    unsigned int accuracy_control_value;
+
+    //holds the filetype that the mesh will be outputted to
+    vba::MESH_FILETYPE mesh_filetype;
+
     /*
      * Actions for menue
      */
@@ -199,9 +303,14 @@ private:
     QAction *exitAct;
     QAction *omitFramesAct;
     QAction *filterAccuracyAct;
-    QAction *meshAccuracyAct;
+    QAction *sampleRateAct;
     QAction *aboutAct;
     QAction *viewWikiAct;
+
+    QActionGroup *meshOutputFiletypeAct;
+    QAction *meshOutputPLYAct;
+    QAction *meshOutputOBJAct;
+    QAction *meshOutputVTKAct;
 
     /*
      * Menu
@@ -209,37 +318,61 @@ private:
     QMenu *fileMenu;
     QMenu *settingMenu;
     QMenu *helpMenu;
+    QMenu *meshOutputSubMenu;
+
+
+    /*
+     * Dialog Boxes
+     */
+     AccuracyControlMenu* accuracyControlMenu;
+     AboutDialog* aboutDialog;
 
     /*
      * Marks the completion of the last step of controller constants
      * Used for processing outputbuffer.
+     * TODO : check where this is being monitored. May be obselete
      */
     bool done;
+
+    /* True when the start button has been pressed and through all processes until final
+     * output file is created */
+    bool workingOnFile;
+
     /*
-     * Pre:  outputBuffer is non-null
-     * Post: outputbuffer elements are being removed and entered into display concole
+     * @Pre:        outputBuffer is non-null
+     * @return:     outputbuffer elements are being removed and entered into display concole
      */
     void checkOutputBuffer();
     /*
-     * Controller for ONI to pcd module
-     * Post: oni file has been converted to many pcd file
+     * @brief       Controller for ONI to pcd module
+     * @return      oni file has been converted to many pcd file
      */
     void oniToPCDController();
     /*
-     * Controller for multiple pcd file to single point cloud file
-     * Post: final pointcloud file has been generated from pcd files
+     * @brief       Controller for multiple pcd file to single point cloud file
+     * @return      final pointcloud file has been generated from pcd files
      */
     void cloudStitcherController();
     /*
-     * Conroller for point cloud file to mesh
-     * Post: point cloud file has been converted to single mesh file
+     * @brief       Conroller for point cloud file to mesh
+     * @return      point cloud file has been converted to single mesh file
      */
     void meshConstructorController();
+
     /*
-     * Stops and deletes task thread.
+     * Controller for omit frames component.
+     * Pre:  oniFileNames contains a list of oni files.
+     *       a viewer will be presented to the user so that they may select what
+     *       frames to omit
+     * Post: the viewer has been called with each file in oniFileNames
+     */
+    void omitFramesController();
+
+    /*
+     * @brief       Stops and deletes task thread.
+     * @return      task thread has been stopped and deallocated
      */
     void clearTaskThread();
-
 
 };
 

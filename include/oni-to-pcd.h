@@ -8,6 +8,7 @@
 #include <pcl/io/openni2/openni.h>
 #include <pcl/point_cloud.h>
 #include <boost/lockfree/spsc_queue.hpp>
+#include <set>
 
 #ifndef _ONI_TO_PCD
 #define _ONI_TO_PCD
@@ -28,7 +29,8 @@ namespace vba
 			uint32_t long_value;		//!< RGBA color value in long format
 		} RGBValue;
 		
-	const int DEFAULT_FRAME_SKIP = 10;	//!< Lowest number of frames to skip between reading a frame
+	static const int DEFAULT_FRAME_SKIP = 10;	//!< Lowest number of frames to skip between reading a frame
+	static const int MAX_FRAME_SKIP = 100;		//!< Highest number of frames to skip between reading a frame
 	
 	/// @brief A class to handle the reading of an oni file and output the data to csv and point cloud files
 	class OniToPcd
@@ -38,13 +40,31 @@ namespace vba
 
 			OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer );
 
+			OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& omitFrames );
+			
 			virtual ~OniToPcd();
 
 			void setOutputBuffer( boost::lockfree::spsc_queue<std::string>* _outputBuffer );
 			
 			void setFrameSkip( const int framesToSkip );
 			
+			void setDebugMode( bool debugBool);
+
+			/*Public facing function that gets the number of frames to skip between reading a frame.
+			*
+			*/
+			int getFrameSkip() { return frameSkip; }
+
+			/*Public facing function that gets the debug mode bool.
+			*
+			*/
+			int getDebugMode() { return debugMode; }
+			
 			int outputOniData( const std::string inputFile );
+			
+			static bool minimumSamplingRate (int sampleRate);
+			
+			void setOmmittedFrames( const std::set<int>& of );
 			
 		private:
 			void init();
@@ -65,6 +85,8 @@ namespace vba
 			std::string outputDirPath;								//!< Directory to put all output files
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;	//!< Function Pointer to message output buffer
 			bool redirectOutputFlag;								//!< True to redirct display messages to the output buffer, false otherwise
+			std::set<int> ommittedFrames;
+			bool debugMode;
 	};
 };
 

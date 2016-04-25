@@ -151,45 +151,20 @@ namespace vba
 
 		PointCloud::Ptr cloud( new PointCloud );
 		pcl::io::loadPCDFile( this->input_filename , *cloud );
-        ss << "Original Cloud Size: " << cloud->size() << "\n";
 
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr radius_remove_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cond_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
 
-		pcl::VoxelGrid< pcl::PointXYZRGB  > voxel_filter;
-		voxel_filter.setLeafSize( 0.1 , 0.1 , 0.1 );
-		voxel_filter.setInputCloud( cloud  );
-		voxel_filter.filter( *filtered_cloud );
-
-        ss << "New Cloud Size: " << filtered_cloud->size() << "\n";
-        ss << "Removed " << cloud->size() - filtered_cloud->size() << " points.";
-        this->sendOutput(ss);
-        ss.str("");
-
-		pcl::RadiusOutlierRemoval< pcl::PointXYZRGB > radius_remove;
-
-		radius_remove.setInputCloud( filtered_cloud );
-		radius_remove.setRadiusSearch( 0.5 );
-		radius_remove.setMinNeighborsInRadius( 75  );
-		radius_remove.filter( *radius_remove_cloud );
-
-        ss << "\nRadius Removal Cloud Size: " << radius_remove_cloud->size() << "\n";
-        ss << "Removed " << filtered_cloud->size() - radius_remove_cloud->size() <<  " points.";
-        this->sendOutput(ss);
-        ss.str("");
 
 		pcl::NormalEstimation< PointT , PointNormal > normal_estimator;
 		PointCloudNormals::Ptr normals( new PointCloudNormals );
 		pcl::search::KdTree< PointT >::Ptr tree( new pcl::search::KdTree< PointT > );
-		tree->setInputCloud( radius_remove_cloud );
-		normal_estimator.setInputCloud( radius_remove_cloud );
+		tree->setInputCloud( cloud );
+		normal_estimator.setInputCloud( cloud );
 		normal_estimator.setSearchMethod( tree );
 		normal_estimator.setKSearch( 50 );
 		normal_estimator.compute( *normals );
 
 		pcl::PointCloud< PointNormal >::Ptr cloud_normals( new pcl::PointCloud< PointNormal > );
-		concatenateFields (*normals , *radius_remove_cloud, *cloud_normals);
+		concatenateFields (*normals , *cloud, *cloud_normals);
 
 		pcl::search::KdTree< PointNormal >::Ptr tree2 (new pcl::search::KdTree< PointNormal >);
 		tree2->setInputCloud( cloud_normals );

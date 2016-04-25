@@ -63,10 +63,6 @@ IF( NOT CMAKE_CXX_STANDARD )
 	SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 ENDIF()
 
-# Add SuperBuild custom scripts to CMake module path
-SET( SUPERBUILD_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/CMake")
-LIST( APPEND CMAKE_MODULE_PATH ${SUPERBUILD_CMAKE_DIR} ${CMAKE_MODULE_PATH} )
-
 # cmake includes
 INCLUDE( CMakeDependentOption )
 INCLUDE( ExternalProject )

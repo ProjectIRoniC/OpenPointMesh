@@ -1,0 +1,72 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 FATAL_ERROR )
+PROJECT( OpenPointMeshTests )
+
+#### Package Dependencies
+FIND_PACKAGE( Qt4 REQUIRED )
+FIND_PACKAGE( VTK REQUIRED )
+FIND_PACKAGE( PCL 1.7 REQUIRED )
+
+enable_testing()
+
+
+
+#### Variables
+FILE( GLOB OPENPOINTMESH_HEADERS "../include/*.h" "include/*.h" )
+#SET( OPENPOINTMESH_SOURCES  "src/main.cpp" "src/mainwindow.cpp" "src/qtestsuite.cpp" "src/mytestsuite.cpp" )
+FILE( GLOB OPENPOINTMESH_SOURCES "../src/*.cpp" "src/*.cpp" )
+LIST(REMOVE_ITEM OPENPOINTMESH_SOURCES "/home/paul/Documents/2016Volcanobot/OpenPointMesh/qtest/../src/main.cpp" )
+#foreach( var in ${OPENPOINTMESH_SOURCES} )
+#message("${var}")
+#endforeach(var)
+#RETURN()
+FILE( GLOB OPENPOINTMESH_FORMS "../src/*.ui" )
+SET( OPENPOINTMESH_INCLUDE_DIRS "../include" )
+SET( QTEST_INCLUDE_DIRS "include" )
+#foreach( var in ${OPENPOINTMESH_INCLUDE_DIRS} )
+#message("${var}")
+#endforeach(var)
+SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/build_output" )
+SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
+
+#### Qt4 Settings
+INCLUDE( ${QT_USE_FILE} )
+QT4_WRAP_CPP( OPENPOINTMESH_HEADERS_MOC ${OPENPOINTMESH_HEADERS} )
+QT4_WRAP_UI( OPENPOINTMESH_FORMS_HEADERS ${OPENPOINTMESH_FORMS} )
+
+#### Platform Specific Build Flags
+IF( UNIX )
+	MESSAGE( STATUS "Setting GCC flags" )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -g -Wall" )
+ELSE ()
+	MESSAGE( FATAL_ERROR "You are on an unsupported platform! (Not UNIX)" )
+ENDIF()
+MESSAGE( STATUS "** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}" )
+
+#### Build Settings
+SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
+SET( CMAKE_LIBRARIES_OUTPUT_DIRECTORY ${OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY} )
+
+INCLUDE_DIRECTORIES(	${PCL_INCLUDE_DIRS}
+						${OPENPOINTMESH_INCLUDE_DIRS} ${QTEST_INCLUDE_DIRS} 
+						 )
+
+LINK_DIRECTORIES( ${PCL_LIBRARY_DIRS} )
+
+ADD_DEFINITIONS(	${PCL_DEFINITIONS}
+					${QT_DEFINITIONS} )
+
+ADD_EXECUTABLE(	${PROJECT_NAME}
+				${OPENPOINTMESH_SOURCES}
+				${OPENPOINTMESH_FORMS_HEADERS}
+				${OPENPOINTMESH_HEADERS_MOC} )
+
+target_link_libraries(	${PROJECT_NAME}
+						${PCL_LIBRARIES}
+						${QT_LIBRARIES} 
+						${VTK_LIBRARIES} QtTest )
+
+add_test( NAME tst_MainWindow COMMAND $<TARGET_FILE:${PROJECT_NAME}> ) 
+
+
+
+
