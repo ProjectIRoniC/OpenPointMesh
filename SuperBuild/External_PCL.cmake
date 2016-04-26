@@ -3,7 +3,7 @@
 # ExternalProject_Include_Dependencies
 SET( extProjName PCL ) # The find_package known name
 SET( proj        PCL ) # The local name
-SET( ${extProjName}_REQUIRED_VERSION "1.7" )  #If a required version is necessary, then set this, else leave blank
+SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
 IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
@@ -111,18 +111,19 @@ SET( ${proj}_CMAKE_OPTIONS
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz )
-SET( ${proj}_MD5 02c72eb6760fcb1f2e359ad8871b9968 )
-#SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl.git" )
-#SET( ${proj}_GIT_TAG "master" )
+# SET( ${proj}_URL https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz )
+# SET( ${proj}_MD5 02c72eb6760fcb1f2e359ad8871b9968 )
+SET( ${proj}_REPOSITORY "${git_protocol}://github.com/PointCloudLibrary/pcl.git" )
+SET( ${proj}_GIT_TAG "master" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
 	${${proj}_EP_ARGS}
-	URL					${${proj}_URL}
-	URL_MD5				${${proj}_MD5}
-	# GIT_REPOSITORY	${${proj}_REPOSITORY}
-	# GIT_TAG 			${${proj}_GIT_TAG}
+	# URL				${${proj}_URL}
+	# URL_MD5			${${proj}_MD5}
+	GIT_REPOSITORY		${${proj}_REPOSITORY}
+	GIT_TAG 			${${proj}_GIT_TAG}
+	UPDATE_COMMAND		""	# we are skipping update so we don't have to build every time
 	SOURCE_DIR			${${proj}_SOURCE_DIR}
 	BINARY_DIR			${${proj}_BUILD_DIR}
 	INSTALL_DIR			${${proj}_INSTALL_DIR}
