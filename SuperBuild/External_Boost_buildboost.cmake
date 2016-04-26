@@ -1,6 +1,8 @@
 
 SET( BOOST_BUILD_COMMAND ./b2 )
 
+SET( BOOST_LINKER_FLAGS "-L${BZIP2_LIBRARY_DIR} -L${ZLIB_LIBRARY_DIR}" )
+
 SET( BOOST_OPTIONS
 	threading=multi					# single,multi		: thread safety
 	address-model=64				# 32,64				: bit type
@@ -11,6 +13,7 @@ SET( BOOST_OPTIONS
 	include=${BZIP2_INCLUDE_DIR}	# add bzip2 dependency include directory
 	include=${ZLIB_INCLUDE_DIR}		# add zlib dependency include directory
 	include=${PYTHON_INCLUDE_DIRS}	# add python dependency include directory
+	linkflags=${BOOST_LINKER_FLAGS}	# add library directories to the linker
 )
 
 IF( "${CMAKE_BUILD_TYPE}" MATCHES "Release" OR "${CMAKE_BUILD_TYPE}" MATCHES "MinSizeRel" )
