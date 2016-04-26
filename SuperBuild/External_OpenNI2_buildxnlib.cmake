@@ -3,7 +3,7 @@
 SET( XNLIB_SOURCE_DIR ${SOURCE_DIR}/ThirdParty/PSCommon/XnLib/Source )
 
 # Set compile and link flags
-SET( XNLIB_CXX_FLAGS "${EP_NONCMAKE_COMMON_CXX_FLAGS} -I${XNLIB_INCLUDE_DIR} -I${LIBUSB_1_INCLUDE_DIR}" )
+SET( XNLIB_CXX_FLAGS "${EP_NONCMAKE_COMMON_CXX_FLAGS} -I${LIBUSB_1_INCLUDE_DIR} -I${XNLIB_INCLUDE_DIR} -I${INTERNAL_JPEG_INCLUDE_DIR}" )
 SET( XNLIB_LD_FLAGS "${CMAKE_EXE_LINKER_CXX_FLAGS} -L${LIBUSB_1_LIBRARY_DIR}" )
 
 # Add flags for Position Independent Code
@@ -24,7 +24,6 @@ ENDIF()
 # If needed set debug information
 IF( CMAKE_BUILD_TYPE MATCHES "Debug" )
 	LIST( APPEND XNLIB_BUILD_ARGS CFG=Debug )
-	SET( XNLIB_BIN_DIR ${SOURCE_DIR}/ThirdParty/PSCommon/XnLib/Bin/x64-Debug )
 ENDIF()
 
 # Run the build command
