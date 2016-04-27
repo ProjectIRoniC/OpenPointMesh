@@ -19,6 +19,7 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 # Set directories
 SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj} )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_LIBRARY_INSTALL_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
@@ -78,7 +79,7 @@ ExternalProject_Add_Step( ${proj} run_reautoconf
 SET( LIBUSB_1_DIR ${${proj}_INSTALL_DIR} )
 SET( LIBUSB_1_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( LIBUSB_1_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( LIBUSB_1_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( LIBUSB_1_LIBRARY_DIR ${${proj}_LIBRARY_INSTALL_DIR} )
 SET( LIBUSB_1_LIBRARY_NAME usb-1.0 )
 	
 mark_as_superbuild(

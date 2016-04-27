@@ -21,6 +21,7 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 # Set directories
 SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj} )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_LIBRARY_INSTALL_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
@@ -84,7 +85,7 @@ ExternalProject_Add_Step( ${proj} "update_config.guess"
 SET( TIFF_DIR ${${proj}_INSTALL_DIR} )
 SET( TIFF_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( TIFF_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( TIFF_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( TIFF_LIBRARY_DIR ${${proj}_LIBRARY_INSTALL_DIR} )
 
 mark_as_superbuild(
 	VARS

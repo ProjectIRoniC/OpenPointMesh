@@ -15,6 +15,7 @@ SET( FONTCONFIG_OPTIONS
 	--prefix=${INSTALL_DIR}
 	--enable-dependency-tracking
 	--disable-docs
+	include=${FREETYPE_LIBRARY_DIR}
 )
 
 IF( CMAKE_POSITION_INDEPENDENT_CODE )

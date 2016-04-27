@@ -22,6 +22,7 @@ ExternalProject_Include_Dependencies( ${proj} PROJECT_VAR proj DEPENDS_VAR ${pro
 # Set directories
 SET( ${proj}_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build )
 SET( ${proj}_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install )
+SET( ${proj}_LIBRARY_INSTALL_DIR ${${proj}_INSTALL_DIR}/lib )
 SET( ${proj}_SOURCE_DIR ${SOURCE_DOWNLOAD_CACHE}/${proj} )
 
 ### --- Project specific additions here
@@ -87,7 +88,7 @@ ExternalProject_Add( ${proj}
 SET( FONTCONFIG_DIR ${${proj}_INSTALL_DIR} )
 SET( FONTCONFIG_BUILD_DIR ${${proj}_BUILD_DIR} )
 SET( FONTCONFIG_INCLUDE_DIR ${${proj}_INSTALL_DIR}/include )
-SET( FONTCONFIG_LIBRARY_DIR ${${proj}_INSTALL_DIR}/lib )
+SET( FONTCONFIG_LIBRARY_DIR ${${proj}_LIBRARY_INSTALL_DIR} )
 SET( FONTCONFIG_LIBRARY_NAME fontconfig )
 	
 mark_as_superbuild(

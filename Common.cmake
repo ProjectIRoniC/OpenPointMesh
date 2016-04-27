@@ -27,7 +27,7 @@ OPTION( EP_LOG_UPDATE "Wrap External Projects update in script to log output" OF
 OPTION( EP_LOG_CONFIGURE "Wrap External Projects configure in script to log output" OFF )
 OPTION( EP_LOG_BUILD "Wrap External Projects build in script to log output" OFF )
 OPTION( EP_LOG_TEST "Wrap External Projects test in script to log output" OFF )
-OPTION( EP_LOG_INSTALL "Wrap External Projects install in script to log output" ON )
+OPTION( EP_LOG_INSTALL "Wrap External Projects install in script to log output" OFF )
 
 #-----------------------------------------------------------------------------
 # Platform check
@@ -97,23 +97,18 @@ SET( CMAKE_BUNDLE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/install/bin )
 #-----------------------------------------------------------------------------
 # Setup RPATH
 #-----------------------------------------------------------------------------
+# disable automatic mac rpath settings
+SET( CMAKE_MACOSX_RPATH ON )
+
 # use, i.e. don't skip the full RPATH for the build tree
 SET( CMAKE_SKIP_BUILD_RPATH OFF )
 
 # when building, don't use the install RPATH already (but later on when installing)
 SET( CMAKE_BUILD_WITH_INSTALL_RPATH OFF ) 
 
-SET( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET( CMAKE_INSTALL_RPATH_USE_LINK_PATH ON )
-
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST( FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir )
-IF( "${isSystemDir}" STREQUAL "-1" )
-   SET( CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-ENDIF()
 
 
 #-----------------------------------------------------------------------------
@@ -130,17 +125,6 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Augment compiler flags
 #-----------------------------------------------------------------------------
-# Add needed flag for gnu on linux like enviroments to build static common
-# libs suitable for linking with shared object libs.
-IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" )
-	IF( NOT "${NONCMAKE_CXX_FLAGS}" MATCHES "-fPIC" )
-		SET( NONCMAKE_CXX_FLAGS "${NONCMAKE_CXX_FLAGS} -fPIC" )
-	ENDIF()
-	IF( NOT "${NONCMAKE_C_FLAGS}" MATCHES "-fPIC" )
-		SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -fPIC" )
-	ENDIF()
-ENDIF()
-
 # Set BUILD_SHARED_LIBS option settings
 IF( BUILD_SHARED_LIBS )
 	IF( NOT APPLE ) # OS X does not support this flag
@@ -356,9 +340,9 @@ MARK_AS_SUPERBUILD(
 		CMAKE_INSTALL_ARCHIVE_DIRECTORY:PATH
 		CMAKE_INSTALL_RUNTIME_DIRECTORY:PATH
 		CMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH
+		CMAKE_MACOSX_RPATH:BOOL
 		CMAKE_SKIP_BUILD_RPATH:BOOL
 		CMAKE_BUILD_WITH_INSTALL_RPATH:BOOL
-		CMAKE_INSTALL_RPATH:PATH
 		CMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL
 		CTEST_NEW_FORMAT:BOOL
 		MEMORYCHECK_COMMAND_OPTIONS:STRING

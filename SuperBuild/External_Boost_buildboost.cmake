@@ -1,7 +1,19 @@
 
 SET( BOOST_BUILD_COMMAND ./b2 )
 
-SET( BOOST_LINKER_FLAGS "-L${BZIP2_LIBRARY_DIR} -L${ZLIB_LIBRARY_DIR}" )
+SET( BOOST_C_FLAGS ${EP_NONCMAKE_COMMON_C_FLAGS} )
+SET( BOOST_CXX_FLAGS ${EP_NONCMAKE_COMMON_CXX_FLAGS} )
+
+IF( CMAKE_POSITION_INDEPENDENT_CODE )
+	IF( NOT "${BOOST_CXX_FLAGS}" MATCHES "-fPIC" )
+		SET( BOOST_CXX_FLAGS "${BOOST_CXX_FLAGS} -fPIC" )
+	ENDIF()
+	IF( NOT "${BOOST_C_FLAGS}" MATCHES "-fPIC" )
+		SET( BOOST_C_FLAGS "${BOOST_C_FLAGS} -fPIC" )
+	ENDIF()
+ENDIF()
+
+SET( BOOST_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${BZIP2_LIBRARY_DIR} -L${ZLIB_LIBRARY_DIR}" )
 
 SET( BOOST_OPTIONS
 	threading=multi					# single,multi		: thread safety
@@ -13,6 +25,8 @@ SET( BOOST_OPTIONS
 	include=${BZIP2_INCLUDE_DIR}	# add bzip2 dependency include directory
 	include=${ZLIB_INCLUDE_DIR}		# add zlib dependency include directory
 	include=${PYTHON_INCLUDE_DIRS}	# add python dependency include directory
+	cxxflags=${BOOST_CXX_FLAGS}		# add cxx flags
+	cflags=${BOOST_C_FLAGS}			# add c flags
 	linkflags=${BOOST_LINKER_FLAGS}	# add library directories to the linker
 )
 
