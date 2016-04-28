@@ -19,6 +19,9 @@
 #
 #  FREETYPE_INCLUDE_DIR_ft2build	- the freetype build include directory
 #  FREETYPE_INCLUDE_DIR_freetype2	- the freetype include directory
+#
+# To fix a bug in the CMakeLists.txt for FontConfig:
+#  FREETYPR_LIBRARIES				- freetype libraries
 
 IF( FREETYPE_FOUND )
 	MESSAGE( STATUS "FREETYPE is already in the cache." )
@@ -148,6 +151,9 @@ IF( FREETYPE_FOUND )
 			SET_PROPERTY( TARGET FREETYPE::FREETYPE APPEND PROPERTY
 				IMPORTED_LOCATION "${FREETYPE_LIBRARY}" )
 		ENDIF()
+		
+		# To fix a bug in the CMakeLists.txt we are using for FontConfig
+		SET( FREETYPR_LIBRARIES ${FREETYPE_LIBRARIES} )
 	ENDIF()
 	
 	MESSAGE( STATUS "  Include Dirs: ${FREETYPE_INCLUDE_DIRS}" )
