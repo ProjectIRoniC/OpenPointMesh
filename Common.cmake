@@ -6,19 +6,31 @@
 # projects
 ##############################################################################
 #-----------------------------------------------------------------------------
-# Build option(s)
+# CMake Initialization
+#-----------------------------------------------------------------------------
+# Initialize compiler
+ENABLE_LANGUAGE( C )
+ENABLE_LANGUAGE( CXX )
+
+INCLUDE( CMakeDependentOption )
+INCLUDE( ExternalProject )
+INCLUDE( ExternalProjectDependency )
+FIND_PACKAGE( PythonLibs 3 REQUIRED )
+FIND_PACKAGE( OpenGL REQUIRED )
+FIND_PACKAGE( GLUT REQUIRED )
+
+
+#-----------------------------------------------------------------------------
+# Build Option(s)
 #-----------------------------------------------------------------------------
 # CMake Options
 OPTION( CMAKE_INCLUDE_DIRECTORIES_BEFORE "Set to prepend include directories" ON )
 OPTION( CMAKE_POSITION_INDEPENDENT_CODE "Set to use Position Independent Code" ON )
 
 # Library Options
-OPTION( BUILD_SHARED_LIBS "Build Shared Libraries" OFF )
-IF( APPLE )
-	# OS X does not support static os libraries so we must use a shared library build
-	SET( BUILD_SHARED_LIBS ON FORCE )
-ENDIF()
-
+OPTION( BUILD_SHARED_LIBS "Build Shared Libraries" ON )
+CMAKE_DEPENDENT_OPTION( BUILD_WITH_STATIC_STANDARD_LIBRARIES "Build using static standard c/cxx libraries" OFF
+						"NOT BUILD_SHARED_LIBS" OFF )
 OPTION( LINK_TIME_OPTIMIZATION "***** WARNING EXPERIMENTAL ***** Use Link Time Optimization (only affects Release and RelWithDebInfo builds)" OFF )
 
 # Output Options
@@ -29,8 +41,16 @@ OPTION( EP_LOG_BUILD "Wrap External Projects build in script to log output" OFF 
 OPTION( EP_LOG_TEST "Wrap External Projects test in script to log output" OFF )
 OPTION( EP_LOG_INSTALL "Wrap External Projects install in script to log output" OFF )
 
+# Options Check
+IF( APPLE )
+	# OS X does not support static os libraries so we must use a shared library build
+	SET( BUILD_SHARED_LIBS ON FORCE )
+	SET( BUILD_WITH_STATIC_STANDARD_LIBRARIES OFF FORCE )
+ENDIF()
+
+
 #-----------------------------------------------------------------------------
-# Platform check
+# Platform Check
 #-----------------------------------------------------------------------------
 SET( PLATFORM_CHECK true )
 IF( PLATFORM_CHECK )
@@ -49,10 +69,6 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Common Settings
 #-----------------------------------------------------------------------------
-# Initialize compiler
-ENABLE_LANGUAGE( C )
-ENABLE_LANGUAGE( CXX )
-
 # Set the c/cxx standard
 IF( NOT CMAKE_C_STANDARD )
 	SET( CMAKE_C_STANDARD 11 ) # Supported values are ``90``, ``99`` and ``11``
@@ -62,14 +78,6 @@ IF( NOT CMAKE_CXX_STANDARD )
 	SET( CMAKE_CXX_STANDARD 14 ) # Supported values are ``98``, ``11`` and ``14``
 	SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 ENDIF()
-
-# cmake includes
-INCLUDE( CMakeDependentOption )
-INCLUDE( ExternalProject )
-INCLUDE( ExternalProjectDependency )
-FIND_PACKAGE( PythonLibs 3 REQUIRED )
-FIND_PACKAGE( OpenGL REQUIRED )
-FIND_PACKAGE( GLUT REQUIRED )
 
 # Add paths to external project helper scripts
 SET( RUN_AUTOGENSH_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_runautogensh.cmake )
@@ -123,33 +131,10 @@ ENDIF()
 
 
 #-----------------------------------------------------------------------------
-# Augment compiler flags
+# Augment Compiler Flags
 #-----------------------------------------------------------------------------
-# Set BUILD_SHARED_LIBS option settings
-IF( BUILD_SHARED_LIBS )
-	IF( NOT APPLE ) # OS X does not support this flag
-		# Produce a shared object which can then be linked with other objects to
-		# form an executable. Not all systems support this option. For 
-		# predictable results, you must also specify the same set of options used
-		# for compilation (-fpic, -fPIC, or model suboptions) when you specify
-		# this linker option.
-		IF( NOT "${NONCMAKE_CXX_FLAGS}" MATCHES "-shared" )
-			SET( NONCMAKE_CXX_FLAGS "${NONCMAKE_CXX_FLAGS} -shared" )
-		ENDIF()
-		IF( NOT "${NONCMAKE_C_FLAGS}" MATCHES "-shared" )
-			SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -shared" )
-		ENDIF()
-	ENDIF()
-ELSE()
-	# On systems that support dynamic linking, this prevents linking with the
-	# shared libraries. On other systems, this option has no effect.  
-	IF( NOT "${NONCMAKE_CXX_FLAGS}" MATCHES "-static" )
-		SET( NONCMAKE_CXX_FLAGS "${NONCMAKE_CXX_FLAGS} -static" )
-	ENDIF()
-	IF( NOT "${NONCMAKE_C_FLAGS}" MATCHES "-static" )
-		SET( NONCMAKE_C_FLAGS "${NONCMAKE_C_FLAGS} -static" )
-	ENDIF()
-
+# Set BUILD_WITH_STATIC_STANDARD_LIBRARIES option settings
+IF( BUILD_WITH_STATIC_STANDARD_LIBRARIES )
 	# On systems that provide libgcc as a shared library, these options force
 	# the use of either the shared or static version, respectively. If no
 	# shared version of libgcc was built when the compiler was configured,
@@ -292,6 +277,7 @@ SET( EP_CMAKE_ARGS "-Wno-dev --no-warn-unused-cli" )
 MARK_AS_SUPERBUILD(
 	VARS
 		BUILD_SHARED_LIBS:BOOL
+		BUILD_WITH_STATIC_STANDARD_LIBRARIES:BOOL
 		BUILDNAME:STRING
 		MAKECOMMAND:STRING
 		CMAKE_SKIP_RPATH:BOOL
@@ -362,7 +348,7 @@ MARK_AS_SUPERBUILD(
 
 
 #-----------------------------------------------------------------------------
-# Git protocol option
+# Git Protocol Option
 #-----------------------------------------------------------------------------
 OPTION( ${CMAKE_PROJECT_NAME}_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON )
 SET( git_protocol "git" )

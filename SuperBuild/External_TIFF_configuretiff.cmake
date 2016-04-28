@@ -13,7 +13,9 @@ SET( TIFF_OPTIONS
 	--with-zlib-include-dir=${ZLIB_INCLUDE_DIR}
 	--with-zlib-lib-dir=${ZLIB_LIBRARY_DIR}
 	# JPEG ARGS
-	--disable-jpeg
+	--enable-jpeg
+	--with-jpeg-include-dir=${JPEG_INCLUDE_DIR}
+	--with-jpeg-lib-dir=${JPEG_LIBRARY_DIR}
 )
 
 IF( CMAKE_POSITION_INDEPENDENT_CODE )
