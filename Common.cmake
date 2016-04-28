@@ -29,8 +29,7 @@ OPTION( CMAKE_POSITION_INDEPENDENT_CODE "Set to use Position Independent Code" O
 
 # Library Options
 OPTION( BUILD_SHARED_LIBS "Build Shared Libraries" ON )
-CMAKE_DEPENDENT_OPTION( BUILD_WITH_STATIC_STANDARD_LIBRARIES "Build using static standard c/cxx libraries" OFF
-						"NOT BUILD_SHARED_LIBS" OFF )
+OPTION( BUILD_WITH_STATIC_STANDARD_LIBRARIES "Build using static standard c/cxx libraries" OFF )
 OPTION( LINK_TIME_OPTIMIZATION "***** WARNING EXPERIMENTAL ***** Use Link Time Optimization (only affects Release and RelWithDebInfo builds)" OFF )
 
 # Output Options
@@ -42,10 +41,9 @@ OPTION( EP_LOG_TEST "Wrap External Projects test in script to log output" OFF )
 OPTION( EP_LOG_INSTALL "Wrap External Projects install in script to log output" OFF )
 
 # Options Check
-IF( APPLE )
+IF( APPLE AND NOT BUILD_SHARED_LIBS )
 	# OS X does not support static os libraries so we must use a shared library build
 	SET( BUILD_SHARED_LIBS ON FORCE )
-	SET( BUILD_WITH_STATIC_STANDARD_LIBRARIES OFF FORCE )
 ENDIF()
 
 
@@ -142,7 +140,7 @@ IF( BUILD_WITH_STATIC_STANDARD_LIBRARIES )
 	IF( NOT "${CMAKE_EXE_LINKER_C_FLAGS}" MATCHES "-static-libstdc\\+\\+" )
 		SET( CMAKE_EXE_LINKER_C_FLAGS "${CMAKE_EXE_LINKER_C_FLAGS} -static-libstdc++" )
 	ENDIF()
-	IF( NOT "${CMAKE_EXE_LINKER_CXX_FLAGS}" MATCHES "-static-libgcc" )
+	IF( NOT "${CMAKE_EXE_LINKER_CXX_FLAGS}" MATCHES "-static-libgcc" AND NOT APPLE ) # OS X does not support this
 		SET( CMAKE_EXE_LINKER_CXX_FLAGS "${CMAKE_EXE_LINKER_CXX_FLAGS} -static-libgcc" )
 	ENDIF()
 ENDIF()
