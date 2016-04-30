@@ -2,29 +2,45 @@
 INCLUDE( PreventInSourceBuilds )
 INCLUDE( PreventInBuildInstalls )
 
-# Tell CMake where our built libraries are located
-SET( CMAKE_PREFIX_PATH
-	${BOOST_DIR}
-	${BZIP2_DIR}
-	${EIGEN_DIR}
-	${EXPAT_DIR}
-	${FLANN_DIR}
-	${FONTCONFIG_DIR}
-	${FREETYPE_DIR}
-	${JPEG_DIR}
-	${LCMS_DIR}
-	${LIBTOOL_DIR}
-	${LIBUSB_1_DIR}
-	${MNG_DIR}
-	${OPENNI2_DIR}
-	${PCL_DIR}
-	${PNG_DIR}
-	${QHULL_DIR}
-	${QT_DIR}
-	${TIFF_DIR}
-	${VTK_DIR}
-	${ZLIB_DIR}
-)
+IF( OpenPointMesh_SUPERBUILD )
+	# Tell CMake where our built libraries are located
+	SET( CMAKE_PREFIX_PATH
+		${BOOST_DIR}
+		${BZIP2_DIR}
+		${EIGEN_DIR}
+		${EXPAT_DIR}
+		${FLANN_DIR}
+		${FONTCONFIG_DIR}
+		${FREETYPE_DIR}
+		${JPEG_DIR}
+		${LCMS_DIR}
+		${LIBTOOL_DIR}
+		${LIBUSB_1_DIR}
+		${MNG_DIR}
+		${OPENNI2_DIR}
+		${PCL_DIR}
+		${PNG_DIR}
+		${QHULL_DIR}
+		${QT_DIR}
+		${TIFF_DIR}
+		${VTK_DIR}
+		${ZLIB_DIR}
+	)
+ELSE()
+	# Download the OpenNI2 Source Code, our viewer uses it
+	SET( OPENNI2_SOURCE_ZIP ${CMAKE_CURRENT_BINARY_DIR}/develop.zip )
+	SET( OPENNI2_SOURCE_URL https://github.com/occipital/OpenNI2/archive/develop.zip )
+	#SET( OPENNI2_SOURCE_MD5 bdb95be379150c6bd0433f8a6862ee7f ) # We are not checking the MD5 because the develop branch changes often
+
+	FILE( DOWNLOAD ${OPENNI2_SOURCE_URL} ${OPENNI2_SOURCE_ZIP}
+			#EXPECTED_MD5 ${OPENNI2_SOURCE_MD5}
+			SHOW_PROGRESS )
+
+	# Unzip the sources
+	SET( OPENNI2_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/OpenNI2-develop )
+	FILE( MAKE_DIRECTORY ${OPENNI2_SOURCE_DIR} )
+	EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E tar xzf ${OPENNI2_SOURCE_ZIP} )
+ENDIF()
 
 #### Package Dependencies ####
 FIND_PACKAGE( Qt4 REQUIRED )
