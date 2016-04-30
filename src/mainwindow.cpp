@@ -450,7 +450,7 @@ void MainWindow::oniToPCDController()
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
-        oniReader->setOmmittedFrames( this->ommittedFrames[i] );
+        // oniReader->setOmmittedFrames( this->ommittedFrames[i] );
 	}
 
     emit oniToPCDFinished( CLOUDSTITCHER );
@@ -535,12 +535,13 @@ void MainWindow::on_oni_browse_button_clicked()
 void MainWindow::omitFramesController()
 {
     char oniFileName [oniFileNames[0].length()];
+    char *omittedFramesFile = "omittedFrames.txt";   // TODO: replace with GUI fed omitted frames file
 
     strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
 
-    initLaunchViewer (oniFileName);
-    this->ommittedFrames.push_back( getOmittedFrameSet() );
-    destroyOmittedFrameSet();
+    // initLaunchViewer (oniFileName, omittedFramesFile);
+    // this->ommittedFrames.push_back( getOmittedFrameSet() );
+    // destroyOmittedFrameSet();
 
     emit omitFramesFinished( FINISHED );
 }

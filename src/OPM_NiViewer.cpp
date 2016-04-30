@@ -49,6 +49,7 @@
 // --------------------------------
 #include "../include/OPM_NiViewer.h"
 #include <iostream>
+#include <fstream>
 
 // #include <XnCppWrapper.h>
 // 
@@ -551,8 +552,10 @@ void createMenu()
 	endMenu();
 }
 
-void onExit()
+void onExit(const char* omittedFramesFilename)
 {
+	writeOmittedFramesToFile (*viewerOmittedFrames, omittedFramesFilename);
+
 	closeDevice();
 	captureStop(0);
 }
@@ -583,7 +586,7 @@ void destroyOmittedFrameSet () {
 	delete viewerOmittedFrames;
 }
 
-void initLaunchViewer(char* oniFile) {
+void initLaunchViewer(char* oniFile, const char* omittedFramesFile) {
 	initOmittedFrameSet();
 
 	XnBool bChooseDevice = FALSE;
@@ -648,7 +651,8 @@ void initLaunchViewer(char* oniFile) {
 	createKeyboardMap();
 	createMenu();
 
-	// atexit(onExit);
+	// atexit(onExit(omittedFramesFile));
+	// onExit(omittedFramesFile);
 	
 	// Per frame code is in drawFrame()
 	glutMainLoop();
@@ -658,3 +662,28 @@ void initLaunchViewer(char* oniFile) {
 	closeSample(ERR_OK);
 	return ;
 }
+
+void writeOmittedFramesToFile (const std::set<int>& omittedFrames, const char *filename) {
+	std::ofstream ofs;
+	ofs.open (filename);
+
+	if (ofs.good()) {
+		std::set<int>::iterator itr = omittedFrames.begin();
+
+		if (omittedFrames.size() > 0) {
+			ofs << omittedFrames.size() << '\n';
+
+			for (itr; itr != omittedFrames.end(); ++itr) {
+				ofs << *itr << '\n';
+			}
+		}
+	} else {
+		// error opening file
+	}
+
+	return;
+}
+
+// int main (int argc, char* argv[]) {
+// 	initLaunchViewer (argv[1], argv[2]);
+// }

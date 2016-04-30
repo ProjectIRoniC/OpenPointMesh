@@ -72,7 +72,7 @@ void createKeyboardMap();
 
 void createMenu();
 
-void onExit();
+void onExit(const char* omittedFramesFilename);
 
 int changeDirectory(char* arg0);
 
@@ -84,6 +84,8 @@ std::set<int> getOmittedFrameSet ();
 
 void destroyOmittedFrameSet ();
 
-void initLaunchViewer (char* );
+void initLaunchViewer (char* oniFile, const char* omittedFramesFile );
+
+void writeOmittedFramesToFile(const std::set<int>& omittedFrames, const char *filename);
 
 #endif
