@@ -1,0 +1,21 @@
+diff -Naur ./conf.d/CMakeLists.txt ./conf.d/CMakeLists.txt
+--- ./conf.d/CMakeLists.txt	2014-04-09 15:09:10.000000000 -0600
++++ ./conf.d/CMakeLists.txt	2016-04-30 01:13:03.389647000 -0600
+@@ -1,3 +1,3 @@
+ file( GLOB conf_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.conf" )
+-install( FILES README ${conf_files} DESTINATION etc/fonts/conf.d )
+-install( FILES README ${conf_files} DESTINATION etc/fonts/conf.avail )
+\ No newline at end of file
++install( FILES README.in ${conf_files} DESTINATION etc/fonts/conf.d )
++install( FILES README.in ${conf_files} DESTINATION etc/fonts/conf.avail )
+diff -Naur ./src/CMakeLists.txt ./src/CMakeLists.txt
+--- ./src/CMakeLists.txt	2014-04-09 15:09:10.000000000 -0600
++++ ./src/CMakeLists.txt	2016-04-30 00:54:31.901647000 -0600
+@@ -28,6 +28,7 @@
+     fcstr.c
+     fcxml.c
+     ftglue.c
++    fcrange.c
+ )
+ 
+ include_directories(
