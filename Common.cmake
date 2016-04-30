@@ -15,10 +15,12 @@ ENABLE_LANGUAGE( CXX )
 INCLUDE( CMakeDependentOption )
 INCLUDE( ExternalProject )
 INCLUDE( ExternalProjectDependency )
-FIND_PACKAGE( PythonLibs 3 REQUIRED )
 FIND_PACKAGE( OpenGL REQUIRED )
 FIND_PACKAGE( GLUT REQUIRED )
 
+IF( OpenPointMesh_SUPERBUILD )
+	FIND_PACKAGE( PythonLibs 3 REQUIRED )
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # Build Option(s)
