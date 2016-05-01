@@ -24,7 +24,6 @@ SET( BOOST_OPTIONS
 	--prefix=${BOOST_INSTALL_DIR}	# location of boost installation
 	include=${BZIP2_INCLUDE_DIR}	# add bzip2 dependency include directory
 	include=${ZLIB_INCLUDE_DIR}		# add zlib dependency include directory
-	include=${PYTHON_INCLUDE_DIRS}	# add python dependency include directory
 	cxxflags=${BOOST_CXX_FLAGS}		# add cxx flags
 	cflags=${BOOST_C_FLAGS}			# add c flags
 	linkflags=${BOOST_LINKER_FLAGS}	# add library directories to the linker
@@ -32,6 +31,8 @@ SET( BOOST_OPTIONS
 
 IF( NOT PYTHONLIBS_FOUND )
 	LIST( APPEND BOOST_OPTIONS --without-python )
+ELSE()
+	LIST( APPEND BOOST_OPTIONS include=${PYTHON_INCLUDE_DIRS} )	# add python dependency include directory
 ENDIF()
 
 IF( "${CMAKE_BUILD_TYPE}" MATCHES "Release" OR "${CMAKE_BUILD_TYPE}" MATCHES "MinSizeRel" )
