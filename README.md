@@ -1,5 +1,5 @@
 # OpenPointMesh
-University of Colorado Denver, Computer Science, Senior Design, ProjectIrOniC Team, 2016
+University of Colorado Denver, Computer Science, ProjectIRoniC Team, 2016
 
 -----
 
