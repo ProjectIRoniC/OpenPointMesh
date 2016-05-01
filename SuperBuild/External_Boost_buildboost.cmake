@@ -29,10 +29,10 @@ SET( BOOST_OPTIONS
 	linkflags=${BOOST_LINKER_FLAGS}	# add library directories to the linker
 )
 
-IF( NOT PYTHONLIBS_FOUND )
-	LIST( APPEND BOOST_OPTIONS --without-python )
-ELSE()
+IF( PYTHONLIBS_FOUND )
 	LIST( APPEND BOOST_OPTIONS include=${PYTHON_INCLUDE_DIRS} )	# add python dependency include directory
+ELSE()
+	LIST( APPEND BOOST_OPTIONS --without-python )
 ENDIF()
 
 IF( "${CMAKE_BUILD_TYPE}" MATCHES "Release" OR "${CMAKE_BUILD_TYPE}" MATCHES "MinSizeRel" )
