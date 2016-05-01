@@ -3,7 +3,7 @@
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 #include "../include/mainwindow.h"
-#include "../build/OpenPointMesh-build/ui_mainwindow.h"
+#include "ui_mainwindow.h"
 #include "../include/oni-to-pcd.h"
 #include "../include/CloudStitcher.h"
 #include "../include/filesystemHelper.h"

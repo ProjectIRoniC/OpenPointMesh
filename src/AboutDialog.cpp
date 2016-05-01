@@ -1,5 +1,5 @@
 #include "AboutDialog.h"
-#include "../build/OpenPointMesh-build/ui_AboutDialog.h"
+#include "ui_AboutDialog.h"
 
 AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent),
