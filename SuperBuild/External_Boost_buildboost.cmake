@@ -30,6 +30,10 @@ SET( BOOST_OPTIONS
 	linkflags=${BOOST_LINKER_FLAGS}	# add library directories to the linker
 )
 
+IF( NOT PYTHONLIBS_FOUND )
+	LIST( APPEND BOOST_OPTIONS --without-python )
+ENDIF()
+
 IF( "${CMAKE_BUILD_TYPE}" MATCHES "Release" OR "${CMAKE_BUILD_TYPE}" MATCHES "MinSizeRel" )
 	LIST( APPEND BOOST_OPTIONS variant=release )	# build type release
 ELSE()
