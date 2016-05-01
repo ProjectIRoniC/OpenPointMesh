@@ -63,8 +63,12 @@ SET( ${proj}_CMAKE_OPTIONS
 SET( ${proj}_REPOSITORY "${git_protocol}://github.com/Mixaill/cmake.fontconfig.git" )
 SET( ${proj}_GIT_TAG "cmake" )
 
-# We are patching the source CMakeLists.txt to include fcrange.c
-SET( ${proj}_PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/External_FontConfig_patchsrccmakelists.diff )
+# We are patching:
+#	src/CMakeLists.txt to include fcrange.c
+#	conf.d/CMakeLists.txt to install the README.in file instead of README since it is not generated
+#	CMakeLists.txt to not overwrite our CMAKE_MODULES_PATH
+#	autogen.sh to use glibtoolize instead of libtoolize since GUN libtoolize is named differently on OS X
+SET( ${proj}_PATCH_COMMAND patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/External_FontConfig_patchfontconfig.diff )
 ### --- End Project specfic additions
 
 ExternalProject_Add( ${proj}
