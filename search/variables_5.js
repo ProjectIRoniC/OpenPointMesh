@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['long_5fvalue',['long_value',['../unionvba_1_1_r_g_b_value.html#a16a5ba87ea9881ef7964351dad49885e',1,'vba::RGBValue']]]
+  ['red',['Red',['../unionvba_1_1_r_g_b_value.html#a60a0662efc8b92f327882951d2dedaa7',1,'vba::RGBValue']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['default_5fframe_5fskip',['DEFAULT_FRAME_SKIP',['../oni-to-pcd_8h.html#af55699ade6c0cbc92bd1bb5d9094c833',1,'vba']]]
+  ['float_5fvalue',['float_value',['../unionvba_1_1_r_g_b_value.html#a2e2eb6f5fbf00803d5e14a87ae09c0e2',1,'vba::RGBValue']]]
 ];

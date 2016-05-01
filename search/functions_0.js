@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['onitopcd',['OniToPcd',['../classvba_1_1_oni_to_pcd.html#a63e31300bb3401d6995ca9e259ba5c03',1,'vba::OniToPcd::OniToPcd()'],['../classvba_1_1_oni_to_pcd.html#a4cd8d5d80bf375bb52c88fe89c5fb471',1,'vba::OniToPcd::OniToPcd(std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue&lt; std::string &gt; *_outputBuffer)']]],
-  ['outputonidata',['outputOniData',['../classvba_1_1_oni_to_pcd.html#a233d0ad48cf64f0105a33be055a0cb13',1,'vba::OniToPcd']]]
+  ['cloudstitcher',['CloudStitcher',['../classvba_1_1_cloud_stitcher.html#acee41737a4eaf0ca6ec21e061004e170',1,'vba::CloudStitcher']]],
+  ['constructmesh',['constructMesh',['../classvba_1_1_mesh_constructor.html#ace2e89b34566a4306a41f6dc7973aae5',1,'vba::MeshConstructor']]]
 ];

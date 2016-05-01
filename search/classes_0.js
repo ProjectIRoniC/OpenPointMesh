@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['cloudstitcher',['CloudStitcher',['../classvba_1_1_cloud_stitcher.html',1,'vba']]]
+  ['aboutdialog',['AboutDialog',['../class_about_dialog.html',1,'']]],
+  ['accuracycontrolmenu',['AccuracyControlMenu',['../class_accuracy_control_menu.html',1,'']]]
 ];
