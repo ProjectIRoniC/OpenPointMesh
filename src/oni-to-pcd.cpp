@@ -11,9 +11,9 @@
 #include <iomanip>
 #include <cmath>
 #include <pcl/io/pcd_io.h>
-#include "../include/oni-to-pcd.h"
-#include "../include/errorMsgHandler.h"
-#include "../include/filesystemHelper.h"
+#include "oni-to-pcd.h"
+#include "errorMsgHandler.h"
+#include "filesystemHelper.h"
 
 /// @brief Default constructor for this class, which initializes the members to default values
 vba::OniToPcd::OniToPcd()

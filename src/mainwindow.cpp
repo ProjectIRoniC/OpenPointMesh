@@ -2,16 +2,16 @@
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
-#include "../include/mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "../include/oni-to-pcd.h"
-#include "../include/CloudStitcher.h"
-#include "../include/filesystemHelper.h"
-#include "../include/MeshConstructor.h"
-#include "../include/AccuracyControlMenu.h"
-#include "../include/AboutDialog.h"
-#include "../qtest/include/debugger.h"
-#include "../include/OPM_NiViewer.h"
+#include "oni-to-pcd.h"
+#include "CloudStitcher.h"
+#include "filesystemHelper.h"
+#include "MeshConstructor.h"
+#include "AccuracyControlMenu.h"
+#include "AboutDialog.h"
+#include "debugger.h"
+#include "OPM_NiViewer.h"
 #include <QMessageBox>
 #include <QInputDialog>
 

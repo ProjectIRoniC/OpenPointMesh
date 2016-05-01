@@ -7,7 +7,7 @@ Description:	Reads an oni file recorded using the Openni2 or Openni library and 
 
 #include <QApplication>
 #include <iostream>
-#include "../include/mainwindow.h"
+#include "mainwindow.h"
 #include <QTextStream>
 
 /***************************************************************

@@ -39,7 +39,8 @@ SET( PRIMARY_PROJECT_NAME OpenPointMesh )
 #		Phase II: Build the ${PRIMARY_PROJECT_NAME}, referencing the support
 #					packages built in Phase I.
 #-----------------------------------------------------------------------------
-OPTION( ${PRIMARY_PROJECT_NAME}_SUPERBUILD "Build ${PRIMARY_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake." ON )
+OPTION( ${PRIMARY_PROJECT_NAME}_WITH_SUPERBUILD "Build ${PRIMARY_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake." ON )
+OPTION( ${PRIMARY_PROJECT_NAME}_SUPERBUILD "***DO NOT CHANGE*** Internal option used by SuperBuild ***DO NOT CHANGE***" ON )
 MARK_AS_ADVANCED( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
 
 
@@ -52,7 +53,7 @@ INCLUDE( ${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake )
 #-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------
-IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD )
+IF( ${PRIMARY_PROJECT_NAME}_SUPERBUILD AND ${PRIMARY_PROJECT_NAME}_WITH_SUPERBUILD )
 	PROJECT( SuperBuild_${PRIMARY_PROJECT_NAME} )  # <- NOTE: Project name for pre-requisites is different from main project
 	# Sanity checks
 	IF( WIN32 )

@@ -2,7 +2,7 @@
 INCLUDE( PreventInSourceBuilds )
 INCLUDE( PreventInBuildInstalls )
 
-IF( OpenPointMesh_SUPERBUILD )
+IF( OpenPointMesh_WITH_SUPERBUILD )
 	# Tell CMake where our built libraries are located
 	SET( CMAKE_PREFIX_PATH
 		${BOOST_DIR}
@@ -54,7 +54,7 @@ INCLUDE( ExternalProject )
 FILE( GLOB OPENPOINTMESH_HEADERS "include/*.h" )
 FILE( GLOB OPENPOINTMESH_SOURCES "src/*.cpp" )
 FILE( GLOB OPENPOINTMESH_FORMS "src/*.ui" )
-SET( OPENPOINTMESH_INCLUDE_DIRS "include" ${CMAKE_BINARY_DIR} )
+SET( OPENPOINTMESH_INCLUDE_DIRS "include" "qtest/include" ${CMAKE_BINARY_DIR} )
 SET( OPENPOINTMESH_BUILD_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build_output" )
 #SET( VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK )
 
