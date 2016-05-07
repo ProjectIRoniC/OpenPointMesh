@@ -76,6 +76,12 @@ IF( NOT CMAKE_CXX_STANDARD )
 	SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 ENDIF()
 
+# The xcode clang c++14 compiler does not support thread-local storage and fails building boost
+# Since this is only an issue with c++14 we will change the c/cxx standard for OS X
+IF( APPLE AND "${CMAKE_CXX_STANDARD}" MATCHES "14" )
+	SET( CMAKE_CXX_STANDARD 11 )
+ENDIF()
+
 # Add paths to external project helper scripts
 SET( RUN_AUTOGENSH_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_runautogensh.cmake )
 SET( RUN_AUTORECONF_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/SuperBuild/External_runautoreconf.cmake )
