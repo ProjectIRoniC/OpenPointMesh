@@ -99,6 +99,33 @@ ExternalProject_Add( ${proj}
 	DEPENDS 			${${proj}_DEPENDENCIES}
 )
 
+# this custom step is to copy the lcms library folder to the Qt libs folder
+ExternalProject_Add_Step( ${proj} copy_lcms_library_to_qt_lib
+	COMMAND ${CMAKE_COMMAND}
+			-E copy_directory ${LCMS_LIBRARY_DIR} ${${proj}_LIBRARY_INSTALL_DIR}
+
+		DEPENDEES download
+		DEPENDERS configure
+)
+
+# this custom step is to copy the jpeg library folder to the Qt libs folder
+ExternalProject_Add_Step( ${proj} copy_jpeg_library_to_qt_lib
+	COMMAND ${CMAKE_COMMAND}
+			-E copy_directory ${JPEG_LIBRARY_DIR} ${${proj}_LIBRARY_INSTALL_DIR}
+
+		DEPENDEES download
+		DEPENDERS configure
+)
+
+# this custom step is to copy the zlib library folder to the Qt libs folder
+ExternalProject_Add_Step( ${proj} copy_zlib_library_to_qt_lib
+	COMMAND ${CMAKE_COMMAND}
+			-E copy_directory ${ZLIB_LIBRARY_DIR} ${${proj}_LIBRARY_INSTALL_DIR}
+
+		DEPENDEES download
+		DEPENDERS configure
+)
+
 ### --- Set binary information
 SET( QT_DIR ${${proj}_INSTALL_DIR} )
 SET( QT_BUILD_DIR ${${proj}_BUILD_DIR} )
