@@ -5,7 +5,7 @@
  *      Author: matt
  */
 
-#include "../include/MeshConstructor.h"
+#include "MeshConstructor.h"
 
 namespace vba
 {

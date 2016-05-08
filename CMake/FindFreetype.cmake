@@ -1,0 +1,164 @@
+# - Try to find FREETYPE
+#
+# IMPORTED Targets
+# ^^^^^^^^^^^^^^^^
+# This module defines :prop_tgt:`IMPORTED` target ``FREETYPE::FREETYPE``, if
+# FREETYPE has been found.
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+# This module defines the following variables:
+#
+#  FREETYPE_FOUND 			- system has FREETYPE
+#  FREETYPE_INCLUDE_DIRS	- the FREETYPE include directories
+#  FREETYPE_LIBRARIES		- link these to use FREETYPE
+#  FREETYPE_DEFINITIONS		- compiler flags for FREETYPE
+#  FREETYPE_VERSION			- the version of FREETYPE found (x.y.z)
+#
+# For backwards compatibility:
+#
+#  FREETYPE_INCLUDE_DIR_ft2build	- the freetype build include directory
+#  FREETYPE_INCLUDE_DIR_freetype2	- the freetype include directory
+#
+# To fix a bug in the CMakeLists.txt for FontConfig:
+#  FREETYPR_LIBRARIES				- freetype libraries
+
+IF( FREETYPE_FOUND )
+	MESSAGE( STATUS "FREETYPE is already in the cache." )
+	return()
+ENDIF()
+
+INCLUDE( ${CMAKE_CURRENT_LIST_DIR}/LibFindMacros.cmake )
+INCLUDE( ${CMAKE_ROOT}/Modules/SelectLibraryConfigurations.cmake )
+
+# Dependencies
+LIBFIND_PACKAGE( FREETYPE ZLIB )
+LIBFIND_PACKAGE( FREETYPE BZip2 )
+LIBFIND_PACKAGE( FREETYPE PNG )
+
+# Help CMake choose Static vs Shared Libraries
+# Since CMake search order prefers Shared Libraries we only need
+# to change the search order for Static Libraries
+IF( NOT BUILD_SHARED_LIBS )
+	IF( WIN32 )
+		SET( CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
+	ELSE()
+		SET( CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES} )
+	ENDIF()
+ENDIF()
+
+# Use pkg-config to get hints about paths if it exists
+LIBFIND_PKG_CHECK_MODULES( FREETYPE_PKGCONF freetype )
+SET( FREETYPE_DEFINITIONS ${FREETYPE_PKGCONF_CFLAGS_OTHER} )
+
+# Include dirs, FREETYPE does some include header tricks so there are two of them
+FIND_PATH( FREETYPE_INCLUDE_DIR_ft2build
+  NAMES ft2build.h
+  HINTS ${FREETYPE_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES freetype2
+)
+
+FIND_PATH( FREETYPE_INCLUDE_DIR_freetype2
+  NAMES freetype/config/ftheader.h
+  HINTS ${FREETYPE_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES freetype2
+)
+
+# The release library
+FIND_LIBRARY( FREETYPE_LIBRARY_RELEASE
+  NAMES freetype libfreetype
+  HINTS ${FREETYPE_PKGCONF_LIBRARY_DIRS}
+)
+
+# The debug library
+FIND_LIBRARY( FREETYPE_LIBRARY_DEBUG
+  NAMES freetyped libfreetyped
+  HINTS ${FREETYPE_PKGCONF_LIBRARY_DIRS}
+)
+
+MARK_AS_ADVANCED( FREETYPE_LIBRARY_RELEASE FREETYPE_LIBRARY_DEBUG )
+
+# This macro takes a library base name as an argument, and will choose good values
+# for basename_LIBRARY, basename_LIBRARIES, basename_LIBRARY_DEBUG, and
+# basename_LIBRARY_RELEASE depending on what has been found and set.
+SELECT_LIBRARY_CONFIGURATIONS( FREETYPE )
+
+# Set by SELECT_LIBRARY_CONFIGURATIONS(), but we want the ones from LIBFIND_PROCESS() below.
+UNSET( FREETYPE_FOUND )
+UNSET( FREETYPE_LIBRARIES )
+
+# The version number
+IF( EXISTS "${FREETYPE_INCLUDE_DIR_ft2build}/freetype/freetype.h" )
+	SET( FREETYPE_H "${FREETYPE_INCLUDE_DIR_ft2build}/freetype/freetype.h" )
+ENDIF()
+
+IF( FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_H )
+	FILE( STRINGS "${FREETYPE_H}" freetype_version_str
+		REGEX "^#[\t ]*define[\t ]+FREETYPE_(MAJOR|MINOR|PATCH)[\t ]+[0-9]+$" )
+	
+	UNSET( FREETYPE_VERSION )
+	FOREACH( VPART MAJOR MINOR PATCH )
+		FOREACH( VLINE ${freetype_version_str} )
+			IF( VLINE MATCHES "^#[\t ]*define[\t ]+FREETYPE_${VPART}[\t ]+([0-9]+)$" )
+				SET( FREETYPE_VERSION_PART "${CMAKE_MATCH_1}" )
+				IF( FREETYPE_VERSION )
+					SET( FREETYPE_VERSION "${FREETYPE_VERSION}.${FREETYPE_VERSION_PART}" )
+				ELSE()
+					SET( FREETYPE_VERSION "${FREETYPE_VERSION_PART}" )
+				ENDIF()
+				UNSET( FREETYPE_VERSION_PART )
+			ENDIF()
+		ENDFOREACH()
+	ENDFOREACH()
+ENDIF()
+
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this lib depends on.
+SET( FREETYPE_PROCESS_INCLUDES FREETYPE_INCLUDE_DIR_ft2build FREETYPE_INCLUDE_DIR_freetype2 ${PNG_INCLUDE_DIRS} ${BZip2_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS} )
+SET( FREETYPE_PROCESS_LIBS ${FREETYPE_LIBRARY} ${PNG_LIBRARIES} ${BZip2_LIBRARIES} ${ZLIB_LIBRARIES} )
+LIBFIND_PROCESS( FREETYPE )
+
+# Set IMPORTED Targets
+IF( FREETYPE_FOUND )
+	IF( NOT TARGET FREETYPE::FREETYPE )
+		GET_FILENAME_COMPONENT( LIB_EXT ${FREETYPE_LIBRARY} EXT )
+		IF( "${LIB_EXT}" MATCHES "a" OR "${LIB_EXT}" MATCHES "lib" )
+			SET( LIB_TYPE STATIC )
+		ELSE()
+			SET( LIB_TYPE SHARED )
+		ENDIF()
+		
+		ADD_LIBRARY( FREETYPE::FREETYPE ${LIB_TYPE} IMPORTED )
+		SET_TARGET_PROPERTIES( FREETYPE::FREETYPE PROPERTIES
+			INTERFACE_INCLUDE_DIRECTORIES "${FREETYPE_INCLUDE_DIRS}"
+			VERSION "${FREETYPE_VERSION}" )
+
+		IF( FREETYPE_LIBRARY_RELEASE )
+			SET_PROPERTY( TARGET FREETYPE::FREETYPE APPEND PROPERTY
+				IMPORTED_CONFIGURATIONS RELEASE )
+			SET_TARGET_PROPERTIES( FREETYPE::FREETYPE PROPERTIES
+				IMPORTED_LOCATION_RELEASE "${FREETYPE_LIBRARY_RELEASE}" )
+		ENDIF()
+
+		IF( FREETYPE_LIBRARY_DEBUG )
+			SET_PROPERTY( TARGET FREETYPE::FREETYPE APPEND PROPERTY
+				IMPORTED_CONFIGURATIONS DEBUG )
+			SET_TARGET_PROPERTIES( FREETYPE::FREETYPE PROPERTIES
+				IMPORTED_LOCATION_DEBUG "${FREETYPE_LIBRARY_DEBUG}" )
+		ENDIF()
+
+		IF( NOT FREETYPE_LIBRARY_RELEASE AND NOT FREETYPE_LIBRARY_DEBUG )
+			SET_PROPERTY( TARGET FREETYPE::FREETYPE APPEND PROPERTY
+				IMPORTED_LOCATION "${FREETYPE_LIBRARY}" )
+		ENDIF()
+		
+		# To fix a bug in the CMakeLists.txt we are using for FontConfig
+		SET( FREETYPR_LIBRARIES ${FREETYPE_LIBRARIES} )
+	ENDIF()
+	
+	MESSAGE( STATUS "  Include Dirs: ${FREETYPE_INCLUDE_DIRS}" )
+	MESSAGE( STATUS "  Libraries: ${FREETYPE_LIBRARIES}" )
+	IF( FREETYPE_DEFINITIONS )
+		MESSAGE( STATUS "  Definitions: ${FREETYPE_DEFINITIONS}" )
+	ENDIF()
+ENDIF()

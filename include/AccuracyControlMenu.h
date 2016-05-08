@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QMainWindow>
-#include "../build/ui_AccuracyControlMenu.h"
+#include "ui_AccuracyControlMenu.h"
 
 
 class AccuracyControlMenu : public QDialog

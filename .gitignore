@@ -1,11 +1,13 @@
 # Custom
-*~
 *.swp
 *.o
 *.oni
+*.pcd
 *.save
 res/*
 build/*
+build_output/*
+doxygen_generated_documentation/*
 test/build/*
 test/reports*
 
@@ -46,13 +48,18 @@ Makefile*
 # QtCreator
 *.autosave
 
-#QtCtreator Qml
+# QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
 
-#QtCtreator CMake
+# QtCtreator CMake
 CMakeLists.txt.user
 
-#qTest
-qtest/build*
+# Ignore git merge temporaries.
+*.orig
 
+# emacs backup files
+*~
+
+# qTest
+qtest/build*

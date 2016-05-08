@@ -2,16 +2,16 @@
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
-#include "../include/mainwindow.h"
-#include "../build/ui_mainwindow.h"
-#include "../include/oni-to-pcd.h"
-#include "../include/CloudStitcher.h"
-#include "../include/filesystemHelper.h"
-#include "../include/MeshConstructor.h"
-#include "../include/AccuracyControlMenu.h"
-#include "../include/AboutDialog.h"
-#include "../qtest/include/debugger.h"
-#include "../include/OPM_NiViewer.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "oni-to-pcd.h"
+#include "CloudStitcher.h"
+#include "filesystemHelper.h"
+#include "MeshConstructor.h"
+#include "AccuracyControlMenu.h"
+#include "AboutDialog.h"
+#include "debugger.h"
+#include "OPM_NiViewer.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <fstream>
@@ -447,7 +447,7 @@ void MainWindow::oniToPCDController()
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
     oniReader->setOmittedFrames( this->omittedFrames );
 
-    std::cout << "the number of omitted frames " << this->omittedFrames.size();
+    // std::cout << "the number of omitted frames " << this->omittedFrames.size();
 
 	// Loop through each input file and its associated set of omitted frames, which may be an empty set
     // for( int i = 0; i < oniFileNames.size(); ++i )   // may add support for multiple files at another time
@@ -594,7 +594,7 @@ std::set<int> MainWindow::readOmittedFramesFile ( char* filename ) {
     }
 
     ifs >> numberOfFrameListings;
-    std::cout << "\nReading " << numberOfFrameListings << " frames.\n";
+    // std::cout << "\nReading " << numberOfFrameListings << " frames.\n";
     
     for (int i = 0; i < numberOfFrameListings; ++i) {
         ifs >> frameNumber;

@@ -3,7 +3,7 @@
 
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include "../include/filesystemHelper.h"
+#include "filesystemHelper.h"
 
 /// <summary>
 /// Creates a name for an output file
