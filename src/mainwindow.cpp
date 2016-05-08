@@ -539,7 +539,7 @@ void MainWindow::on_oni_browse_button_clicked()
 void MainWindow::omitFramesController()
 {
     char oniFileName [oniFileNames[0].length()];
-    char *omittedFramesFile = "omittedFrames.txt";   // TODO: replace with GUI fed omitted frames file
+    char *omittedFramesFile = "omittedFrames.off";   // TODO: replace with GUI fed omitted frames file
 
     strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
 
