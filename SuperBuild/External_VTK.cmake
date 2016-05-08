@@ -3,7 +3,7 @@
 # ExternalProject_Include_Dependencies
 SET( extProjName VTK ) # The find_package known name
 SET( proj        VTK ) # The local name
-SET( ${extProjName}_REQUIRED_VERSION "6.3" )  #If a required version is necessary, then set this, else leave blank
+SET( ${extProjName}_REQUIRED_VERSION "" )  #If a required version is necessary, then set this, else leave blank
 
 # Sanity checks
 IF( DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR} )
@@ -102,7 +102,7 @@ SET( ${proj}_CMAKE_OPTIONS
 	-DBUILD_TESTING:BOOL=OFF
 	-DBUILD_EXAMPLES:BOOL=OFF
 	-DVTK_USE_PARALLEL:BOOL=ON
-	-DVTK_LEGACY_REMOVE:BOOL=ON
+	-DVTK_LEGACY_REMOVE:BOOL=OFF
 	# FreeType ARGS
 	-DVTK_USE_SYSTEM_FREETYPE:BOOL=ON
 	-DModule_vtkRenderingFreeTypeFontConfig:BOOL=ON
@@ -119,10 +119,10 @@ SET( ${proj}_CMAKE_OPTIONS
 )
 
 # Download tar source when possible to speed up build time
-SET( ${proj}_URL https://github.com/Kitware/VTK/archive/v6.3.0.tar.gz )
-SET( ${proj}_MD5 b2f6fcc29fb42231bc2b025eccb41122 )
+SET( ${proj}_URL https://github.com/Kitware/VTK/archive/v7.0.0.tar.gz )
+SET( ${proj}_MD5 efeedb050728ba76a1e2cf381ec70d7a )
 # SET( ${proj}_GIT_REPOSITORY "${git_protocol}://github.com/Kitware/VTK.git" )
-# SET( ${proj}_GIT_TAG "v6.3.0" )
+# SET( ${proj}_GIT_TAG "v7.0.0" )
 ### --- End Project specific additions
 
 ExternalProject_Add( ${proj}
