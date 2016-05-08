@@ -681,7 +681,8 @@ void writeOmittedFramesToFile () {
 	} else {
 		// error opening file
 	}
-
+	ofs.close();
+	
 	return;
 }
 
@@ -694,9 +695,8 @@ int main (int argc, char* argv[]) {
 
 	// get the omitted frames filename from the second argument passed
 	// at the command line
-	// strcpy ( omittedFramesFilename, argv[2] );
 	omittedFramesFilename = argv[2];
-	std::cout << "\nOmit-> " << omittedFramesFilename << '\n';
+	// std::cout << "\nOmit-> " << omittedFramesFilename << '\n';
 
 	initLaunchViewer(argv[1]);
 }
