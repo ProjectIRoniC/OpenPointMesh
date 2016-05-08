@@ -14,6 +14,7 @@
 #include "../include/OPM_NiViewer.h"
 #include <QMessageBox>
 #include <QInputDialog>
+#include <fstream>
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -444,16 +445,19 @@ void MainWindow::oniToPCDController()
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
     unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
+    oniReader->setOmittedFrames( this->omittedFrames );
+
+    std::cout << "the number of omitted frames " << this->omittedFrames.size();
 
 	// Loop through each input file and its associated set of omitted frames, which may be an empty set
-	for( int i = 0; i < oniFileNames.size(); ++i )
+    // for( int i = 0; i < oniFileNames.size(); ++i )   // may add support for multiple files at another time
+	for( int i = 0; i < 1; ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
-        // oniReader->setOmmittedFrames( this->ommittedFrames[i] );
 	}
 
-    emit oniToPCDFinished( CLOUDSTITCHER );
+    emit oniToPCDFinished( FINISHED );
 
 }
 
@@ -539,11 +543,18 @@ void MainWindow::omitFramesController()
 
     strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
 
+    this->omittedFrames = readOmittedFramesFile (omittedFramesFile);
+
     // initLaunchViewer (oniFileName, omittedFramesFile);
     // this->ommittedFrames.push_back( getOmittedFrameSet() );
     // destroyOmittedFrameSet();
 
-    emit omitFramesFinished( FINISHED );
+    // for (std::set<int>::iterator itr = this->omittedFrames.begin();
+    //     itr != this->omittedFrames.end(); ++itr) {
+    //     std::cout << "\n" << *itr << ".";
+    // }
+
+    emit omitFramesFinished( ONITOPCD );
 }
 
 /* Setters and Getters */
@@ -569,4 +580,28 @@ QString MainWindow::getOutputFolderName() {
 bool MainWindow::hasStartedWorkingOnFile()
 {
     return workingOnFile;
+}
+
+std::set<int> MainWindow::readOmittedFramesFile ( char* filename ) {
+    std::ifstream ifs;
+    ifs.open (filename);
+    int frameNumber = -1,
+        numberOfFrameListings = 0;
+    std::set<int> omitted;
+
+    if (!ifs.good()) {
+        return omitted;
+    }
+
+    ifs >> numberOfFrameListings;
+    std::cout << "\nReading " << numberOfFrameListings << " frames.\n";
+    
+    for (int i = 0; i < numberOfFrameListings; ++i) {
+        ifs >> frameNumber;
+        // std::cout << "\nFrame Number read " << frameNumber << ".\n";
+        omitted.insert( frameNumber );
+    }
+
+    ifs.close();
+    return omitted;
 }

@@ -74,6 +74,8 @@ public:
 
     bool hasStartedWorkingOnFile();
 
+    //// @brief reads a file containing omitted frames
+    std::set<int> readOmittedFramesFile ( char* filename );
 
 private:
     /*
@@ -244,7 +246,6 @@ signals:
     void meshConstructorFinished( int );
 
 
-
 private:
 
     /*
@@ -258,7 +259,7 @@ private:
     static const int OMITFRAMES = 3;
     static const int FINISHED = 4;
 
-    std::vector<std::set<int> > ommittedFrames;
+    std::set<int> omittedFrames;
 
     /*
      * if the user has changed the sampleing rate

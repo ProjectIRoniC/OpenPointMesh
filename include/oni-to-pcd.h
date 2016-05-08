@@ -107,7 +107,7 @@ namespace vba
 			 */
             static bool minimumSamplingRate (int sampleRate);
 
-			void setOmmittedFrames( const std::set<int>& of );
+			void setOmittedFrames( const std::set<int>& of );
 			
 		private:
 			/*Performs class setup actions
@@ -168,7 +168,7 @@ namespace vba
 			std::string outputDirPath;
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;
 			bool redirectOutputFlag;
-			std::set<int> ommittedFrames;
+			std::set<int> omittedFrames;
                         bool debugMode;
 	};
 };
