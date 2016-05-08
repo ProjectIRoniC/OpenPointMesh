@@ -457,7 +457,7 @@ void MainWindow::oniToPCDController()
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
 	}
 
-    emit oniToPCDFinished( FINISHED );
+    emit oniToPCDFinished( CLOUDSTITCHER );
 
 }
 
