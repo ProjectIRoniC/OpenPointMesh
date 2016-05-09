@@ -190,11 +190,18 @@ private slots:
      */
     void viewWikiSlot();
 
+    /*
+        * @brief       Slot needs to be connected to a signal to use
+        * @pre         NONE
+        * @return      Opens file explorer and shows .off files only.
+        *
+        */
+       void omitFramesSlot();
+
 
     /*
      * Not Implemented
      */
-    void omitFramesSlot();
     void filterAccuracySlot();
 
     void meshOutputOBJSlot();
@@ -290,6 +297,10 @@ private:
      * worker thread that will do all the tasks that user enters
      */
     boost::thread* taskThread;
+    /*
+     * Stores the .off file name if user has selected it.
+     */
+    QString omitFileName;
 
 
     unsigned int accuracy_control_value;
