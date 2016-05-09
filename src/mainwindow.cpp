@@ -75,8 +75,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     /* Omit Frames */
     omitFramesAct = new QAction(tr("&Omit Frames"), this);
     omitFramesAct->setShortcuts(QKeySequence::Find);
-    omitFramesAct->setStatusTip(tr("Select frames to omit"));
-    omitFramesAct->setCheckable(true);
+    omitFramesAct->setStatusTip(tr("Select omitteed frames file"));
     connect(omitFramesAct, SIGNAL(triggered()), this, SLOT(omitFramesSlot()));
     omitFramesAct->setObjectName("omitFramesAct");
 
@@ -189,13 +188,24 @@ void MainWindow::exitSlot()
 
 void MainWindow::omitFramesSlot()
 {
-    /* omitFrameAct retains the check status */
-    /* send message to output */
-    if(omitFramesAct->isChecked()) {
-        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " enabled\n");
+    QStringList files;
+
+    files = QFileDialog::getOpenFileNames(
+                this,
+                "Select one or more files to open",
+                "/home",
+                "Text files (*.off)");
+
+    if( files.size() > 0 )
+    {
+        appendMessageToOutputBuffer("Selected " + files[0].toStdString() + " as omitted frames file.\n");
+        omitFileName = files[0];
+        omitFramesAct->setChecked(true);
+
     }
     else {
-        appendMessageToOutputBuffer("" + omitFramesAct->iconText().toStdString() + " disabled\n");
+        appendMessageToOutputBuffer("No omitted frames file selected. \n");
+        omitFramesAct->setChecked(true);
     }
 }
 
@@ -538,6 +548,8 @@ void MainWindow::on_oni_browse_button_clicked()
 
 void MainWindow::omitFramesController()
 {
+    /* omitFileName is a QString that contains absolute path to omit file user has selected */
+
     char oniFileName [oniFileNames[0].length()];
     char *omittedFramesFile = "omittedFrames.off";   // TODO: replace with GUI fed omitted frames file
 
