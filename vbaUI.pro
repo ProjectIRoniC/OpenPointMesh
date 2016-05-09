@@ -135,3 +135,6 @@ DEPENDPATH += $$PWD/../../../usr/include/pcl-1.7
 
 RESOURCES += \
     res/resources.qrc
+
+DISTFILES += \
+    res/ss.qss
