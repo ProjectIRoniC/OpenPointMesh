@@ -14,6 +14,7 @@
 #include "OPM_NiViewer.h"
 #include <QMessageBox>
 #include <QInputDialog>
+#include <fstream>
 
 
 MainWindow::MainWindow( QWidget *parent ) :
@@ -168,7 +169,6 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     this->samplingRate = vba::DEFAULT_FRAME_SKIP;
     this->hasSamplingRate = false;
-
 }
 
 
@@ -295,6 +295,7 @@ void MainWindow::nextStep( const int& step )
 {
     switch( step ) {
     case OMITFRAMES:
+        workingOnFile = true;
         setButtonsAllDisabledState();
         clearTaskThread();
         taskThread = new boost::thread( &MainWindow::omitFramesController, this );
@@ -338,7 +339,10 @@ void MainWindow::clearTaskThread()
     if( taskThread == NULL )
         return;
 
-    taskThread->join(); // this should return immeditly as the thread should already have finished if this function is called.
+    if ( !(taskThread->try_join_for(boost::chrono::milliseconds(1000))) ) { // this should return immeditly as the thread should already have finished if this function is called.
+       taskThread->detach(); 
+    }
+
     delete taskThread;
     taskThread = NULL;
 }
@@ -441,13 +445,16 @@ void MainWindow::oniToPCDController()
     appendMessageToOutputBuffer( "Output to " + outputFolderName.toStdString() + '\n' );
     unsigned frameSkipMod = (hasSamplingRate) ? samplingRate : 25;
 	vba::OniToPcd* oniReader = new vba::OniToPcd(outputFolderName.toStdString(), frameSkipMod, this->outputBuffer);
+    oniReader->setOmittedFrames( this->omittedFrames );
+
+    // std::cout << "the number of omitted frames " << this->omittedFrames.size();
 
 	// Loop through each input file and its associated set of omitted frames, which may be an empty set
-	for( int i = 0; i < oniFileNames.size(); ++i )
+    // for( int i = 0; i < oniFileNames.size(); ++i )   // may add support for multiple files at another time
+	for( int i = 0; i < 1; ++i )
 	{
         appendMessageToOutputBuffer( "Working on file " + oniFileNames[i].toStdString() + '\n');
 		oniReader->outputOniData( oniFileNames[i].toStdString() );
-        oniReader->setOmmittedFrames( this->ommittedFrames[i] );
 	}
 
     emit oniToPCDFinished( CLOUDSTITCHER );
@@ -531,8 +538,21 @@ void MainWindow::on_oni_browse_button_clicked()
 
 void MainWindow::omitFramesController()
 {
-    int of[] = {3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 30, 32, 33, 34, 35, 36, 37, 39};
-    this->ommittedFrames.push_back(std::set<int> (of, of+22));
+    char oniFileName [oniFileNames[0].length()];
+    char *omittedFramesFile = "omittedFrames.off";   // TODO: replace with GUI fed omitted frames file
+
+    strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
+
+    this->omittedFrames = readOmittedFramesFile (omittedFramesFile);
+
+    // initLaunchViewer (oniFileName, omittedFramesFile);
+    // this->ommittedFrames.push_back( getOmittedFrameSet() );
+    // destroyOmittedFrameSet();
+
+    // for (std::set<int>::iterator itr = this->omittedFrames.begin();
+    //     itr != this->omittedFrames.end(); ++itr) {
+    //     std::cout << "\n" << *itr << ".";
+    // }
 
     emit omitFramesFinished( ONITOPCD );
 }
@@ -560,4 +580,28 @@ QString MainWindow::getOutputFolderName() {
 bool MainWindow::hasStartedWorkingOnFile()
 {
     return workingOnFile;
+}
+
+std::set<int> MainWindow::readOmittedFramesFile ( char* filename ) {
+    std::ifstream ifs;
+    ifs.open (filename);
+    int frameNumber = -1,
+        numberOfFrameListings = 0;
+    std::set<int> omitted;
+
+    if (!ifs.good()) {
+        return omitted;
+    }
+
+    ifs >> numberOfFrameListings;
+    // std::cout << "\nReading " << numberOfFrameListings << " frames.\n";
+    
+    for (int i = 0; i < numberOfFrameListings; ++i) {
+        ifs >> frameNumber;
+        // std::cout << "\nFrame Number read " << frameNumber << ".\n";
+        omitted.insert( frameNumber );
+    }
+
+    ifs.close();
+    return omitted;
 }

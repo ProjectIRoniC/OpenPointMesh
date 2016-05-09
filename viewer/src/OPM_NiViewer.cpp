@@ -51,6 +51,17 @@
 #include <iostream>
 #include <fstream>
 
+// #include <XnCppWrapper.h>
+// 
+// #if (XN_PLATFORM == XN_PLATFORM_LINUX_X86 || XN_PLATFORM == XN_PLATFORM_LINUX_ARM)
+// 	#define UNIX
+// 	#define GLX_GLXEXT_LEGACY
+// #endif
+// 
+// #if (XN_PLATFORM == XN_PLATFORM_MACOSX)
+// 	#define MACOS
+// #endif
+
 // Undeprecate CRT functions
 #ifndef _CRT_SECURE_NO_DEPRECATE 
 	#define _CRT_SECURE_NO_DEPRECATE 1
@@ -60,12 +71,22 @@
 #include "OpenNI.h"
 #include "XnLib.h"
 
-#ifdef MACOS
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
+#define GLH_EXT_SINGLE_FILE
+#if (ONI_PLATFORM == ONI_PLATFORM_WIN32)
+#pragma warning(push, 3)
+#endif
+#include <glh/glh_obs.h>
+#include <glh/glh_glut2.h>
+#if (ONI_PLATFORM == ONI_PLATFORM_WIN32)
+#pragma warning(pop)
 #endif
 
+// using namespace glh;
+
+glh::glut_perspective_reshaper reshaper;
+glh::glut_callbacks cb;
+
+// #include <XnLog.h>
 #include "Capture.h"
 #include "Draw.h"
 #include "Keyboard.h"
@@ -93,18 +114,19 @@ IntPair windowSize;
 
 int currentFrame = 0;
 std::set<int> *viewerOmittedFrames;
+char *omittedFramesFilename = NULL;
 
 // --------------------------------
 // Utilities
 // --------------------------------
 void motionCallback(int x, int y)
 {
-	mouseInputMotion(x, y);
+	mouseInputMotion(int((double)x/windowSize.X*WIN_SIZE_X), int((double)y/windowSize.Y*WIN_SIZE_Y));
 }
 
 void mouseCallback(int button, int state, int x, int y)
 {
-	mouseInputButton(button, state, x, y);
+	mouseInputButton(button, state, int((double)x/windowSize.X*WIN_SIZE_X), int((double)y/windowSize.Y*WIN_SIZE_Y));
 }
 
 void keyboardCallback(unsigned char key, int /*x*/, int /*y*/)
@@ -137,14 +159,6 @@ void keyboardSpecialCallback(int key, int /*x*/, int /*y*/)
 
 void reshapeCallback(int width, int height)
 {
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	gluPerspective(20, (GLdouble)width / height, 1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	
 	windowSize.X = width;
 	windowSize.Y = height;
 	windowReshaped(width, height);
@@ -286,20 +300,17 @@ void createKeyboardMap()
  		startKeyboardGroup(KEYBOARD_GROUP_DEVICE);
  		{
 			registerKey('y', "Frame sync on/off", toggleFrameSync, 0);
-			registerKey('z', "Zoom crop on/off", toggleZoomCrop, 0);
-			
  			registerKey('m', "Mirror on/off", toggleMirror, 0);
  			registerKey('/', "Reset all croppings", resetAllCropping, 0);
 
-			registerKey('a', "Toggle Auto Exposure", toggleImageAutoExposure, 0);
-			registerKey('q', "Toggle AWB", toggleImageAutoWhiteBalance, 0);
+			registerKey('a', "toggle Auto Exposure", toggleImageAutoExposure, 0);
+			registerKey('q', "toggle AWB", toggleImageAutoWhiteBalance, 0);
 			registerKey('e', "Increase Exposure", changeImageExposure, 1);
 			registerKey('E', "Decrease Exposure", changeImageExposure, -1);
 			registerKey('g', "Increase Gain", changeImageGain, 10);
 			registerKey('G', "Decrease Gain", changeImageGain, -10);
 
-			registerKey('x', "Toggle Close Range", toggleCloseRange, 0);
-			registerKey('t', "IR Emitter on/off", toggleEmitterState, 0);
+			registerKey('x', "Close Range", toggleCloseRange, 0);
 			registerKey('i', "Toggle Image Registration", toggleImageRegistration, 0);
  		}
  		endKeyboardGroup();
@@ -315,7 +326,6 @@ void createKeyboardMap()
 		{
 			registerKey('p', "Pointer Mode On/Off", togglePointerMode, 0);
 			registerKey('f', "Full Screen On/Off", toggleFullScreen, 0);
-			registerKey('h', "Reset IR histogram", resetIRHistogram, 0);
 			registerKey('?', "Show/Hide Help screen", toggleHelpScreen, 0);
 		}
 		endKeyboardGroup();
@@ -386,7 +396,6 @@ void createMenu()
 				}
 			}
 			endSubMenu();
-			createMenuEntry("Reset IR histogram", resetIRHistogram, 0);
 			createMenuEntry("Pointer Mode On/Off", togglePointerMode, 0);
 			createMenuEntry("Show/Hide Help Screen", toggleHelpScreen, 0);
 		}
@@ -544,9 +553,9 @@ void createMenu()
 	endMenu();
 }
 
-void onExit(const char* omittedFramesFilename)
+void onExit()
 {
-	writeOmittedFramesToFile (*viewerOmittedFrames, omittedFramesFilename);
+	writeOmittedFramesToFile ();
 
 	closeDevice();
 	captureStop(0);
@@ -578,7 +587,7 @@ void destroyOmittedFrameSet () {
 	delete viewerOmittedFrames;
 }
 
-void initLaunchViewer(char* oniFile, const char* omittedFramesFile) {
+void initLaunchViewer(char* oniFile) {
 	initOmittedFrameSet();
 
 	XnBool bChooseDevice = FALSE;
@@ -613,21 +622,28 @@ void initLaunchViewer(char* oniFile, const char* omittedFramesFile) {
 
  	captureInit();
 
+	reshaper.zNear = 1;
+	reshaper.zFar = 100;
+	glut_add_interactor(&reshaper);
+
+	cb.mouse_function = mouseCallback;
+	cb.motion_function = motionCallback;
+	cb.passive_motion_function = motionCallback;
+	cb.keyboard_function = keyboardCallback;
+	cb.special_function  = keyboardSpecialCallback;
+	cb.reshape_function = reshapeCallback;
+	glut_add_interactor(&cb);
+
 	glutInit(&noArgs, oniFilePtr);
 	glutInitDisplayString("stencil double rgb");
-	glutInitWindowSize(1280, 1024);
+	glutInitWindowSize(WIN_SIZE_X, WIN_SIZE_Y);
 	glutCreateWindow("OpenNI Viewer");
 	glutFullScreen();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
 	init_opengl();
 
-	glutMouseFunc(mouseCallback);
-	glutMotionFunc(motionCallback);
-	glutPassiveMotionFunc(motionCallback);
-	glutKeyboardFunc(keyboardCallback);
-	glutSpecialFunc(keyboardSpecialCallback);
-	glutReshapeFunc(reshapeCallback);
+	glh::glut_helpers_initialize();
 
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(drawFrame);
@@ -636,8 +652,8 @@ void initLaunchViewer(char* oniFile, const char* omittedFramesFile) {
 	createKeyboardMap();
 	createMenu();
 
-	// atexit(onExit(omittedFramesFile));
-	// onExit(omittedFramesFile);
+	atexit(onExit);
+	// onExit();
 	
 	// Per frame code is in drawFrame()
 	glutMainLoop();
@@ -648,27 +664,39 @@ void initLaunchViewer(char* oniFile, const char* omittedFramesFile) {
 	return ;
 }
 
-void writeOmittedFramesToFile (const std::set<int>& omittedFrames, const char *filename) {
+void writeOmittedFramesToFile () {
 	std::ofstream ofs;
-	ofs.open (filename);
+	ofs.open (omittedFramesFilename);
 
 	if (ofs.good()) {
-		std::set<int>::iterator itr = omittedFrames.begin();
+		std::set<int>::iterator itr = viewerOmittedFrames->begin();
 
-		if (omittedFrames.size() > 0) {
-			ofs << omittedFrames.size() << '\n';
+		if (viewerOmittedFrames->size() > 0) {
+			ofs << viewerOmittedFrames->size() << "\n\n";
 
-			for (itr; itr != omittedFrames.end(); ++itr) {
+			for (itr; itr != viewerOmittedFrames->end(); ++itr) {
 				ofs << *itr << '\n';
 			}
 		}
 	} else {
 		// error opening file
 	}
-
+	ofs.close();
+	
 	return;
 }
 
-// int main (int argc, char* argv[]) {
-// 	initLaunchViewer (argv[1], argv[2]);
-// }
+int main (int argc, char* argv[]) {
+	if (argc < 3) {
+		std::cerr << "\nNot enough arguments provided. Input should be in the format:\n" \
+			"\t./viewer <.oni filename> <omitted frames output filename>\n\n";
+		return (-1);
+	}
+
+	// get the omitted frames filename from the second argument passed
+	// at the command line
+	omittedFramesFilename = argv[2];
+	// std::cout << "\nOmit-> " << omittedFramesFilename << '\n';
+
+	initLaunchViewer(argv[1]);
+}

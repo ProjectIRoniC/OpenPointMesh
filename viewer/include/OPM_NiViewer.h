@@ -9,6 +9,7 @@
  */
 extern std::set<int> *viewerOmittedFrames;
 extern int currentFrame;
+extern char *omittedFramesFilename;
 
 // --------------------------------
 // Defines
@@ -84,8 +85,8 @@ std::set<int> getOmittedFrameSet ();
 
 void destroyOmittedFrameSet ();
 
-void initLaunchViewer (char* oniFile, const char* omittedFramesFile );
+void initLaunchViewer (char* oniFile );
 
-void writeOmittedFramesToFile(const std::set<int>& omittedFrames, const char *filename);
+void writeOmittedFramesToFile();
 
 #endif

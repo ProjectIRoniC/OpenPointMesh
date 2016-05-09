@@ -21,7 +21,7 @@ vba::OniToPcd::OniToPcd()
 	, outputDirPath( "output" )
 	, outputBuffer( NULL )
 	, redirectOutputFlag( false )
-	, ommittedFrames()
+	, omittedFrames()
 	, debugMode( false )
 {
 	init();
@@ -50,12 +50,12 @@ vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModu
 * @param: frameSkipModulus - how many frames to skip between reading a frame
 * @param: omitFrames - frames to be excluded from sampling
 */
-vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& _ommittedFrames )
+vba::OniToPcd::OniToPcd( std::string outputDirectoryPath, unsigned frameSkipModulus, boost::lockfree::spsc_queue<std::string>* _outputBuffer, const std::set<int>& _omittedFrames )
 	: frameSkip( frameSkipModulus )
 	, outputDirPath( outputDirectoryPath )
 	, outputBuffer( _outputBuffer )
 	, redirectOutputFlag( true )
-	, ommittedFrames(_ommittedFrames)
+	, omittedFrames(_omittedFrames)
 {
 	setDebugMode( false );
 	init();
@@ -104,9 +104,9 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 	this->frameSkip = framesToSkip;
 }
 
-void vba::OniToPcd::setOmmittedFrames( const std::set<int>& of ) 
+void vba::OniToPcd::setOmittedFrames( const std::set<int>& of ) 
 {
-	this->ommittedFrames = of;  
+	this->omittedFrames = of;  
 }
 
 /*Public facing function that sets debug mode to true for testing purposes.
@@ -137,10 +137,10 @@ bool vba::OniToPcd::minimumSamplingRate (int sampleRate)
 ///////////////////////////////////////////////////////////////////////////////////////
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
-	for (std::set<int>::iterator it=this->ommittedFrames.begin(); it != this->ommittedFrames.end(); ++it)
-	{
-		std::cout << '\n' << *it << '\n';
-	}
+	// for (std::set<int>::iterator it=this->omittedFrames.begin(); it != this->omittedFrames.end(); ++it)
+	// {
+	// 	std::cout << '\n' << *it << '\n';
+	// }
     
 	// Open the .oni file
 	openni::Device device;
@@ -274,15 +274,18 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 		const long frameIndex = depthStreamFrame.getFrameIndex();
 
 		// Skip unneeded frames
-		if( frameIndex % frameSkip == 0 )
+		if( *(this->omittedFrames.find(frameIndex)) == *(this->omittedFrames.end()) )
 		{
-			// Get the video stream field of view
-			const float fov_x = depthStream.getHorizontalFieldOfView();
-			const float fov_y = depthStream.getVerticalFieldOfView();
-			
-			// Output needed frame data
-			outputFrameToCsv( out, depthStreamFrame );
-			outputFrameToPcd<pcl::PointXYZRGBA>( pointCloudOutputDirectory + '/', &device, depthStreamFrame, colorStreamFrame, fov_x, fov_y );
+			if(frameIndex % frameSkip == 0 ) {
+	                        std::cout<<"Frame Number: " << frameIndex << '\n';
+				// Get the video stream field of view
+				const float fov_x = depthStream.getHorizontalFieldOfView();
+				const float fov_y = depthStream.getVerticalFieldOfView();
+				
+				// Output needed frame data
+				outputFrameToCsv( out, depthStreamFrame );
+				outputFrameToPcd<pcl::PointXYZRGBA>( pointCloudOutputDirectory + '/', &device, depthStreamFrame, colorStreamFrame, fov_x, fov_y );
+			}
 		}
 		else
 		{

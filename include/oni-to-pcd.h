@@ -61,14 +61,24 @@ namespace vba
 			int getDebugMode() { return debugMode; }
 			
 			int outputOniData( const std::string inputFile );
-			
-			static bool minimumSamplingRate (int sampleRate);
-			
-			void setOmmittedFrames( const std::set<int>& of );
+
+			/*Public facing function that checks if a value meets the minimum frame sampling rate
+			 *
+			 * @param: The positive integer frame sampling rate to check
+			 *
+			 * @return: returns true if the value provided meets or is greater than the minimum value
+			 *			returns false if the value provided is less than the minimum value
+			 */
+      static bool minimumSamplingRate (int sampleRate);
+
+			void setOmittedFrames( const std::set<int>& of );
 			
 		private:
+			/*Performs class setup actions
+			 * 
+			 */
 			void init();
-			
+
 			void sendOutput( const std::string& output, const bool error );
 			
 			void outputFrameToCsv( std::ofstream& outFileStream, const openni::VideoFrameRef frameReference );
@@ -85,7 +95,7 @@ namespace vba
 			std::string outputDirPath;								//!< Directory to put all output files
 			boost::lockfree::spsc_queue<std::string>* outputBuffer;	//!< Function Pointer to message output buffer
 			bool redirectOutputFlag;								//!< True to redirct display messages to the output buffer, false otherwise
-			std::set<int> ommittedFrames;
+			std::set<int> omittedFrames;
 			bool debugMode;
 	};
 };
