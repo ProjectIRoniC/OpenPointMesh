@@ -24,7 +24,7 @@ int main( int argc, char* argv[] )
 
     if(File.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        //a.setStyleSheet(File.readAll());
+        a.setStyleSheet(File.readAll());
         File.close();
     }
     else
