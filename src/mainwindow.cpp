@@ -551,20 +551,10 @@ void MainWindow::omitFramesController()
     /* omitFileName is a QString that contains absolute path to omit file user has selected */
 
     char oniFileName [oniFileNames[0].length()];
-    char *omittedFramesFile = "omittedFrames.off";   // TODO: replace with GUI fed omitted frames file
 
     strcpy (oniFileName, oniFileNames[0].toStdString().c_str());
 
-    this->omittedFrames = readOmittedFramesFile (omittedFramesFile);
-
-    // initLaunchViewer (oniFileName, omittedFramesFile);
-    // this->ommittedFrames.push_back( getOmittedFrameSet() );
-    // destroyOmittedFrameSet();
-
-    // for (std::set<int>::iterator itr = this->omittedFrames.begin();
-    //     itr != this->omittedFrames.end(); ++itr) {
-    //     std::cout << "\n" << *itr << ".";
-    // }
+    this->omittedFrames = readOmittedFramesFile (this->omitFileName.toStdString().c_str());
 
     emit omitFramesFinished( ONITOPCD );
 }
@@ -594,7 +584,7 @@ bool MainWindow::hasStartedWorkingOnFile()
     return workingOnFile;
 }
 
-std::set<int> MainWindow::readOmittedFramesFile ( char* filename ) {
+std::set<int> MainWindow::readOmittedFramesFile ( const char* filename ) {
     std::ifstream ifs;
     ifs.open (filename);
     int frameNumber = -1,

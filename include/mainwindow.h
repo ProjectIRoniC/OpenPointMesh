@@ -75,7 +75,7 @@ public:
     bool hasStartedWorkingOnFile();
 
     //// @brief reads a file containing omitted frames
-    std::set<int> readOmittedFramesFile ( char* filename );
+    std::set<int> readOmittedFramesFile ( const char* filename );
 
 private:
     /*

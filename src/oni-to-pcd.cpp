@@ -72,7 +72,6 @@ void vba::OniToPcd::setFrameSkip( const int framesToSkip )
 
 void vba::OniToPcd::setOmittedFrames( const std::set<int>& of ) 
 {
-	std::cout << "In omit frame set func";
 	this->omittedFrames = of;  
 	// for (std::set<int>::iterator itr = of.begin(); itr != of.end(); ++itr) {
 	// 	std::cout << *itr << " _ _ _ 888888";
@@ -86,12 +85,6 @@ void vba::OniToPcd::setDebugMode( bool debugBool )
 
 int vba::OniToPcd::outputOniData( const std::string inputFile )
 {
-
-	   //  for (std::set<int>::iterator it=this->omittedFrames.begin(); it != this->omittedFrames.end(); ++it) {
-    //     std::cout << "7777777" << *it << '\n';
-    // }
-
-
 	// Open the .oni file
 	openni::Device device;
 	openni::Status rc = device.open( inputFile.c_str() );
@@ -225,10 +218,11 @@ int vba::OniToPcd::outputOniData( const std::string inputFile )
 		const long frameIndex = depthStreamFrame.getFrameIndex();
                 whileFrameIndex = frameIndex;
 		// Skip unneeded frames
-		if( *(this->omittedFrames.find(frameIndex)) == *(this->omittedFrames.end()) )
-		{
-			if(frameIndex % frameSkip == 0 ) {
-	                        std::cout<<"Frame Number: " << frameIndex << '\n';
+		if(frameIndex % frameSkip == 0 ) 
+		{          
+			if( *(this->omittedFrames.find(frameIndex)) == *(this->omittedFrames.end()) )
+			{
+        std::cout<<"Frame Number: " << frameIndex << '\n';
 				// Get the video stream field of view
 				const float fov_x = depthStream.getHorizontalFieldOfView();
 				const float fov_y = depthStream.getVerticalFieldOfView();
