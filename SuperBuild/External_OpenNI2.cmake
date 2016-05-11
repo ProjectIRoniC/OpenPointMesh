@@ -306,6 +306,16 @@ ExternalProject_Add_Step( ${proj} build_OniFile
 	DEPENDERS install
 )
 
+IF( BUILD_SHARED_LIBS )
+	# this custom step is to copy the OpenNI2 library folder to the main project runtime directory
+	ExternalProject_Add_Step( ${proj} copy_openni2_libraries_to_main_project_runtime_directory
+		COMMAND ${CMAKE_COMMAND}
+				-E copy_directory ${${proj}_LIBRARY_INSTALL_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+
+			DEPENDEES install
+	)
+ENDIF()
+
 ### --- Set binary information
 SET( OPENNI2_DIR ${${proj}_INSTALL_DIR} )
 SET( OPENNI2_SOURCE_DIR ${${proj}_SOURCE_DIR} )

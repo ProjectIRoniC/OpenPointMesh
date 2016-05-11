@@ -92,6 +92,16 @@ ExternalProject_Add( ${proj}
 	DEPENDS				${${proj}_DEPENDENCIES}
 )
 
+IF( BUILD_SHARED_LIBS )
+	# this custom step is to copy the Boost library folder to the main project runtime directory
+	ExternalProject_Add_Step( ${proj} copy_boost_libraries_to_main_project_runtime_directory
+		COMMAND ${CMAKE_COMMAND}
+				-E copy_directory ${${proj}_LIBRARY_INSTALL_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+
+			DEPENDEES install
+	)
+ENDIF()
+
 ### --- Set binary information
 SET( BOOST_DIR ${${proj}_INSTALL_DIR} )
 SET( BOOST_BUILD_DIR ${${proj}_BUILD_DIR} )
